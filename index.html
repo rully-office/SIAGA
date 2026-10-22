@@ -2074,6 +2074,34 @@ html[data-theme="dark"] .gf-proj-note strong{color:#5CC8FF}
 .gf-exp .sm-exp-m button small{font-size:10.5px;font-weight:500;color:var(--muted)}
 .gf-c{width:100%;height:auto;aspect-ratio:16/9;display:block;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
 .gf-c.gf-c-all{aspect-ratio:1600/1240}
+.gf-mode.hyb{background:rgba(217,119,6,.14);color:#B45309}
+.gf-inp-prog{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid var(--border-2,var(--border));background:var(--surface-2,var(--surface));color:var(--fg-2,var(--text));white-space:nowrap}
+.gf-inp-prog strong{font-weight:800;color:var(--fg,var(--text))}
+.gf-inp-prog.partial{border-color:rgba(217,119,6,.35);background:rgba(217,119,6,.07)}
+.gf-inp-prog.partial strong{color:#B45309}
+.gf-inp-prog.full{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.08);color:#047857}
+.gf-inp-prog.full strong{color:#047857}
+html[data-theme="dark"] .gf-mode.hyb{background:rgba(251,191,36,.16);color:#FBBF24}
+html[data-theme="dark"] .gf-inp-prog.partial{border-color:rgba(251,191,36,.32);background:rgba(251,191,36,.09)}
+html[data-theme="dark"] .gf-inp-prog.partial strong{color:#FBBF24}
+html[data-theme="dark"] .gf-inp-prog.full{border-color:rgba(52,211,153,.32);background:rgba(52,211,153,.10);color:#34D399}
+html[data-theme="dark"] .gf-inp-prog.full strong{color:#34D399}
+#tt.gf-tt{max-width:368px;min-width:258px;padding:9px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 28px rgba(0,0,0,.38);line-height:1.45}
+.gf-tt-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:2px}
+.gf-tt-nm{font-weight:800;font-size:12.5px;color:#fff}
+.gf-tt-bdg{padding:1px 6px;border-radius:999px;font-size:9.5px;font-weight:800;letter-spacing:.04em}
+.gf-tt-bdg.norm{background:rgba(56,189,248,.22);color:#7DD3FC}
+.gf-tt-bdg.siaga{background:rgba(251,191,36,.24);color:#FDE68A}
+.gf-tt-bdg.emerg{background:rgba(248,113,113,.26);color:#FCA5A5}
+.gf-tt-sub{font-size:10.5px;color:rgba(255,255,255,.68);padding-bottom:5px;margin-bottom:5px;border-bottom:1px solid rgba(255,255,255,.12)}
+.gf-tt-sub em{font-style:normal;color:#FCD34D;font-weight:600}
+.gf-tt-tot{margin-top:3px;padding-top:3px;border-top:1px dashed rgba(255,255,255,.15)}
+.gf-tt-sec{margin-top:6px;padding-top:5px;border-top:1px solid rgba(255,255,255,.12)}
+.gf-tt-shd{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.62);margin-bottom:2px}
+.gf-tt-sh{font-size:10.8px;color:rgba(255,255,255,.92);display:flex;justify-content:space-between;gap:8px;padding:1px 0}
+.gf-tt-sh span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gf-tt-sh span:last-child{flex:none;color:#E2E8F0;font-weight:600}
+.gf-tt-more{font-size:10px;color:rgba(255,255,255,.55);font-style:italic;margin-top:1px}
 </style>
 </head>
 <body>
@@ -4319,9 +4347,10 @@ function moveTT(e){
   if (y + h > innerHeight - 8) y = innerHeight - h - 8;
   tt.style.left = x + 'px'; tt.style.top = Math.max(8,y) + 'px';
 }
-function hideTT(){ tt.classList.remove('on'); }
+function hideTT(){ tt.classList.remove('on', 'gf-tt'); }
 function hasTTTarget(el){
   if (!el || !el.closest) return false;
+  if (el.closest('canvas.gf-c')) return true;
   const hc = el.closest('td.hopc');
   if (hc && hc.dataset.unit && HOPBY && HOPBY[hc.dataset.unit] && HOPBY[hc.dataset.unit].seri[hc.dataset.d]) return true;
   const td = el.closest('td.d');
@@ -7678,8 +7707,29 @@ function gfLocalBongkarCorr(u, targetDate){
   return { inHop:inHop, grossHop:cur.pbHop, remFactor:remFactor, cLast:cLoc };
 }
 
-/* hitung proyeksi 1 PLTU pada tanggal D > realToday dengan pembongkaran bertahap (1/3 per hari selama 3 hari):
-   - setiap tambahan % bongkar yang masuk Stock Efektif otomatis mengurangi sisa Stock Apung (zero double counting) */
+/* cek apakah unit sudah memiliki input Stock Efektif aktual pada tanggal d */
+function gfHasActualOnDate(u, h, d){
+  if (!u || !d) return false;
+  const ser = (h && h.seri) || {};
+  if (ser[d] && ser[d].actual && isFinite(ser[d].v)) return true;
+  if (u.tgl && d === u.tgl && u.base != null && isFinite(Number(u.base))) return true;
+  if (u.tgl && d < u.tgl && ser[d] && ser[d].v != null && isFinite(ser[d].v)) return true;
+  return false;
+}
+function gfInputProgress(targetDate){
+  const units = (HOPDATA && HOPDATA.units) || [];
+  let act = 0, tot = 0;
+  units.forEach(u => {
+    const h = HOPBY && HOPBY[u.pltu];
+    if (!h) return;
+    tot++;
+    if (gfHasActualOnDate(u, h, targetDate)) act++;
+  });
+  return { act:act, tot:tot, est:Math.max(0, tot - act) };
+}
+
+/* hitung proyeksi 1 PLTU pada tanggal D (baik > realToday maupun hibrida <= realToday saat aktual belum diinput)
+   dengan pembongkaran bertahap (1/3 per hari selama 3 hari) & konservasi massa Stock Apung */
 function gfEvalProjOnDate(u, unitShips, D, realToday){
   const h = HOPBY && HOPBY[u.pltu];
   const p0 = EW.project(u, {}, [], {});
@@ -7697,7 +7747,7 @@ function gfEvalProjOnDate(u, unitShips, D, realToday){
   const ships = unitShips || [];
   const addDay = {};
   let ap = 0, sl = 0;
-  const sailingShips = [];
+  const sailingShips = [], portList = [];
 
   ships.forEach(sh => {
     if (!sh.diPelabuhan && !sh.praTiba && tglPlus(sh.pod, nBongkar - 1) <= tBase) return;
@@ -7710,20 +7760,24 @@ function gfEvalProjOnDate(u, unitShips, D, realToday){
       const remDays = Math.max(1, Math.min(nBongkar, Math.ceil(corr.remFactor * nBongkar)));
       const perDay = remHop / remDays;
       const startD = tglPlus(tBase, 1);
+      let remOnD = 0;
       for (let k = 0; k < remDays; k++){
         const dU = tglPlus(startD, k);
         addDay[dU] = (addDay[dU] || 0) + perDay;
-        if (dU > D) ap += perDay;
+        if (dU > D){ ap += perDay; remOnD += perDay; }
       }
+      if (remOnD > 0.02) portList.push({ nom:sh.nom || 'TBN', sup:sh.sup || '—', vol:Math.round(remOnD * bagi), hop:remOnD, status:sh.status });
     } else if (sh.diPelabuhan && sh.pod <= tBase){
       /* kapal di pelabuhan hari ini: bongkar bertahap nBongkar hari mulai tBase + 1 */
       const perDay = fullHop / nBongkar;
       const startD = tglPlus(tBase, 1);
+      let remOnD = 0;
       for (let k = 0; k < nBongkar; k++){
         const dU = tglPlus(startD, k);
         addDay[dU] = (addDay[dU] || 0) + perDay;
-        if (dU > D) ap += perDay;
+        if (dU > D){ ap += perDay; remOnD += perDay; }
       }
+      if (remOnD > 0.02) portList.push({ nom:sh.nom || 'TBN', sup:sh.sup || '—', vol:Math.round(remOnD * bagi), hop:remOnD, status:sh.status });
     } else {
       /* kapal tiba sesudah tBase: bongkar bertahap nBongkar hari sejak ETA POD (pod, pod+1, pod+2) */
       const startD = sh.pod > tBase ? sh.pod : tglPlus(tBase, 1);
@@ -7738,9 +7792,11 @@ function gfEvalProjOnDate(u, unitShips, D, realToday){
           sailingShips.push(sh);
         }
       } else {
+        let remOnD = 0;
         for (let k = 0; k < nBongkar; k++){
-          if (tglPlus(startD, k) > D) ap += perDay;
+          if (tglPlus(startD, k) > D){ ap += perDay; remOnD += perDay; }
         }
+        if (remOnD > 0.02) portList.push({ nom:sh.nom || 'TBN', sup:sh.sup || '—', vol:Math.round(remOnD * bagi), hop:remOnD, status:'Bongkar Bertahap' });
       }
     }
   });
@@ -7749,80 +7805,159 @@ function gfEvalProjOnDate(u, unitShips, D, realToday){
   for (let d = tglPlus(tBase, 1); d <= D; d = tglPlus(d, 1)){
     ef = Math.max(0, ef - burnHop) + (addDay[d] || 0);
   }
-  let ann = null, pem = '';
+  let ann = null, pem = '', sailMt = 0;
+  const sailList = [];
   if (sl >= 0.05 && sailingShips.length){
-    let next = null;
-    sailingShips.forEach(sh => {
-      if (!sh.pod) return;
-      if (!next || sh.pod < next.pod) next = sh;
-    });
+    const sortedSail = sailingShips.slice().sort((a, b) => (!a.pod ? 1 : (!b.pod ? -1 : (a.pod < b.pod ? -1 : 1))));
+    const next = sortedSail.find(sh => !!sh.pod) || null;
     if (next) ann = { n:Math.max(1, simDD(next.pod, D)), rb:(Number(next.vol) || 0) / 1000 };
-    else ann = { n:null, rb:(Number(sailingShips[0].vol) || 0) / 1000 };
+    else ann = { n:null, rb:(Number(sortedSail[0].vol) || 0) / 1000 };
     const names = [];
-    sailingShips.forEach(sh => { const nm = String(sh.sup || '—').trim() || '—'; if (names.indexOf(nm) < 0) names.push(nm); });
-    const tot = sailingShips.reduce((a, sh) => a + (Number(sh.vol) || 0), 0);
-    pem = names.join(', ') + ' (' + sailingShips.length + ' tkg: ' + gfN(tot) + ' MT)';
+    sortedSail.forEach(sh => {
+      const nm = String(sh.sup || '—').trim() || '—';
+      if (names.indexOf(nm) < 0) names.push(nm);
+      const v = Number(sh.vol) || 0;
+      sailMt += v;
+      sailList.push({
+        nom:sh.nom || 'TBN', sup:nm, vol:v, hop:bagi > 0 ? (v / bagi) : 0,
+        eta:sh.pod || null, nHari:sh.pod ? Math.max(1, simDD(sh.pod, D)) : null
+      });
+    });
+    pem = names.join(', ') + ' (' + sailingShips.length + ' tkg: ' + gfN(sailMt) + ' MT)';
   }
-  return { ef:Math.max(0, ef), ap:Math.max(0, ap), sl:Math.max(0, sl), ann:ann, pem:pem };
+  return {
+    ef:Math.max(0, ef), ap:Math.max(0, ap), sl:Math.max(0, sl), ann:ann, pem:pem,
+    portList:portList, sailList:sailList, sailCnt:sailList.length, sailMt:sailMt
+  };
 }
 
-function gfBuildRegRows(reg, targetDate, realToday, projMap){
+function gfBuildRegRows(reg, targetDate, realToday, shipMap, optProjMap){
   const w = (WILAYAH || []).filter(x => x.k === reg)[0];
   const rank = k => { const b = wilInduk(k).toLowerCase(); const l = w ? w.l : []; const i = l.findIndex(x => x.toLowerCase() === b); return i < 0 ? 999 : i; };
   const units = HOPDATA.units.filter(u => wilOf(u.pltu) === reg)
     .slice().sort((a, b) => rank(a.pltu) - rank(b.pltu) || (a.pltu < b.pltu ? -1 : 1));
   const isProj = !!(targetDate && targetDate > realToday);
   const kemarin = tglPlus(targetDate, -1);
+  let lazyProjMap = optProjMap || null;
+  const getProjMap = () => {
+    if (!lazyProjMap) lazyProjMap = gfCollectProjShips(realToday);
+    return lazyProjMap;
+  };
   const rows = [];
   units.forEach(u => {
     const h = HOPBY[u.pltu]; if (!h) return;
+    const burn = Number(u.bagi) || 0;
+    const pakaiEst = typeof simPakaiEst === 'function' ? simPakaiEst(u) : { ok:false, mt:0 };
+    const pakaiMt = (pakaiEst && pakaiEst.ok && pakaiEst.mt > 0) ? Math.round(pakaiEst.mt) : Math.round(Number(u.pakai) || 0);
+    const ser = h.seri || {};
     if (!isProj){
-      /* mode aktual / historis (<= hari ini): otomatis menggunakan Koreksi Bongkar agar tidak double-counting */
-      const ser = h.seri || {};
-      const kini = (targetDate === S.today) ? hopKini(h) : ((ser[targetDate] && ser[targetDate].v != null) ? ser[targetDate].v : hopKini(h));
-      const vk = ser[kemarin];
-      let dTxt = '0,0', dir = 'same';
-      if (kini != null && vk && vk.v != null && isFinite(kini) && isFinite(vk.v)){
-        const dv = Math.round((kini - vk.v) * 10) / 10;
-        dTxt = gfF1(dv);
-        if (dv > 0.05) dir = 'up'; else if (dv < -0.05) dir = 'down';
-      }
-      const burn = Number(u.bagi) || 0;
-      const corr = gfLocalBongkarCorr(u, targetDate);
-      let ap = 0, sl = 0;
-      const ships = (projMap ? projMap[u.pltu] : (SHIPBY && SHIPBY[u.pltu])) || [], sailingShips = [];
+      /* cek apakah PLTU ini sudah input Stock Efektif aktual pada targetDate;
+         bila belum (mis. tanggal 23 pagi saat data terakhir di Sheet masih tanggal 22),
+         gunakan Hibrida Proyeksi per PLTU agar bar & delta ▲/▼ tetap akurat dan tidak 0,0 palsu */
+      const hasAct = gfHasActualOnDate(u, h, targetDate);
+      const ships = (shipMap ? shipMap[u.pltu] : (SHIPBY && SHIPBY[u.pltu])) || [];
+      let sl = 0, sailMt = 0;
+      const sailingShips = [], sailList = [];
       ships.forEach(sh => {
         const days = burn > 0 ? (Number(sh.vol) || 0) / burn : 0;
-        if (sh.status === 'Proses Bongkar' || sh.status === 'Bongkar') ap += days * corr.remFactor;
-        else if (sh.cert === 'di_pelabuhan') ap += days;
-        else if (sh.cert === 'berlayar'){
+        if (sh.cert === 'berlayar'){
           sl += days;
           if (days > 0) sailingShips.push(sh);
         }
       });
       let ann = null, pem = '';
       if (sl >= 0.05 && sailingShips.length){
-        let next = null;
-        sailingShips.forEach(sh => {
-          if (!sh.awal) return;
-          if (!next || sh.awal < next.awal) next = sh;
-        });
+        const sortedSail = sailingShips.slice().sort((a, b) => (!a.awal ? 1 : (!b.awal ? -1 : (a.awal < b.awal ? -1 : 1))));
+        const next = sortedSail.find(sh => !!sh.awal) || null;
         if (next) ann = { n:Math.max(1, Math.round((toDate(next.awal) - toDate(targetDate)) / 86400000)), rb:(Number(next.vol) || 0) / 1000 };
-        else ann = { n:null, rb:(Number(sailingShips[0].vol) || 0) / 1000 };
+        else ann = { n:null, rb:(Number(sortedSail[0].vol) || 0) / 1000 };
         const names = [];
-        sailingShips.forEach(sh => { const nm = String(sh.sup || '—').trim() || '—'; if (names.indexOf(nm) < 0) names.push(nm); });
-        const tot = sailingShips.reduce((a, sh) => a + (Number(sh.vol) || 0), 0);
-        pem = names.join(', ') + ' (' + sailingShips.length + ' tkg: ' + gfN(tot) + ' MT)';
+        sortedSail.forEach(sh => {
+          const nm = String(sh.sup || '—').trim() || '—';
+          if (names.indexOf(nm) < 0) names.push(nm);
+          const v = Number(sh.vol) || 0;
+          sailMt += v;
+          sailList.push({
+            nom:sh.nom || 'TBN', sup:nm, vol:v, hop:burn > 0 ? (v / burn) : 0,
+            eta:sh.awal || null, nHari:sh.awal ? Math.max(1, Math.round((toDate(sh.awal) - toDate(targetDate)) / 86400000)) : null
+          });
+        });
+        pem = names.join(', ') + ' (' + sailingShips.length + ' tkg: ' + gfN(sailMt) + ' MT)';
       }
-      rows.push({ nm:u.pltu, dTxt:dTxt, dir:dir, ef:Math.max(0, Number(kini) || 0), ap:Math.max(0, ap), sl:Math.max(0, sl), ann:ann, pem:pem });
+
+      if (hasAct){
+        const kini = (ser[targetDate] && ser[targetDate].v != null && isFinite(ser[targetDate].v))
+          ? Number(ser[targetDate].v)
+          : ((u.tgl === targetDate && u.base != null) ? Number(u.base) : Number(hopKini(h)));
+        const vk = ser[kemarin];
+        let dTxt = '0,0', dir = 'same';
+        if (kini != null && vk && vk.v != null && isFinite(kini) && isFinite(vk.v)){
+          const dv = Math.round((kini - vk.v) * 10) / 10;
+          dTxt = gfF1(dv);
+          if (dv > 0.05) dir = 'up'; else if (dv < -0.05) dir = 'down';
+        }
+        const corr = gfLocalBongkarCorr(u, targetDate);
+        let ap = 0;
+        const portList = [];
+        ships.forEach(sh => {
+          const v = Number(sh.vol) || 0;
+          const days = burn > 0 ? v / burn : 0;
+          if (sh.status === 'Proses Bongkar' || sh.status === 'Bongkar'){
+            const hRem = days * corr.remFactor;
+            ap += hRem;
+            if (hRem > 0.02) portList.push({ nom:sh.nom || 'TBN', sup:sh.sup || '—', vol:Math.round(v * corr.remFactor), hop:hRem, status:sh.status });
+          } else if (sh.cert === 'di_pelabuhan'){
+            ap += days;
+            if (days > 0.02) portList.push({ nom:sh.nom || 'TBN', sup:sh.sup || '—', vol:Math.round(v), hop:days, status:sh.status });
+          }
+        });
+        const efVal = Math.max(0, Number(kini) || 0), apVal = Math.max(0, ap), slVal = Math.max(0, sl);
+        rows.push({
+          nm:u.pltu, dTxt:dTxt, dir:dir, ef:efVal, ap:apVal, sl:slVal, ann:ann, pem:pem,
+          est:false, burn:burn, pakaiMt:pakaiMt,
+          efMt:Math.round(efVal * burn), apMt:Math.round(apVal * burn), slMt:Math.round(slVal * burn),
+          lastActTgl:u.tgl || targetDate, lastActVal:efVal,
+          portList:portList, sailList:sailList, sailCnt:sailList.length, sailMt:sailMt
+        });
+      } else {
+        /* Hibrida Proyeksi: estimasi sementara ef & ap dari stok aktual terakhir (u.tgl),
+           sedangkan Stock Sailing tetap menggunakan kapal 'Sailing' aktual hari ini */
+        const pm = getProjMap();
+        const uProjShips = (pm && pm[u.pltu]) || [];
+        const curH = gfEvalProjOnDate(u, uProjShips, targetDate, realToday);
+        let prevEf = null;
+        if (gfHasActualOnDate(u, h, kemarin)){
+          prevEf = (ser[kemarin] && ser[kemarin].v != null && isFinite(ser[kemarin].v))
+            ? Number(ser[kemarin].v)
+            : ((u.tgl === kemarin && u.base != null) ? Number(u.base) : null);
+        } else {
+          prevEf = gfEvalProjOnDate(u, uProjShips, kemarin, realToday).ef;
+        }
+        let dTxt = '0,0', dir = 'same';
+        if (curH.ef != null && prevEf != null && isFinite(curH.ef) && isFinite(prevEf)){
+          const dv = Math.round((curH.ef - prevEf) * 10) / 10;
+          dTxt = gfF1(dv);
+          if (dv > 0.05) dir = 'up'; else if (dv < -0.05) dir = 'down';
+        }
+        const efVal = curH.ef, apVal = curH.ap, slVal = Math.max(0, sl);
+        rows.push({
+          nm:u.pltu, dTxt:dTxt, dir:dir, ef:efVal, ap:apVal, sl:slVal, ann:ann, pem:pem,
+          est:true, burn:burn, pakaiMt:pakaiMt,
+          efMt:Math.round(efVal * burn), apMt:Math.round(apVal * burn), slMt:Math.round(slVal * burn),
+          lastActTgl:u.tgl || '', lastActVal:(u.base != null && isFinite(Number(u.base))) ? Number(u.base) : null,
+          portList:curH.portList || [], sailList:sailList, sailCnt:sailList.length, sailMt:sailMt
+        });
+      }
     } else {
       /* mode proyeksi (> hari ini) */
-      const uShips = (projMap && projMap[u.pltu]) || [];
+      const pMap = optProjMap || shipMap;
+      const uShips = (pMap && pMap[u.pltu]) || [];
       const cur = gfEvalProjOnDate(u, uShips, targetDate, realToday);
       let prevEf;
-      if (kemarin <= realToday){
-        const ser = h.seri || {};
-        prevEf = (ser[kemarin] && ser[kemarin].v != null) ? ser[kemarin].v : hopKini(h);
+      if (kemarin <= realToday && gfHasActualOnDate(u, h, kemarin)){
+        prevEf = (ser[kemarin] && ser[kemarin].v != null && isFinite(ser[kemarin].v))
+          ? Number(ser[kemarin].v)
+          : ((u.tgl === kemarin && u.base != null) ? Number(u.base) : hopKini(h));
       } else {
         prevEf = gfEvalProjOnDate(u, uShips, kemarin, realToday).ef;
       }
@@ -7832,7 +7967,13 @@ function gfBuildRegRows(reg, targetDate, realToday, projMap){
         dTxt = gfF1(dv);
         if (dv > 0.05) dir = 'up'; else if (dv < -0.05) dir = 'down';
       }
-      rows.push({ nm:u.pltu, dTxt:dTxt, dir:dir, ef:cur.ef, ap:cur.ap, sl:cur.sl, ann:cur.ann, pem:cur.pem });
+      rows.push({
+        nm:u.pltu, dTxt:dTxt, dir:dir, ef:cur.ef, ap:cur.ap, sl:cur.sl, ann:cur.ann, pem:cur.pem,
+        est:false, burn:burn, pakaiMt:pakaiMt,
+        efMt:Math.round(cur.ef * burn), apMt:Math.round(cur.ap * burn), slMt:Math.round(cur.sl * burn),
+        lastActTgl:u.tgl || '', lastActVal:(u.base != null && isFinite(Number(u.base))) ? Number(u.base) : null,
+        portList:cur.portList || [], sailList:cur.sailList || [], sailCnt:cur.sailCnt || 0, sailMt:cur.sailMt || 0
+      });
     }
   });
   if (GF.sort === 'asc'){
@@ -7843,29 +7984,53 @@ function gfBuildRegRows(reg, targetDate, realToday, projMap){
   return rows;
 }
 
+function gfMakeGroupRow(label, regRows, gapTop){
+  let burnSum = 0, mtEf = 0, nEmerg = 0, nSiaga = 0, sailTkg = 0, sailMt = 0;
+  (regRows || []).forEach(r => {
+    const b = Number(r.burn) || 0;
+    if (b > 0){ burnSum += b; mtEf += r.ef * b; }
+    if (r.ef < 10) nEmerg++;
+    else if (r.ef < 15) nSiaga++;
+    sailTkg += (r.sailCnt || 0);
+    sailMt += (r.sailMt || 0);
+  });
+  return {
+    isGroup:true, label:label, gapTop:gapTop || 0,
+    nPltu:(regRows || []).length,
+    hopReg:burnSum > 0 ? (mtEf / burnSum) : 0,
+    nEmerg:nEmerg, nSiaga:nSiaga,
+    sailTkg:sailTkg, sailRb:sailMt / 1000
+  };
+}
+
 /* susun data grafik dengan skala X seragam (standar 100) untuk SULMAPANA / Sulawesi / MAPANA */
 function gfModel(reg){
   if (!HOPDATA || !HOPBY) return null;
   const realToday = gfRealToday(), targetDate = gfTgl();
   const isProj = !!(targetDate && targetDate > realToday);
-  const shipMap = isProj ? gfCollectProjShips(realToday) : gfCollectActualShips(targetDate, realToday);
-  const sulRows = gfBuildRegRows('SULAWESI', targetDate, realToday, shipMap);
-  const mapRows = gfBuildRegRows('MAPANA', targetDate, realToday, shipMap);
-  let rows, lh = 900;
+  const prog = gfInputProgress(targetDate);
+  const actualMap = isProj ? null : gfCollectActualShips(targetDate, realToday);
+  const projMap = (isProj || prog.est > 0) ? gfCollectProjShips(realToday) : null;
+  const sulRows = gfBuildRegRows('SULAWESI', targetDate, realToday, isProj ? projMap : actualMap, projMap);
+  const mapRows = gfBuildRegRows('MAPANA', targetDate, realToday, isProj ? projMap : actualMap, projMap);
+  let rows, lh = 900, regList;
   if (reg === 'SULMAPANA'){
     rows = [];
     if (sulRows.length){
-      rows.push({ isGroup:true, label:'SULAWESI', gapTop:0 });
+      rows.push(gfMakeGroupRow('SULAWESI', sulRows, 0));
       sulRows.forEach(r => rows.push(r));
     }
     if (mapRows.length){
-      rows.push({ isGroup:true, label:'MAPANA', gapTop:sulRows.length ? 0.22 : 0 });
+      rows.push(gfMakeGroupRow('MAPANA', mapRows, sulRows.length ? 0.22 : 0));
       mapRows.forEach(r => rows.push(r));
     }
+    regList = sulRows.concat(mapRows);
     lh = 1240;
   } else {
-    rows = reg === 'MAPANA' ? mapRows : sulRows;
+    regList = reg === 'MAPANA' ? mapRows : sulRows;
+    rows = regList;
   }
+  const estCount = regList.filter(r => r.est).length;
   let mx = 0;
   sulRows.concat(mapRows).forEach(r => { mx = Math.max(mx, r.ef + r.ap + r.sl); });
   /* skala maksimum sumbu X disamakan antara Sulawesi & MAPANA dengan dasar 100 */
@@ -7874,6 +8039,7 @@ function gfModel(reg){
   const baseJudul = GF_JUDUL[reg] || ('HOP PLTU REGIONAL ' + reg);
   return { reg:reg, judul:(isProj ? 'PROYEKSI ' : '') + baseJudul, rows:rows,
            lh:lh, axMax:axMax, isProj:isProj, isoDate:targetDate,
+           estCount:estCount, regPltuCount:regList.length, prog:prog,
            tgl:d.getDate() + ' ' + GF_BLN[d.getMonth()] + ' ' + d.getFullYear() };
 }
 
@@ -7959,13 +8125,13 @@ function grafDraw(cvs, m, opts){
     green:'#22E568', dgreen:'#34D399', dred:'#F87171', dot:'#7B90AB', name:'#DCE7F5',
     inkOut:'#E8F0FA', pillBg:'rgba(22,36,56,0.96)', pillBd:'#3B5270', pillLn:'#93ACC8', pillFg:'#F1F6FD',
     arrow:'#A6BDD9', pem:'#D4E1F2', pemBd:'#8BA3C2', axis:'#9EB0C8', leg:'#DCE7F5', noteBg:'#162438', noteFg:'#CBD8EA',
-    grpBg:'rgba(92,200,255,0.11)'
+    grpBg:'rgba(92,200,255,0.11)', grpSub:'#9EB0C8', warn:'#FBBF24', estMark:'#FBBF24', estBg:'rgba(251,191,36,0.09)'
   } : {
     bg:'#FFFFFF', strip0:'#DFF3E9', strip1:'#FFFFFF', title:GF_COL.title, hdr:'#000000',
     green:GF_COL.green, dgreen:GF_COL.dgreen, dred:GF_COL.dred, dot:GF_COL.dot, name:GF_COL.name,
     inkOut:'#000000', pillBg:'rgba(255,255,255,0.94)', pillBd:'', pillLn:'#334155', pillFg:'#000000',
     arrow:'#000000', pem:'#000000', pemBd:'#000000', axis:GF_COL.axis, leg:'#000000', noteBg:'#F4F8FC', noteFg:'#334155',
-    grpBg:'rgba(21,96,130,0.08)'
+    grpBg:'rgba(21,96,130,0.08)', grpSub:'#475569', warn:'#B45309', estMark:'#D97706', estBg:'#FFFBEB'
   };
   ctx.imageSmoothingEnabled = true;
   try { ctx.imageSmoothingQuality = 'high'; } catch(_){}
@@ -8021,11 +8187,12 @@ function grafDraw(cvs, m, opts){
   ctx.font = F(700, 20); ctx.fillText('15 HOP', x15, Y(174));
   ctx.font = F(700, 18); ctx.fillText('Pemasok', (pemX0 + pemX1) / 2, Y(170));
 
+  const hitBands = [];
   let curU = 0;
   rows.forEach(r => {
     if (r.isGroup){
       curU += (r.gapTop || 0);
-      const gh = Math.min(27, pitch * 0.64);
+      const gh = Math.min(28, pitch * 0.65);
       const gyc = top + (curU + 0.39) * pitch;
       curU += 0.78;
       ctx.save();
@@ -8038,11 +8205,52 @@ function grafDraw(cvs, m, opts){
       ctx.font = F(700, 16);
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       ctx.fillText(r.label, X(24), gyc + 0.5);
+      if (r.nPltu != null){
+        const lw = ctx.measureText(r.label).width;
+        ctx.font = F(500, 13);
+        ctx.fillStyle = P.grpSub;
+        ctx.fillText('(' + r.nPltu + ' PLTU)', X(24) + lw + 8, gyc + 0.5);
+
+        /* ringkasan HOP regional & status di sisi kanan pita grup */
+        const hopCol = r.hopReg >= 15 ? P.title : (r.hopReg >= 10 ? P.warn : P.dred);
+        const spans = [
+          { t:'HOP Regional: ', w:500, c:P.grpSub },
+          { t:gfF1(r.hopReg) + ' hari', w:700, c:hopCol },
+          { t:'  ·  ', w:500, c:P.dot }
+        ];
+        if (r.nEmerg > 0){
+          spans.push({ t:'<10 HOP: ' + r.nEmerg + ' PLTU', w:700, c:P.dred });
+          if (r.nSiaga > 0){
+            spans.push({ t:'  ·  ', w:500, c:P.dot });
+            spans.push({ t:'10–15 HOP: ' + r.nSiaga + ' PLTU', w:700, c:P.warn });
+          }
+        } else if (r.nSiaga > 0){
+          spans.push({ t:'10–15 HOP: ' + r.nSiaga + ' PLTU', w:700, c:P.warn });
+        } else {
+          spans.push({ t:'Semua ≥15 HOP ✓', w:700, c:P.dgreen });
+        }
+        spans.push({ t:'  ·  ', w:500, c:P.dot });
+        spans.push({
+          t:r.sailTkg > 0 ? (r.sailTkg + ' tkg sailing (' + gfF1(r.sailRb) + ' RB MT)') : '0 tkg sailing',
+          w:600, c:P.grpSub
+        });
+        const fsR = 13.2;
+        let totRW = 0;
+        spans.forEach(sp => { ctx.font = F(sp.w, fsR); sp.px = ctx.measureText(sp.t).width; totRW += sp.px; });
+        let rx = pemX1 - 12 - totRW;
+        spans.forEach(sp => {
+          ctx.font = F(sp.w, fsR);
+          ctx.fillStyle = sp.c;
+          ctx.fillText(sp.t, rx, gyc + 0.5);
+          rx += sp.px;
+        });
+      }
       ctx.restore();
       return;
     }
     const yc = top + (curU + 0.5) * pitch;
     curU += 1;
+    hitBands.push({ y0:(yc - pitch * 0.48) / LH, y1:(yc + pitch * 0.48) / LH, r:r });
     /* delta */
     const tcol = r.dir === 'up' ? P.dgreen : r.dir === 'down' ? P.dred : P.dot;
     const tcx = X(21), tw = X(6.5), th = Y(5.5);
@@ -8057,9 +8265,15 @@ function grafDraw(cvs, m, opts){
     }
     ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
     ctx.font = F(700, 15); ctx.fillText(r.dTxt, X(61), yc);
-    /* nama PLTU */
+    /* nama PLTU (+ tanda bintang halus '*' bila memakai estimasi hibrida karena aktual belum diinput) */
     ctx.fillStyle = P.name; ctx.font = F(600, 19); ctx.textAlign = 'right';
-    ctx.fillText(r.nm, X(150), yc);
+    if (r.est && !m.isProj){
+      ctx.fillText(r.nm, X(144), yc);
+      ctx.fillStyle = P.estMark; ctx.font = F(700, 15);
+      ctx.fillText('*', X(151), yc - 4);
+    } else {
+      ctx.fillText(r.nm, X(150), yc);
+    }
     /* bar bertumpuk + penempatan data label cerdas agar segmen tipis tetap muncul & jelas */
     let xx = X0;
     const segs = [[r.ef, r.ef >= 15 ? GF_COL.blue : r.ef >= 10 ? GF_COL.yellow : GF_COL.red],
@@ -8204,10 +8418,17 @@ function grafDraw(cvs, m, opts){
     ctx.fillStyle = P.leg; ctx.textAlign = 'left'; ctx.fillText(it[0], X(36), y2);
   });
 
-  /* catatan proyeksi singkat di bawah grafik saat tanggal dipilih > hari ini */
-  if (m.isProj){
-    const nx0 = 285, nx1 = 1572, pfx = 'Catatan: ';
-    const fullNote = pfx + GF_PROJ_NOTE;
+  /* catatan di bawah grafik:
+     - tanggal > hari ini: catatan metode proyeksi
+     - tanggal <= hari ini namun sebagian/seluruh PLTU belum input stok aktual: keterangan tanda (*) */
+  if (m.isProj || m.estCount > 0){
+    const isEstNote = !m.isProj && m.estCount > 0;
+    const nx0 = 285, nx1 = 1572;
+    const pfx = isEstNote ? 'Ket (*): ' : 'Catatan: ';
+    const bodyTxt = isEstNote
+      ? ('Stok aktual ' + m.tgl + ' pada ' + m.estCount + ' dari ' + m.regPltuCount + ' PLTU belum diinput; menampilkan estimasi proyeksi sementara (otomatis terbarui saat data masuk).')
+      : GF_PROJ_NOTE;
+    const fullNote = pfx + bodyTxt;
     ctx.font = F(400, 14);
     const nWords = fullNote.split(' '), nLines = []; let curN = '';
     nWords.forEach(wd => {
@@ -8217,15 +8438,17 @@ function grafDraw(cvs, m, opts){
     });
     if (curN) nLines.push(curN);
     const boxH = Math.max(38, nLines.length * 20 + 18), boxY = (860 + dY) - boxH / 2;
-    ctx.fillStyle = P.noteBg;
-    ctx.fillRect(nx0, boxY, nx1 - nx0, boxH);
-    ctx.fillStyle = P.title;
-    ctx.fillRect(nx0, boxY, 4, boxH);
+    ctx.fillStyle = isEstNote ? P.estBg : P.noteBg;
+    gfRRect(ctx, nx0, boxY, nx1 - nx0, boxH, 5);
+    ctx.fill();
+    ctx.fillStyle = isEstNote ? P.estMark : P.title;
+    gfRRect(ctx, nx0, boxY, 4, boxH, 2);
+    ctx.fill();
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     let ny = (860 + dY) - (nLines.length - 1) * 10;
     nLines.forEach((ln, li) => {
       if (li === 0 && ln.indexOf(pfx) === 0){
-        ctx.font = F(700, 14); ctx.fillStyle = P.title;
+        ctx.font = F(700, 14); ctx.fillStyle = isEstNote ? P.estMark : P.title;
         ctx.fillText(pfx, nx0 + 14, ny);
         const pw = ctx.measureText(pfx).width;
         ctx.font = F(400, 14); ctx.fillStyle = P.noteFg;
@@ -8236,6 +8459,11 @@ function grafDraw(cvs, m, opts){
       }
       ny += 20;
     });
+  }
+
+  /* simpan peta koordinat baris PLTU pada kanvas layar untuk Tooltip interaktif hover/tap */
+  if (!(opts && opts.light)){
+    cvs._gfHit = { isProj:!!m.isProj, tgl:m.tgl, isoDate:m.isoDate, bands:hitBands };
   }
 }
 
@@ -8462,6 +8690,72 @@ function gfUnduhMenu(r){
     + '</div></details>';
 }
 
+function gfShowCanvasTT(cvs, e){
+  if (!tt || !cvs || !cvs._gfHit || !cvs._gfHit.bands){ hideTT(); return; }
+  const hit = cvs._gfHit;
+  const rect = cvs.getBoundingClientRect ? cvs.getBoundingClientRect() : null;
+  if (!rect || !(rect.height > 0)){ hideTT(); return; }
+  const ry = (e.clientY - rect.top) / rect.height;
+  const rx = (e.clientX - rect.left) / (rect.width || 1);
+  if (rx < 0 || rx > 1 || ry < 0 || ry > 1){ cvs.style.cursor = 'default'; hideTT(); return; }
+  const b = hit.bands.find(it => ry >= it.y0 && ry <= it.y1);
+  if (!b || !b.r){
+    cvs.style.cursor = 'default';
+    hideTT();
+    return;
+  }
+  cvs.style.cursor = 'pointer';
+  const r = b.r;
+  const stCls = r.ef >= 15 ? 'norm' : (r.ef >= 10 ? 'siaga' : 'emerg');
+  const stLbl = r.ef >= 15 ? 'NORMAL' : (r.ef >= 10 ? 'SIAGA' : 'EMERGENCY');
+  let subHtml;
+  if (hit.isProj){
+    subHtml = 'Proyeksi · ' + esc(hit.tgl);
+  } else if (r.est){
+    subHtml = '<em>Estimasi Proyeksi*</em> · ' + esc(hit.tgl)
+      + (r.lastActTgl && r.lastActVal != null
+        ? ' · Aktual terakhir: ' + gfF1(r.lastActVal) + ' hr (' + esc(fmtShort(r.lastActTgl)) + ')'
+        : '');
+  } else {
+    subHtml = 'Aktual · ' + esc(hit.tgl);
+  }
+  const dClean = String(r.dTxt || '0,0').replace(/^\+/, '');
+  const dArrow = r.dir === 'up' ? ('▲ +' + dClean) : (r.dir === 'down' ? ('▼ ' + dClean) : ('● ' + dClean));
+  const dCol = r.dir === 'up' ? '#6EE7B7' : (r.dir === 'down' ? '#FCA5A5' : '#CBD5E1');
+  const totHop = r.ef + r.ap + r.sl;
+  const totMt = (r.efMt || 0) + (r.apMt || 0) + (r.slMt || 0);
+  let html = '<div class="gf-tt-hd"><span class="gf-tt-nm">PLTU ' + esc(r.nm) + (r.est && !hit.isProj ? '*' : '') + '</span>'
+    + '<span class="gf-tt-bdg ' + stCls + '">' + stLbl + '</span></div>'
+    + '<div class="gf-tt-sub">' + subHtml + '</div>'
+    + '<div class="tt-r"><span>Stock Efektif</span><span>' + gfF1(r.ef) + ' hr · ' + gfN(r.efMt || 0) + ' MT (<span style="color:' + dCol + '">' + esc(dArrow) + '</span>)</span></div>'
+    + '<div class="tt-r"><span>Stock Apung</span><span>' + gfF1(r.ap) + ' hr · ' + gfN(r.apMt || 0) + ' MT</span></div>'
+    + '<div class="tt-r"><span>Stock Sailing</span><span>' + gfF1(r.sl) + ' hr · ' + gfN(r.slMt || 0) + ' MT</span></div>'
+    + '<div class="tt-r gf-tt-tot"><span>Total Pasokan</span><span>' + gfF1(totHop) + ' hr · ' + gfN(totMt) + ' MT</span></div>'
+    + '<div class="tt-r"><span>Pembagi Stock</span><span>' + (r.burn ? (gfN(r.burn) + ' MT/hr' + (r.pakaiMt > 0 && r.pakaiMt !== r.burn ? ' (pakai ~' + gfN(r.pakaiMt) + ')' : '')) : '—') + '</span></div>';
+  if (r.portList && r.portList.length){
+    html += '<div class="gf-tt-sec"><div class="gf-tt-shd">Kapal di Pelabuhan (' + r.portList.length + ' tkg)</div>';
+    r.portList.slice(0, 4).forEach(p => {
+      html += '<div class="gf-tt-sh"><span>• ' + esc(p.nom || 'TBN') + ' (' + esc(p.sup || '—') + ')</span>'
+        + '<span>' + gfN(p.vol || 0) + ' MT · ' + gfF1(p.hop || 0) + ' hr</span></div>';
+    });
+    if (r.portList.length > 4) html += '<div class="gf-tt-more">…dan ' + (r.portList.length - 4) + ' kapal lainnya</div>';
+    html += '</div>';
+  }
+  if (r.sailList && r.sailList.length){
+    html += '<div class="gf-tt-sec"><div class="gf-tt-shd">Tongkang Sailing (' + r.sailList.length + ' tkg)</div>';
+    r.sailList.slice(0, 5).forEach(s => {
+      const etaTxt = s.eta ? (' · ETA ' + esc(fmtShort(s.eta)) + (s.nHari != null ? ' (' + s.nHari + ' hr)' : '')) : '';
+      html += '<div class="gf-tt-sh"><span>• ' + esc(s.nom || 'TBN') + ' (' + esc(s.sup || '—') + ')</span>'
+        + '<span>' + gfN(s.vol || 0) + ' MT' + etaTxt + '</span></div>';
+    });
+    if (r.sailList.length > 5) html += '<div class="gf-tt-more">…dan ' + (r.sailList.length - 5) + ' tongkang lainnya</div>';
+    html += '</div>';
+  }
+  tt.innerHTML = html;
+  tt.classList.add('gf-tt', 'on');
+  moveTT(e);
+}
+
 function gfInitOnce(){
   if (GF.inited) return;
   GF.inited = true;
@@ -8476,7 +8770,15 @@ function gfInitOnce(){
   });
   const el = $id('gfBody');
   if (el){
+    el.addEventListener('mousemove', e => {
+      const cv = e.target && e.target.closest ? e.target.closest('canvas.gf-c') : null;
+      if (cv) gfShowCanvasTT(cv, e);
+      else if (tt && tt.classList.contains('gf-tt')) hideTT();
+    });
+    el.addEventListener('mouseleave', () => { if (tt && tt.classList.contains('gf-tt')) hideTT(); });
     el.addEventListener('click', e => {
+      const cv = e.target && e.target.closest ? e.target.closest('canvas.gf-c') : null;
+      if (cv){ gfShowCanvasTT(cv, e); return; }
       const tb = e.target.closest('[data-gftoday]');
       if (tb){ goToday(); return; }
       const vb = e.target.closest('[data-gfview]');
@@ -8484,6 +8786,7 @@ function gfInitOnce(){
         const vw = vb.dataset.gfview;
         if ((vw === 'gabung' || vw === 'pisah') && GF.view !== vw){
           GF.view = vw;
+          hideTT();
           renderGrafik(true);
         }
         return;
@@ -8491,7 +8794,7 @@ function gfInitOnce(){
       const sb = e.target.closest('[data-gfsort]');
       if (sb){
         const nv = sb.dataset.gfsort;
-        if (nv && GF.sort !== nv){ GF.sort = nv; renderGrafik(true); }
+        if (nv && GF.sort !== nv){ GF.sort = nv; hideTT(); renderGrafik(true); }
         return;
       }
       const b = e.target.closest('[data-gf]');
@@ -8501,6 +8804,7 @@ function gfInitOnce(){
     });
     el.addEventListener('change', e => {
       if (e.target && e.target.id === 'gfDatePick' && e.target.value){
+        hideTT();
         gfPickDate(e.target.value);
       }
     });
@@ -8534,6 +8838,22 @@ function renderGrafik(force){
   const regs = GF.view === 'gabung' ? ['SULMAPANA'] : ['SULAWESI', 'MAPANA'];
   const realToday = gfRealToday(), tgl = gfTgl(), bnd = gfProjBounds();
   const isProj = !!(tgl && tgl > realToday);
+  const prog = isProj ? null : gfInputProgress(tgl);
+  const isHyb = !!(prog && prog.est > 0);
+  const tglD = tgl ? toDate(tgl) : null;
+  const tglShort = tglD ? (tglD.getDate() + ' ' + BLN[tglD.getMonth()]) : '';
+  let modeHtml;
+  if (isProj){
+    modeHtml = '<span class="gf-mode proj">Proyeksi</span>';
+  } else if (isHyb){
+    modeHtml = '<span class="gf-mode hyb" title="PLTU bertanda (*) belum input stok aktual tanggal ini; menggunakan estimasi proyeksi sementara">Aktual + Estimasi*</span>'
+      + '<span class="gf-inp-prog partial" title="Progres input Stock Efektif aktual tanggal ' + esc(tglShort) + ': ' + prog.act + ' dari ' + prog.tot + ' PLTU sudah input">Input ' + esc(tglShort) + ': <strong>' + prog.act + '/' + prog.tot + '</strong> PLTU</span>';
+  } else {
+    modeHtml = '<span class="gf-mode ok">Aktual</span>'
+      + (tgl === realToday && prog && prog.tot > 0
+        ? '<span class="gf-inp-prog full" title="Seluruh PLTU sudah menginput Stock Efektif aktual hari ini">Input ' + esc(tglShort) + ': <strong>' + prog.act + '/' + prog.tot + '</strong> PLTU ✓</span>'
+        : '');
+  }
   const needAdjLoad = ((typeof SIM !== 'undefined' && SIM.nextState === 'loading') || GF.prevState === 'loading');
   const maxD = bnd.max ? toDate(bnd.max) : null;
   const maxLbl = maxD ? (maxD.getDate() + ' ' + BLN[maxD.getMonth()] + ' ' + maxD.getFullYear()) : '';
@@ -8543,7 +8863,7 @@ function renderGrafik(force){
     + '<div class="gf-ctrl-g">'
       + '<span class="gf-ctrl-l">Tanggal:</span>'
       + '<input type="date" class="gf-dt" id="gfDatePick" aria-label="Pilih tanggal aktual atau proyeksi" min="' + esc(bnd.min || '') + '" max="' + esc(bnd.max || '') + '" value="' + esc(tgl || '') + '">'
-      + (isProj ? '<span class="gf-mode proj">Proyeksi</span>' : '<span class="gf-mode ok">Aktual</span>')
+      + modeHtml
       + (tgl !== realToday ? '<button type="button" class="gf-today" data-gftoday="1" title="Kembali ke tanggal hari ini">Hari ini</button>' : '')
       + (needAdjLoad ? '<span class="gf-bound">⏳ Sinkronisasi lintas bulan…</span>' : (maxLbl ? '<span class="gf-bound" title="Batas simulasi proyeksi lintas bulan">s.d. ' + esc(maxLbl) + '</span>' : ''))
     + '</div>'
@@ -8559,7 +8879,12 @@ function renderGrafik(force){
       + '</div></div>'
     + '</div>'
     + '</div>';
-  const projNoteHtml = isProj ? '<div class="gf-proj-note"><strong>Catatan:</strong> ' + esc(GF_PROJ_NOTE) + '</div>' : '';
+  let bottomNoteHtml = '';
+  if (isProj){
+    bottomNoteHtml = '<div class="gf-proj-note"><strong>Catatan:</strong> ' + esc(GF_PROJ_NOTE) + '</div>';
+  } else if (isHyb){
+    bottomNoteHtml = '<div class="gf-proj-note"><strong>Keterangan (*):</strong> Sebanyak <strong>' + prog.est + ' dari ' + prog.tot + ' PLTU</strong> belum menginput Stock Efektif aktual tanggal <strong>' + esc(tglShort) + '</strong> dan sementara menampilkan angka estimasi proyeksi (beserta delta harian ▲/▼). Angka dan delta otomatis berganti ke data aktual segera setelah diinput di Google Sheets.</div>';
+  }
   el.innerHTML = '<div class="gf-shell">' + ctrl
     + '<div class="gf-grid">' + regs.map(r => {
       const h0 = r === 'SULMAPANA' ? 1240 : 900;
@@ -8568,7 +8893,7 @@ function renderGrafik(force){
         + gfUnduhMenu(r) + '</div>'
         + '<canvas class="' + clsC + '" id="gfC-' + r + '" width="1600" height="' + h0 + '"></canvas></div>';
     }).join('') + '</div>'
-    + projNoteHtml + '</div>';
+    + bottomNoteHtml + '</div>';
   regs.forEach(r => {
     const c = $id('gfC-' + r); if (!c) return;
     const m = gfModel(r); if (!m) return;
@@ -8940,5 +9265,5 @@ async function callAuthServer(params){
   setInterval(() => { if (SYNC.scriptToken) pullFromSheets(false); }, SYNC.refreshMinutes * 60000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4bc796ccbda6d0a',t:'MTc5MjIxMDQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4e9cd29ee851f0f',t:'MTc5MjY4NTczMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4bc796ccbda6d0a',t:'MTc5MjIxMDQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4ec113d9f656c98',t:'MTc5MjcwOTQ5Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
