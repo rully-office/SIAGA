@@ -7847,8 +7847,6 @@ function gfBuildRegRows(reg, targetDate, realToday, shipMap, optProjMap){
   units.forEach(u => {
     const h = HOPBY[u.pltu]; if (!h) return;
     const burn = Number(u.bagi) || 0;
-    const pakaiEst = typeof simPakaiEst === 'function' ? simPakaiEst(u) : { ok:false, mt:0 };
-    const pakaiMt = (pakaiEst && pakaiEst.ok && pakaiEst.mt > 0) ? Math.round(pakaiEst.mt) : Math.round(Number(u.pakai) || 0);
     const ser = h.seri || {};
     if (!isProj){
       /* cek apakah PLTU ini sudah input Stock Efektif aktual pada targetDate;
@@ -7914,7 +7912,7 @@ function gfBuildRegRows(reg, targetDate, realToday, shipMap, optProjMap){
         const efVal = Math.max(0, Number(kini) || 0), apVal = Math.max(0, ap), slVal = Math.max(0, sl);
         rows.push({
           nm:u.pltu, dTxt:dTxt, dir:dir, ef:efVal, ap:apVal, sl:slVal, ann:ann, pem:pem,
-          est:false, burn:burn, pakaiMt:pakaiMt,
+          est:false, burn:burn,
           efMt:Math.round(efVal * burn), apMt:Math.round(apVal * burn), slMt:Math.round(slVal * burn),
           lastActTgl:u.tgl || targetDate, lastActVal:efVal,
           portList:portList, sailList:sailList, sailCnt:sailList.length, sailMt:sailMt
@@ -7942,7 +7940,7 @@ function gfBuildRegRows(reg, targetDate, realToday, shipMap, optProjMap){
         const efVal = curH.ef, apVal = curH.ap, slVal = Math.max(0, sl);
         rows.push({
           nm:u.pltu, dTxt:dTxt, dir:dir, ef:efVal, ap:apVal, sl:slVal, ann:ann, pem:pem,
-          est:true, burn:burn, pakaiMt:pakaiMt,
+          est:true, burn:burn,
           efMt:Math.round(efVal * burn), apMt:Math.round(apVal * burn), slMt:Math.round(slVal * burn),
           lastActTgl:u.tgl || '', lastActVal:(u.base != null && isFinite(Number(u.base))) ? Number(u.base) : null,
           portList:curH.portList || [], sailList:sailList, sailCnt:sailList.length, sailMt:sailMt
@@ -7969,7 +7967,7 @@ function gfBuildRegRows(reg, targetDate, realToday, shipMap, optProjMap){
       }
       rows.push({
         nm:u.pltu, dTxt:dTxt, dir:dir, ef:cur.ef, ap:cur.ap, sl:cur.sl, ann:cur.ann, pem:cur.pem,
-        est:false, burn:burn, pakaiMt:pakaiMt,
+        est:false, burn:burn,
         efMt:Math.round(cur.ef * burn), apMt:Math.round(cur.ap * burn), slMt:Math.round(cur.sl * burn),
         lastActTgl:u.tgl || '', lastActVal:(u.base != null && isFinite(Number(u.base))) ? Number(u.base) : null,
         portList:cur.portList || [], sailList:cur.sailList || [], sailCnt:cur.sailCnt || 0, sailMt:cur.sailMt || 0
@@ -8425,8 +8423,9 @@ function grafDraw(cvs, m, opts){
     const isEstNote = !m.isProj && m.estCount > 0;
     const nx0 = 285, nx1 = 1572;
     const pfx = isEstNote ? 'Ket (*): ' : 'Catatan: ';
+    const tglLbl = m.isoDate ? fmtShort(m.isoDate) : m.tgl;
     const bodyTxt = isEstNote
-      ? ('Stok aktual ' + m.tgl + ' pada ' + m.estCount + ' dari ' + m.regPltuCount + ' PLTU belum diinput; menampilkan estimasi proyeksi sementara (otomatis terbarui saat data masuk).')
+      ? ('Stok aktual ' + tglLbl + ' belum tersedia (' + m.estCount + '/' + m.regPltuCount + ' PLTU); nilai menggunakan estimasi proyeksi hingga realisasi terbarui.')
       : GF_PROJ_NOTE;
     const fullNote = pfx + bodyTxt;
     ctx.font = F(400, 14);
@@ -8731,7 +8730,7 @@ function gfShowCanvasTT(cvs, e){
     + '<div class="tt-r"><span>Stock Apung</span><span>' + gfF1(r.ap) + ' hr · ' + gfN(r.apMt || 0) + ' MT</span></div>'
     + '<div class="tt-r"><span>Stock Sailing</span><span>' + gfF1(r.sl) + ' hr · ' + gfN(r.slMt || 0) + ' MT</span></div>'
     + '<div class="tt-r gf-tt-tot"><span>Total Pasokan</span><span>' + gfF1(totHop) + ' hr · ' + gfN(totMt) + ' MT</span></div>'
-    + '<div class="tt-r"><span>Pembagi Stock</span><span>' + (r.burn ? (gfN(r.burn) + ' MT/hr' + (r.pakaiMt > 0 && r.pakaiMt !== r.burn ? ' (pakai ~' + gfN(r.pakaiMt) + ')' : '')) : '—') + '</span></div>';
+    + '<div class="tt-r"><span>Pembagi Stock</span><span>' + (r.burn ? (gfN(r.burn) + ' MT/hr') : '—') + '</span></div>';
   if (r.portList && r.portList.length){
     html += '<div class="gf-tt-sec"><div class="gf-tt-shd">Kapal di Pelabuhan (' + r.portList.length + ' tkg)</div>';
     r.portList.slice(0, 4).forEach(p => {
@@ -8883,7 +8882,7 @@ function renderGrafik(force){
   if (isProj){
     bottomNoteHtml = '<div class="gf-proj-note"><strong>Catatan:</strong> ' + esc(GF_PROJ_NOTE) + '</div>';
   } else if (isHyb){
-    bottomNoteHtml = '<div class="gf-proj-note"><strong>Keterangan (*):</strong> Sebanyak <strong>' + prog.est + ' dari ' + prog.tot + ' PLTU</strong> belum menginput Stock Efektif aktual tanggal <strong>' + esc(tglShort) + '</strong> dan sementara menampilkan angka estimasi proyeksi (beserta delta harian ▲/▼). Angka dan delta otomatis berganti ke data aktual segera setelah diinput di Google Sheets.</div>';
+    bottomNoteHtml = '<div class="gf-proj-note"><strong>Ket (*):</strong> Stok aktual <strong>' + esc(tglShort) + '</strong> belum tersedia (' + prog.est + '/' + prog.tot + ' PLTU); nilai menggunakan estimasi proyeksi hingga realisasi terbarui.</div>';
   }
   el.innerHTML = '<div class="gf-shell">' + ctrl
     + '<div class="gf-grid">' + regs.map(r => {
@@ -9265,5 +9264,5 @@ async function callAuthServer(params){
   setInterval(() => { if (SYNC.scriptToken) pullFromSheets(false); }, SYNC.refreshMinutes * 60000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4bc796ccbda6d0a',t:'MTc5MjIxMDQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4ec113d9f656c98',t:'MTc5MjcwOTQ5Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4bc796ccbda6d0a',t:'MTc5MjIxMDQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4ec2a2c79bdc626',t:'MTc5MjcxMDUxNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
