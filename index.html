@@ -2273,6 +2273,31 @@ html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
 .ck-it-l small{font-size:11px;color:var(--fg-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ck-it-r{flex:none;font-size:11px;font-weight:700;color:var(--muted)}
 .ck-foot{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-top:1px solid var(--border);background:var(--surface-2);font-size:10.5px;color:var(--muted)}
+
+/* ══ v57: Unified Ringkasan & Pantauan Risiko (#pg-beranda) ══ */
+#pg-beranda{display:flex;flex-direction:column;gap:12px}
+#pg-beranda[hidden]{display:none}
+.hm-prog{margin-top:0 !important}
+.hm-prog .card-h{justify-content:space-between;flex-wrap:wrap;gap:6px}
+.hm-prog-meta{font-size:11.5px;font-weight:600;color:var(--fg-2);text-transform:none;letter-spacing:0}
+.hm-cards .hm-c{transition:border-color .15s,box-shadow .15s,transform .12s,background .15s;position:relative}
+.hm-cards .hm-c:hover{transform:translateY(-1px)}
+.hm-cards .hm-c.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,var(--surface));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 22%,transparent)}
+.hm-c-tag{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:0;text-transform:none;padding:2px 6px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
+.hm-cards .hm-c.on .hm-c-tag{background:var(--accent);color:#fff}
+.hm-mid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:12px;align-items:stretch}
+@media (max-width:980px){ .hm-mid{grid-template-columns:1fr} }
+.hm-mid>.card{display:flex;flex-direction:column}
+.hm-ok-box{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;background:color-mix(in srgb,#10B981 10%,var(--surface-2));border:1px solid color-mix(in srgb,#10B981 28%,var(--border));font-size:12.5px;line-height:1.5;color:var(--fg)}
+.hm-ok-ico{flex:none;width:24px;height:24px;border-radius:50%;background:#10B981;color:#fff;font-weight:800;font-size:13px;display:inline-flex;align-items:center;justify-content:center}
+.hm-rad{display:flex;flex-direction:column;gap:10px}
+.hm-rad-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.hm-rad-acts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hm-rad-q{height:28px;width:190px;padding:0 10px;border-radius:999px;border:1px solid var(--border-2);background:var(--surface-2);color:var(--fg);font:inherit;font-size:12px;outline:none}
+.hm-rad-q:focus{border-color:var(--accent);background:var(--surface)}
+.hm-exp-btn{height:28px;padding:0 11px;border-radius:999px;border:1px solid var(--border-2);background:var(--surface-2);color:var(--fg-2);font:700 11.5px/1 var(--font);cursor:pointer;white-space:nowrap}
+.hm-exp-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--surface)}
+.rd-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -2350,13 +2375,10 @@ html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
   <div id="gfBody"><div class="pg-busy">Memuat data…</div></div>
 </section>
 
-<section class="page" id="pg-beranda" aria-label="Ringkasan Pasokan" hidden>
+<section class="page" id="pg-beranda" aria-label="Ringkasan &amp; Risiko" hidden>
+  <div id="hmAlert"></div>
+  <div class="card hm-prog"><div class="card-h"><h2>Ringkasan Pasokan &amp; Program Bulan Ini</h2><span class="hm-prog-meta" id="hmProgMeta"></span></div><div class="kpis" id="kpis"></div></div>
   <div id="hmBody"><div class="pg-busy">Memuat data…</div></div>
-  <div class="card hm-prog"><div class="card-h"><h2>Ringkasan program bulan ini</h2></div><div class="kpis" id="kpis"></div></div>
-</section>
-
-<section class="page" id="pg-radar" aria-label="Pantauan Risiko" hidden>
-  <div id="rdBody"><div class="pg-busy">Memuat data…</div></div>
 </section>
 
 <section class="page" id="pg-jadwal" aria-label="Jadwal pasokan" hidden>
@@ -2776,7 +2798,7 @@ const EW = (function(){
     const lastDate = dates[dates.length - 1];
     const vals = fut.map(d => ({ d:d, v:h.seri[d].v, arr:h.seri[d].arr || 0 }));
     const oNow = h.seri[today];
-    out.hopNow = (oNow && oNow.actual) ? oNow.v : ((age != null && age <= 1 && u.base != null) ? u.base : (oNow ? oNow.v : u.base));
+    out.hopNow = (oNow && oNow.v != null) ? oNow.v : u.base;
     const brk = vals.find(x => x.v < cfg.minHop), so = vals.find(x => x.v <= cfg.stockoutHop);
     out.breachDate = brk ? brk.d : null;   out.daysToBreach = brk ? diffDays(brk.d, today) : null;
     out.stockoutDate = so ? so.d : null;   out.daysToStockout = so ? diffDays(so.d, today) : null;
@@ -3888,7 +3910,7 @@ function labelPeriode(sheet){
   const p = (PERIODS || []).filter(x => x.sheet === sheet)[0];
   return p ? p.label : (sheet || 'Data');
 }
-function pgBusy(html){ ['gfBody', 'hmBody', 'rdBody', 'hpBody', 'smBody'].forEach(id => { const e = $id(id); if (e) e.innerHTML = '<div class="pg-busy">' + html + '</div>'; }); }
+function pgBusy(html){ ['gfBody', 'hmBody', 'hpBody', 'smBody'].forEach(id => { const e = $id(id); if (e) e.innerHTML = '<div class="pg-busy">' + html + '</div>'; }); }
 function tampilMuat(label){
   MEMUAT = label;
   document.getElementById('tb-period').textContent = 'Memuat ' + label + '…';
@@ -4424,7 +4446,21 @@ function buildHop(){
   });
   hopShare = sh;
   ASSESS = {};
-  Object.keys(by).forEach(k => { ASSESS[k] = EW.assess(by[k], SHIPBY[k] || [], { today:S.today, dates:DATES, fmt:hopDate }); });
+  const mSync = typeof gfModel === 'function' ? gfModel('SULMAPANA', S.today) : null;
+  const gfEfByU = {};
+  if (mSync && mSync.rows) mSync.rows.forEach(r => { if (!r.isGroup) gfEfByU[r.nm] = r.ef; });
+  Object.keys(by).forEach(k => {
+    const a = EW.assess(by[k], SHIPBY[k] || [], { today:S.today, dates:DATES, fmt:hopDate });
+    if (a && a.level !== 'nodata' && gfEfByU[k] != null && isFinite(gfEfByU[k])){
+      a.hopNow = gfEfByU[k];
+      if (a.hopNow < a.cfg.minHop) a.level = 'kritis';
+      else if (a.level === 'kritis' && !(a.daysToStockout != null && a.daysToStockout <= a.cfg.soonDays)){
+        a.level = (a.daysToBreach != null && a.daysToBreach <= a.cfg.soonDays) ? 'tinggi'
+          : ((a.daysToBreach != null || (a.minHop != null && a.minHop < a.cfg.waspadaHop)) ? 'waspada' : 'terkendali');
+      }
+    }
+    ASSESS[k] = a;
+  });
   gfPaint();
 }
 /* hist = riwayat (angka) · proj = lanjutan proyeksi (angka, digambar putus-putus) */
@@ -4829,8 +4865,9 @@ function hopLvlRow(r){ const h = HOPBY && HOPBY[unitOf(r)]; const w = h && hopWa
 const PRESET = {
   hop:   { t:'HOP perlu perhatian', f:r => hopLvlRow(r) >= 1 },
   eta7:  { t:'Tiba ≤ 7 hari',       f:r => !!r.etaPod && r.etaPod >= S.today && r.etaPod <= tglPlus(S.today, 7) && r.status !== 'Selesai Bongkar' },
-  sail:  { t:'Sedang berlayar',     f:r => r.status === 'Sailing' || r.status === 'Sailing to POL' },
-  apung: { t:'Apung / bongkar',     f:r => r.status === 'Tiba/Antri' || r.status === 'Proses Bongkar' },
+  apung: { t:'Antri / bongkar',     f:r => r.status === 'Tiba/Antri' || r.status === 'Proses Bongkar' },
+  sail:  { t:'Sailing',             f:r => r.status === 'Sailing' },
+  load:  { t:'Rencana loading',     f:r => /^(menunggu\s+loading|proses\s+loading|sailing\s+to\s+pol)$/i.test(String(r.status || '').trim()) },
   novol: { t:'Terjadwal tiba · Vol kosong', f:r => !!(r.etaPod || Object.keys(r.bars || {}).some(k => String(r.bars[k]).toUpperCase() === 'X')) && !(r.vol > 0) && r.status !== 'Cancel' && r.kat !== 'Cancel' },
   nonom: { t:'Belum ternominasi',   f:r => !hasArmada(r) }
 };
@@ -5065,16 +5102,20 @@ function rdDetailHTML(a, k){
       <div><div class="rd-k">Rekomendasi</div>${li(a.actions.length ? a.actions : ['Tidak ada tindakan khusus; pantau saja.'])}</div>
     </div>
     ${a.basis ? '<div class="rd-as"><b>Dasar:</b> ' + esc(a.basis) + '</div>' : ''}
-    <div class="rd-btns"><button type="button" data-a="jadwal">Lihat jadwal PLTU ini</button><button type="button" data-a="grafik">Grafik HOP</button></div>`;
+    <div class="rd-btns"><button type="button" data-a="insp">🔍 Panel Inspeksi</button><button type="button" data-a="jadwal">📅 Lihat Jadwal</button><button type="button" data-a="hop">📈 Proyeksi HOP</button><button type="button" data-a="sim">🧪 Simulasi Mitigasi</button></div>`;
 }
-/* ══ halaman Pantauan Risiko ══ */
+/* ══ Halaman Terpadu: Ringkasan & Risiko (#pg-beranda) ══ */
 const METODE_HTML = '<details class="metode"><summary>Ketentuan &amp; cara baca proyeksi (batas min. 10 hr · siaga 15 hr)</summary><ul>'
   + '<li>Stok akhir hari = stok awal + pasokan masuk − pemakaian harian.</li>'
   + '<li>Pemakaian harian dihitung tetap mengikuti angka pemakaian terakhir. Volume muatan kapal dibagi rata selama 3 hari sejak tanggal ETA POD.</li>'
   + '<li>Pengiriman berstatus Cancel tidak dihitung, dan baris pengiriman ganda hanya dihitung satu kali.</li></ul></details>';
 function fokusHTML(){
   const items = Object.keys(ASSESS).map(k => Object.assign({ k:k }, ASSESS[k]));
-  const F = EW.fokus(items); if (!F.n) return '';
+  const F = EW.fokus(items);
+  if (!F.n){
+    return `<div class="card fk"><div class="card-h"><h2>Prioritas Tindak Lanjut</h2></div>`
+      + `<div class="hm-ok-box"><span class="hm-ok-ico" aria-hidden="true">✓</span><div><b>Seluruh PLTU Terkendali</b><br>Tidak terdeteksi defisit tonase maupun keterlambatan kedatangan kritis hingga akhir horizon pantauan. Lanjutkan pemantauan rutin keberangkatan tongkang sesuai jadwal.</div></div></div>`;
+  }
   const list = a => a.map(x => esc(x.k)).join(', '), mt = n => nfi(n) + ' MT';
   const rows = [];
   if (F.tot > 0 && F.n > 1 && F.core.length < F.n)
@@ -5091,63 +5132,117 @@ function fokusHTML(){
   return `<div class="card fk"><div class="card-h"><h2>Prioritas Tindak Lanjut</h2></div>`
     + rows.map((r, i) => `<div class="fk-r"><span class="fk-n">${i + 1}</span><div><div class="fk-t">${r[0]}</div><div class="fk-d">${r[1]}</div></div></div>`).join('') + '</div>';
 }
-let rdFilter = 'att';
+let rdFilter = 'att', rdQuery = '';
 function renderRadar(){
-  const el = $id('rdBody'); if (!el) return;
-  if (!HOPBY){ el.innerHTML = '<div class="pg-busy">Pantauan risiko akan tampil setelah data stok dan jadwal selesai dimuat.</div>'; return; }
+  renderHome();
+}
+function renderHome(){
+  const el = $id('hmBody'), alEl = $id('hmAlert'), metaEl = $id('hmProgMeta');
+  if (metaEl){
+    metaEl.textContent = S.today ? ('Acuan ' + fmtShort(S.today) + (S.periode ? ' · Program ' + S.periode : '')) : '';
+  }
+  if (!el) return;
+  if (!HOPBY){
+    if (alEl) alEl.innerHTML = '';
+    el.innerHTML = '<div class="pg-busy">' + (MEMUAT ? 'Memuat ' + esc(MEMUAT) + '…' : 'Data stok dan jadwal belum dimuat.') + '</div>';
+    return;
+  }
   const items = Object.keys(ASSESS).map(k => Object.assign({ k:k }, ASSESS[k])).sort(EW.rank);
-  const cnt = { kritis:0, tinggi:0, waspada:0, terkendali:0, nodata:0 }; items.forEach(i => cnt[i.level]++);
+  const cnt = { kritis:0, tinggi:0, waspada:0, terkendali:0, nodata:0 };
+  items.forEach(i => cnt[i.level]++);
+  const nm = l => {
+    const n = items.filter(i => i.level === l).map(i => i.k);
+    return n.length ? n.slice(0, 3).join(', ') + (n.length > 3 ? ' +' + (n.length - 3) : '') : '—';
+  };
+  const so = items.filter(i => i.stockoutDate).sort((a, b) => a.stockoutDate < b.stockoutDate ? -1 : 1);
   const att = items.filter(i => i.level !== 'terkendali');
-  const defs = [['att', 'Perlu perhatian', att.length], ['all', 'Semua', items.length]]
-    .concat(['kritis', 'tinggi', 'waspada', 'terkendali', 'nodata'].map(l => [l, LV[l].s, cnt[l]]));
-  const shown = rdFilter === 'att' ? att : rdFilter === 'all' ? items : items.filter(i => i.level === rdFilter);
+  const card = l => {
+    const isOn = rdFilter === l;
+    return `<button type="button" class="hm-c l-${l}${isOn ? ' on' : ''}" data-rdf="${l}" title="Klik untuk menyaring daftar PLTU kategori ${esc(LV[l].s)}">`
+      + `<span class="hm-l"><i aria-hidden="true">${LV[l].ic}</i>${LV[l].s}<span class="hm-c-tag">${isOn ? 'Aktif ✓' : 'Saring'}</span></span>`
+      + `<span class="hm-n">${cnt[l]}<small>PLTU</small></span>`
+      + `<span class="hm-s" title="${esc(nm(l))}">${esc(nm(l))}</span></button>`;
+  };
+  const soOn = rdFilter === 'so';
+  const prs = [
+    ['late', 'Late loading', ROWS.filter(hasLate).length],
+    ['apung', PRESET.apung.t, ROWS.filter(PRESET.apung.f).length],
+    ['sail', PRESET.sail.t, ROWS.filter(PRESET.sail.f).length],
+    ['load', PRESET.load.t, ROWS.filter(PRESET.load.f).length],
+    ['eta7', PRESET.eta7.t, ROWS.filter(PRESET.eta7.f).length],
+    ['novol', PRESET.novol.t, ROWS.filter(PRESET.novol.f).length],
+    ['nonom', PRESET.nonom.t, ROWS.filter(PRESET.nonom.f).length]
+  ];
+  const dqBad = DQ && DQ.level === 'bad' ? DQ.issues.filter(i => i.sev === 'bad')[0] : null;
+  if (alEl){
+    alEl.innerHTML = dqBad ? `<div class="hm-alert"><b>Data bermasalah:</b> ${esc(dqBad.t)}<button type="button" class="lnk" data-act="dq">Lihat rincian ›</button></div>` : '';
+  }
+  const defs = [
+    ['att', 'Perlu perhatian', att.length],
+    ['all', 'Semua', items.length],
+    ['kritis', LV.kritis.s, cnt.kritis],
+    ['tinggi', LV.tinggi.s, cnt.tinggi],
+    ['waspada', LV.waspada.s, cnt.waspada],
+    ['terkendali', LV.terkendali.s, cnt.terkendali],
+    ['so', 'Stock out', so.length],
+    ['nodata', LV.nodata.s, cnt.nodata]
+  ];
+  let shown = rdFilter === 'att' ? att
+    : rdFilter === 'all' ? items
+    : rdFilter === 'so' ? so
+    : items.filter(i => i.level === rdFilter);
+  const qNorm = String(rdQuery || '').trim().toLowerCase();
+  if (qNorm){
+    shown = shown.filter(i => i.k.toLowerCase().includes(qNorm)
+      || (i.next && String(i.next.sup || '').toLowerCase().includes(qNorm))
+      || (i.next && String(i.next.nom || '').toLowerCase().includes(qNorm)));
+  }
+  const allOpen = shown.length > 0 && shown.every(a => !!radarOpen[a.k]);
   const near = items.filter(i => i.breachDate).sort((a, b) => a.breachDate < b.breachDate ? -1 : 1)[0];
   const cfg = EW.CFG;
-  el.innerHTML = `<div class="rdp-top">${defs.map(([k, t, n]) =>
-      `<button type="button" class="rdp-f${rdFilter === k ? ' on' : ''}" data-f="${k}">${esc(t)} <b>${n}</b></button>`).join('')}
-      <span style="flex:1"></span>
-      ${near ? `<span class="rd-note">Batas minimum terdekat: <b>${esc(near.k)}</b>, ${near.hopNow < cfg.minHop ? 'sudah terlewati' : hopDate(near.breachDate)}</span>` : ''}</div>
-    ${fokusHTML()}
-    ${S.sup ? '<div class="rd-note" style="margin:8px 0"><b>Filter pemasok aktif: hanya menghitung pengiriman dari pemasok terpilih.</b></div>' : ''}
-    <div class="rd-list">${shown.length ? shown.map(a => rdRowHTML(a, a.k, !!radarOpen[a.k])).join('')
-      : '<div class="rd-empty">' + (rdFilter === 'att' ? 'Seluruh PLTU berada dalam kondisi terkendali sampai ' + hopDate(DATES[DATES.length - 1]) + '.' : 'Tidak ada PLTU pada kategori ini.') + '</div>'}</div>
-    <div style="margin-top:10px">${METODE_HTML}</div>`;
-  el.querySelectorAll('.rdp-f').forEach(b => b.addEventListener('click', () => { rdFilter = b.dataset.f; renderRadar(); }));
-  el.querySelectorAll('.rd-row').forEach(b => b.addEventListener('click', () => {
-    const k = b.closest('.rd-i').dataset.k; radarOpen[k] = !radarOpen[k]; renderRadar(); }));
-  el.querySelectorAll('.rd-btns button').forEach(b => b.addEventListener('click', () => {
-    const k = b.closest('.rd-i').dataset.k;
-    if (b.dataset.a === 'jadwal'){
-      const names = [...new Set(ROWS.map(r => r.pltu))].filter(n => unitOf({ pltu:n }) === k);
-      S.pltu = new Set(names.length ? names : [k]); msRefreshAll(); go('jadwal'); render();
-    } else { HPSEL = k; go('hop'); renderHopPage(); }
-  }));
-}
-/* ══ Beranda = Ringkasan Pasokan ══ */
-function renderHome(){
-  const el = $id('hmBody'); if (!el) return;
-  if (!HOPBY){ el.innerHTML = '<div class="pg-busy">' + (MEMUAT ? 'Memuat ' + esc(MEMUAT) + '…' : 'Data stok dan jadwal belum dimuat.') + '</div>'; return; }
-  const items = Object.keys(ASSESS).map(k => Object.assign({ k:k }, ASSESS[k])).sort(EW.rank);
-  const cnt = { kritis:0, tinggi:0, waspada:0, terkendali:0, nodata:0 }; items.forEach(i => cnt[i.level]++);
-  const nm = l => { const n = items.filter(i => i.level === l).map(i => i.k); return n.length ? n.slice(0, 3).join(', ') + (n.length > 3 ? ' +' + (n.length - 3) : '') : '—'; };
-  const so = items.filter(i => i.stockoutDate).sort((a, b) => a.stockoutDate < b.stockoutDate ? -1 : 1);
-  const card = (l, k) => `<button type="button" class="hm-c l-${l}" data-go="radar" data-lv="${l}"><span class="hm-l"><i aria-hidden="true">${LV[l].ic}</i>${LV[l].s}</span><span class="hm-n">${cnt[l]}<small>PLTU</small></span><span class="hm-s" title="${esc(nm(l))}">${esc(nm(l))}</span></button>`;
-  const att = items.filter(i => i.level !== 'terkendali').slice(0, 6);
-  const prs = [['late', 'Late loading', ROWS.filter(hasLate).length], ['eta7', PRESET.eta7.t, ROWS.filter(PRESET.eta7.f).length],
-    ['sail', PRESET.sail.t, ROWS.filter(PRESET.sail.f).length], ['apung', PRESET.apung.t, ROWS.filter(PRESET.apung.f).length],
-    ['novol', PRESET.novol.t, ROWS.filter(PRESET.novol.f).length],
-    ['nonom', PRESET.nonom.t, ROWS.filter(PRESET.nonom.f).length]];
-  const dqBad = DQ && DQ.level === 'bad' ? DQ.issues.filter(i => i.sev === 'bad')[0] : null;
-  el.innerHTML = (dqBad ? `<div class="hm-alert"><b>Data bermasalah:</b> ${esc(dqBad.t)}<button type="button" class="lnk" data-act="dq">Lihat rincian ›</button></div>` : '') + `<div class="hm-cards">${['kritis', 'tinggi', 'waspada', 'terkendali'].map(card).join('')}
-      <button type="button" class="hm-c l-so" data-go="radar" data-lv="kritis"><span class="hm-l"><i aria-hidden="true">■</i>Stock out</span><span class="hm-n">${so.length}<small>PLTU</small></span>
-        <span class="hm-s">${so.length ? 'terdekat: ' + esc(so[0].k) + ', ' + hopDate(so[0].stockoutDate) : 'tidak ada s.d. ' + hopDate(DATES[DATES.length - 1])}</span></button></div>
-    <div class="hm-grid">
-      <div class="card"><div class="card-h"><h2>PLTU perlu perhatian</h2><button type="button" class="lnk" data-go="radar">Lihat semua ›</button></div>
-        <div class="rd-list compact">${att.length ? att.map(a => rdRowHTML(a, a.k, false)).join('') : '<div class="rd-empty">Seluruh PLTU terkendali sampai ' + hopDate(DATES[DATES.length - 1]) + '.</div>'}</div></div>
-      <div class="hm-col">
-        <div class="card"><div class="card-h"><h2>Pasokan &amp; jadwal</h2><button type="button" class="lnk" data-go="jadwal">Buka jadwal ›</button></div>
-          <div class="hm-rows">${prs.map(([k, t, n]) => `<button type="button" class="hm-r${(k === 'late' || k === 'novol') && n ? ' late' : ''}" data-pr="${k}"><span>${esc(t)}</span><b>${n}</b><i>›</i></button>`).join('')}</div></div>
-      </div></div>`;
+
+  el.innerHTML = `<div class="hm-cards">${['kritis', 'tinggi', 'waspada', 'terkendali'].map(card).join('')}
+      <button type="button" class="hm-c l-so${soOn ? ' on' : ''}" data-rdf="so" title="Klik untuk menyaring PLTU berpotensi Stock out">
+        <span class="hm-l"><i aria-hidden="true">■</i>Stock out<span class="hm-c-tag">${soOn ? 'Aktif ✓' : 'Saring'}</span></span>
+        <span class="hm-n">${so.length}<small>PLTU</small></span>
+        <span class="hm-s">${so.length ? 'terdekat: ' + esc(so[0].k) + ', ' + hopDate(so[0].stockoutDate) : 'tidak ada s.d. ' + hopDate(DATES[DATES.length - 1])}</span>
+      </button></div>
+    <div class="hm-mid">
+      ${fokusHTML()}
+      <div class="card">
+        <div class="card-h"><h2>Status Armada &amp; Pintasan Jadwal</h2><button type="button" class="lnk" data-go="jadwal">Buka jadwal ›</button></div>
+        <div class="hm-rows">${prs.map(([k, t, n]) => `<button type="button" class="hm-r${(k === 'late' || k === 'novol') && n ? ' late' : ''}" data-pr="${k}"><span>${esc(t)}</span><b>${n}</b><i>›</i></button>`).join('')}</div>
+      </div>
+    </div>
+    <div class="card hm-rad" id="hmRadCard">
+      <div class="hm-rad-hd">
+        <div>
+          <h2 style="margin:0">Daftar Pantauan Risiko &amp; Mitigasi per PLTU</h2>
+          ${near ? `<div class="rd-note" style="margin-top:3px">Batas minimum terdekat: <b>${esc(near.k)}</b>, ${near.hopNow < cfg.minHop ? 'sudah terlewati' : hopDate(near.breachDate)}</div>` : ''}
+        </div>
+        <div class="hm-rad-acts">
+          <input type="search" class="hm-rad-q" id="rdSearch" placeholder="Cari PLTU / pemasok…" value="${esc(rdQuery)}" aria-label="Cari PLTU di daftar risiko">
+          ${shown.length ? `<button type="button" class="hm-exp-btn" data-rdexp="${allOpen ? '0' : '1'}">${allOpen ? 'Tutup Semua Rincian' : 'Buka Semua Rincian'}</button>` : ''}
+        </div>
+      </div>
+      <div class="rdp-top" style="margin-bottom:2px">${defs.filter(d => d[0] !== 'nodata' || d[2] > 0).map(([k, t, n]) =>
+        `<button type="button" class="rdp-f${rdFilter === k ? ' on' : ''}" data-f="${k}">${esc(t)} <b>${n}</b></button>`).join('')}</div>
+      ${S.sup ? '<div class="rd-note"><b>Filter pemasok aktif: hanya menghitung pengiriman dari pemasok terpilih.</b></div>' : ''}
+      <div class="rd-list">${shown.length ? shown.map(a => rdRowHTML(a, a.k, !!radarOpen[a.k])).join('')
+        : '<div class="rd-empty">' + (qNorm ? 'Tidak ada PLTU yang cocok dengan pencarian "' + esc(rdQuery) + '".' : (rdFilter === 'att' ? 'Seluruh PLTU berada dalam kondisi terkendali sampai ' + hopDate(DATES[DATES.length - 1]) + '.' : 'Tidak ada PLTU pada kategori ini.')) + '</div>'}</div>
+      <div style="margin-top:4px">${METODE_HTML}</div>
+    </div>`;
+
+  const qInp = el.querySelector('#rdSearch');
+  if (qInp){
+    qInp.addEventListener('input', () => {
+      const pos = qInp.selectionStart || 0;
+      rdQuery = qInp.value;
+      renderHome();
+      const q2 = $id('rdSearch');
+      if (q2){ q2.focus(); try { q2.setSelectionRange(pos, pos); } catch(_){} }
+    });
+  }
 }
 /* ══ halaman Proyeksi HOP ══ */
 let HPSEL = null;
@@ -5192,8 +5287,8 @@ function renderHopPage(){
   });
 }
 /* ══ MENU KIRI + HALAMAN (Perbaikan #3: istilah lebih operasional & natural) ══ */
-const PAGE_IDS = ['grafik', 'beranda', 'radar', 'jadwal', 'hop', 'sim'];
-const TITLES = { beranda:'Ringkasan Pasokan', radar:'Pantauan Risiko', jadwal:'Jadwal Pasokan', hop:'Proyeksi HOP', grafik:'Grafik HOP', sim:'Simulasi HOP' };
+const PAGE_IDS = ['grafik', 'beranda', 'jadwal', 'hop', 'sim'];
+const TITLES = { beranda:'Ringkasan & Risiko', radar:'Ringkasan & Risiko', jadwal:'Jadwal Pasokan', hop:'Proyeksi HOP', grafik:'Grafik HOP', sim:'Simulasi HOP' };
 const ICO = {
   plus:'<path d="M12 5v14M5 12h14"/>', swap:'<path d="M4 8h12l-3-3M20 16H8l3 3"/>', clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3 1.8"/>', gauge:'<path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 18l4.5-6.5"/>', gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2M12 19v2M5.5 5.5l1.4 1.4M17.1 17.1l1.4 1.4M3 12h2M19 12h2M5.5 18.5l1.4-1.4M17.1 6.9l1.4-1.4"/>',
   chart: '<rect x="3.5" y="12" width="3.6" height="8" rx="1"/><rect x="10.2" y="5" width="3.6" height="15" rx="1"/><rect x="16.9" y="9" width="3.6" height="11" rx="1"/>',
@@ -5215,11 +5310,10 @@ function renderNav(){
   const tb = $id('tabbar');
   if (tb){
     const t = (id, lb, ic, bd) => `<button type="button" class="tb-i${S.page === id ? ' on' : ''}" data-pg="${id}"${S.page === id ? ' aria-current="page"' : ''}>${svgI(ic)}<span>${lb}</span>${bd ? '<b>' + bd + '</b>' : ''}</button>`;
-    tb.innerHTML = t('grafik', 'Grafik', 'chart') + t('beranda', 'Ringkasan', 'grid') + t('radar', 'Risiko', 'radar', hot || '') + t('jadwal', 'Jadwal', 'gantt', lateCnt || '') + t('hop', 'HOP', 'trend') + t('sim', 'Simulasi', 'sim');
+    tb.innerHTML = t('grafik', 'Grafik', 'chart') + t('beranda', 'Risiko', 'radar', hot || '') + t('jadwal', 'Jadwal', 'gantt', lateCnt || '') + t('hop', 'HOP', 'trend') + t('sim', 'Simulasi', 'sim');
   }
   el.innerHTML = it('grafik', 'Grafik HOP', 'chart')
-    + it('beranda', 'Ringkasan Pasokan', 'grid')
-    + it('radar', 'Pantauan Risiko', 'radar', hot || '', 'PLTU risiko kritis / tinggi')
+    + it('beranda', 'Ringkasan & Risiko', 'radar', hot || '', 'PLTU risiko kritis / tinggi')
     + it('jadwal', 'Jadwal Pasokan', 'gantt', lateCnt || '', 'Pengapalan late loading aktif')
     + it('hop', 'Proyeksi HOP', 'trend')
     + it('sim', 'Simulasi HOP', 'sim');
@@ -7745,6 +7839,57 @@ function gfCollectProjShips(realToday){
   return byUnit;
 }
 
+/* kumpulkan kapal Rencana Loading (Menunggu Loading, Proses Loading, Sailing to POL) untuk tooltip & inspeksi */
+function gfCollectLoadShips(targetDate, realToday){
+  const map = gfUnitMap(), byUnit = {}, reg = gfMakeShipRegistry();
+  const isProj = !!(targetDate && targetDate > realToday);
+  const rankSt = s => /^proses\s+loading$/i.test(s) ? 1 : (/^menunggu\s+loading$/i.test(s) ? 2 : 3);
+  const feedLoad = (rows, dates, src) => {
+    if (!rows || !rows.length) return;
+    rows.forEach(r => {
+      if (!r || gfIsCancel(r)) return;
+      if (!gfSupMatch(r, true)) return;
+      const st = String(r.status || '').trim();
+      if (!/^(menunggu\s+loading|proses\s+loading|sailing\s+to\s+pol)$/i.test(st)) return;
+      const unit = map[r.pltu] || r.pltu;
+      const dt = gfExtractRowDates(r, dates);
+      const pol = r.etaPol || (dt.ls && dt.ls[0]) || null;
+      const rawPod = gfEstProjPod(r, dt, realToday) || dt.rawPod || r.etaPod || r.etaRakor || null;
+      if (src === 'prev'){
+        const touch = dt.lastTouch || rawPod || pol;
+        if (!touch || simDD(realToday, touch) > 14) return;
+      }
+      const vol = Number(r.vol) || 0;
+      if (reg.seenOrAdd(unit, r, rawPod || pol, vol > 0 ? vol : 1, src)) return;
+      let sailFrom = null;
+      if (vol > 0 && rawPod){
+        let pod = rawPod <= realToday ? tglPlus(realToday, 3) : rawPod;
+        if (r.tdPol || (dt.ss && dt.ss.length)){
+          sailFrom = (r.tdPol && dt.ss.length) ? (r.tdPol < dt.ss[0] ? r.tdPol : dt.ss[0]) : (r.tdPol || dt.ss[0]);
+        } else if ((dt.ls && dt.ls.length) || r.etaPol){
+          const byL = dt.ls.length ? tglPlus(dt.ls[0], Math.min(2, dt.ls.length)) : null;
+          const byPol = r.etaPol ? tglPlus(r.etaPol, 2) : null;
+          sailFrom = (byL && byPol) ? (byL < byPol ? byL : byPol) : (byL || byPol);
+          if (sailFrom >= pod) sailFrom = tglPlus(pod, -1);
+        } else {
+          sailFrom = tglPlus(pod, -9);
+        }
+      }
+      if (isProj && vol > 0 && sailFrom && targetDate >= sailFrom) return;
+      (byUnit[unit] = byUnit[unit] || []).push({
+        nom:r.nom || 'TBN', sup:r.sup || '—', vol:vol, status:st, pol:pol, eta:rawPod
+      });
+    });
+  };
+  feedLoad(ROWS, DATES, 'cur');
+  if (typeof SIM !== 'undefined' && SIM.next && SIM.next.rows && SIM.next.dates) feedLoad(SIM.next.rows, SIM.next.dates, 'next');
+  if (GF.prev && GF.prev.rows && GF.prev.dates) feedLoad(GF.prev.rows, GF.prev.dates, 'prev');
+  Object.keys(byUnit).forEach(u => {
+    byUnit[u].sort((a, b) => (rankSt(a.status) - rankSt(b.status)) || String(a.pol || a.eta || '9999').localeCompare(String(b.pol || b.eta || '9999')));
+  });
+  return byUnit;
+}
+
 /* ══ KOREKSI BONGKAR TERKALIBRASI (TOGGLE 'koreksi') ══
    1. Hanya memotong kapal 'Proses Bongkar' (kapal 'Tiba/Antri' di pelabuhan tetap utuh 100%).
    2. Jangkar presisi ke laporan sisa Stock Apung aktual unit pada HOPDATA (u.apung dari sheet Grafik)
@@ -8234,8 +8379,10 @@ function gfModel(reg, optDate){
   const prog = gfInputProgress(targetDate);
   const actualMap = isProj ? null : gfCollectActualShips(targetDate, realToday);
   const projMap = (isProj || prog.est > 0) ? gfCollectProjShips(realToday) : null;
+  const loadMap = gfCollectLoadShips(targetDate, realToday);
   const sulRows = gfBuildRegRows('SULAWESI', targetDate, realToday, isProj ? projMap : actualMap, projMap);
   const mapRows = gfBuildRegRows('MAPANA', targetDate, realToday, isProj ? projMap : actualMap, projMap);
+  sulRows.concat(mapRows).forEach(r => { r.loadList = (loadMap && loadMap[r.nm]) ? loadMap[r.nm] : []; });
   let rows, lh = 900, regList;
   if (reg === 'SULMAPANA'){
     rows = [];
@@ -8650,7 +8797,7 @@ function grafDraw(cvs, m, opts){
     const pfx = isEstNote ? 'Ket (*): ' : 'Catatan: ';
     const tglLbl = m.isoDate ? fmtShort(m.isoDate) : m.tgl;
     const bodyTxt = isEstNote
-      ? ('Stok aktual ' + tglLbl + ' belum tersedia (' + m.estCount + '/' + m.regPltuCount + ' PLTU); nilai menggunakan estimasi proyeksi hingga realisasi terbarui.')
+      ? ('Stok aktual ' + tglLbl + ' belum tersedia (' + m.estCount + '/' + m.regPltuCount + ' PLTU); nilai menggunakan estimasi proyeksi hingga realisasi terbaru.')
       : GF_PROJ_NOTE;
     const fullNote = pfx + bodyTxt;
     ctx.font = F(400, 14);
@@ -8957,7 +9104,7 @@ function gfShowCanvasTT(cvs, e){
     + '<div class="tt-r gf-tt-tot"><span>Total Pasokan</span><span>' + gfF1(totHop) + ' hr · ' + gfN(totMt) + ' MT</span></div>'
     + '<div class="tt-r"><span>Pembagi Stock</span><span>' + (r.burn ? (gfN(r.burn) + ' MT/hr') : '—') + '</span></div>';
   if (r.portList && r.portList.length){
-    html += '<div class="gf-tt-sec"><div class="gf-tt-shd">Kapal di Pelabuhan (' + r.portList.length + ' tkg)</div>';
+    html += '<div class="gf-tt-sec"><div class="gf-tt-shd">Antri/Bongkar (' + r.portList.length + ' tkg)</div>';
     r.portList.slice(0, 4).forEach(p => {
       html += '<div class="gf-tt-sh"><span>• ' + esc(p.nom || 'TBN') + ' (' + esc(p.sup || '—') + ')</span>'
         + '<span>' + gfN(p.vol || 0) + ' MT · ' + gfF1(p.hop || 0) + ' hr</span></div>';
@@ -8966,13 +9113,24 @@ function gfShowCanvasTT(cvs, e){
     html += '</div>';
   }
   if (r.sailList && r.sailList.length){
-    html += '<div class="gf-tt-sec"><div class="gf-tt-shd">Tongkang Sailing (' + r.sailList.length + ' tkg)</div>';
+    html += '<div class="gf-tt-sec"><div class="gf-tt-shd">Sailing (' + r.sailList.length + ' tkg)</div>';
     r.sailList.slice(0, 5).forEach(s => {
       const etaTxt = s.eta ? (' · ETA ' + esc(fmtShort(s.eta)) + (s.nHari != null ? ' (' + s.nHari + ' hr)' : '')) : '';
       html += '<div class="gf-tt-sh"><span>• ' + esc(s.nom || 'TBN') + ' (' + esc(s.sup || '—') + ')</span>'
         + '<span>' + gfN(s.vol || 0) + ' MT' + etaTxt + '</span></div>';
     });
     if (r.sailList.length > 5) html += '<div class="gf-tt-more">…dan ' + (r.sailList.length - 5) + ' tongkang lainnya</div>';
+    html += '</div>';
+  }
+  if (r.loadList && r.loadList.length){
+    html += '<div class="gf-tt-sec"><div class="gf-tt-shd">Rencana Loading (' + r.loadList.length + ' tkg)</div>';
+    r.loadList.slice(0, 4).forEach(l => {
+      const volTxt = l.vol > 0 ? (gfN(l.vol) + ' MT · ') : '';
+      const dtTxt = l.pol ? (' · POL ' + esc(fmtShort(l.pol))) : (l.eta ? (' · ETA ' + esc(fmtShort(l.eta))) : '');
+      html += '<div class="gf-tt-sh"><span>• ' + esc(l.nom || 'TBN') + ' (' + esc(l.sup || '—') + ')</span>'
+        + '<span>' + volTxt + esc(l.status) + dtTxt + '</span></div>';
+    });
+    if (r.loadList.length > 4) html += '<div class="gf-tt-more">…dan ' + (r.loadList.length - 4) + ' rencana lainnya</div>';
     html += '</div>';
   }
   html += '<div class="gf-tt-hint">Klik baris untuk buka Panel Inspeksi · Jadwal · Simulasi ›</div>';
@@ -9269,23 +9427,29 @@ function openPltuInsp(pltuName, optMode){
   }
   const totHop = r.ef + r.ap + r.sl;
   const totMt = (r.efMt || 0) + (r.apMt || 0) + (r.slMt || 0);
-  const renderVesselItem = (v, isSail) => {
+  const renderVesselItem = (v, modeV) => {
     const ri = gfFindRowIndex(u.pltu, v.nom, v.sup);
     const jumpAttr = ri >= 0 ? (' class="pi-v jump" data-inspri="' + ri + '" title="Klik untuk sorot baris kapal ini di Jadwal Pasokan"') : ' class="pi-v"';
-    const rightSub = isSail
+    const rightTop = v.vol > 0 ? (gfN(v.vol) + ' MT') : 'Vol blm diisi';
+    const rightSub = modeV === 'sail'
       ? (v.eta ? ('ETA ' + esc(fmtShort(v.eta)) + (v.nHari != null ? ' (' + v.nHari + ' hr)' : '')) : 'ETA belum tercatat')
-      : (esc(v.status || 'Pelabuhan') + ' · ' + gfF1(v.hop || 0) + ' hr');
+      : (modeV === 'load'
+        ? (esc(v.status || 'Rencana Loading') + (v.pol ? ' · POL ' + esc(fmtShort(v.pol)) : (v.eta ? ' · ETA ' + esc(fmtShort(v.eta)) : '')))
+        : (esc(v.status || 'Antri/Bongkar') + ' · ' + gfF1(v.hop || 0) + ' hr'));
     return '<div' + jumpAttr + '>'
       + '<div class="pi-v-l"><b>' + esc(v.nom || 'TBN') + '</b><small>Pemasok: ' + esc(v.sup || '—') + (ri >= 0 ? ' · Lihat di Jadwal ›' : '') + '</small></div>'
-      + '<div class="pi-v-r">' + gfN(v.vol || 0) + ' MT<small>' + rightSub + '</small></div>'
+      + '<div class="pi-v-r">' + rightTop + '<small>' + rightSub + '</small></div>'
     + '</div>';
   };
   const portHtml = (r.portList && r.portList.length)
-    ? '<div class="pi-vlist">' + r.portList.map(p => renderVesselItem(p, false)).join('') + '</div>'
-    : '<div class="pi-empty">Tidak ada kapal sedang bongkar / antri di pelabuhan.</div>';
+    ? '<div class="pi-vlist">' + r.portList.map(p => renderVesselItem(p, 'port')).join('') + '</div>'
+    : '<div class="pi-empty">Tidak ada kapal sedang antri / bongkar saat ini.</div>';
   const sailHtml = (r.sailList && r.sailList.length)
-    ? '<div class="pi-vlist">' + r.sailList.map(s => renderVesselItem(s, true)).join('') + '</div>'
-    : '<div class="pi-empty">Tidak ada tongkang berstatus Sailing saat ini.</div>';
+    ? '<div class="pi-vlist">' + r.sailList.map(s => renderVesselItem(s, 'sail')).join('') + '</div>'
+    : '<div class="pi-empty">Tidak ada kapal berstatus Sailing saat ini.</div>';
+  const loadHtml = (r.loadList && r.loadList.length)
+    ? '<div class="pi-vlist">' + r.loadList.map(l => renderVesselItem(l, 'load')).join('') + '</div>'
+    : '<div class="pi-empty">Tidak ada rencana loading aktif (Menunggu/Proses Loading, Sailing to POL).</div>';
 
   const panel = $id('pltuInsp'), scrim = $id('pltuInspScrim');
   if (!panel || !scrim) return;
@@ -9311,8 +9475,9 @@ function openPltuInsp(pltuName, optMode){
       + '<div class="pi-box"><div class="pi-box-h"><span>Lintasan Proyeksi HOP (21 Hari)</span><span style="font-weight:600;text-transform:none;color:var(--muted)">● kedatangan kargo</span></div>'
         + gfPltuSparkSVG(u, realToday, selDate)
       + '</div>'
-      + '<div class="pi-box"><div class="pi-box-h"><span>Kapal di Pelabuhan (' + (r.portList ? r.portList.length : 0) + ')</span></div>' + portHtml + '</div>'
-      + '<div class="pi-box"><div class="pi-box-h"><span>Tongkang Sailing (' + (r.sailList ? r.sailList.length : 0) + ')</span></div>' + sailHtml + '</div>'
+      + '<div class="pi-box"><div class="pi-box-h"><span>Antri/Bongkar (' + (r.portList ? r.portList.length : 0) + ' tkg)</span></div>' + portHtml + '</div>'
+      + '<div class="pi-box"><div class="pi-box-h"><span>Sailing (' + (r.sailList ? r.sailList.length : 0) + ' tkg)</span></div>' + sailHtml + '</div>'
+      + '<div class="pi-box"><div class="pi-box-h"><span>Rencana Loading (' + (r.loadList ? r.loadList.length : 0) + ' tkg)</span></div>' + loadHtml + '</div>'
     + '</div>';
   scrim.hidden = false;
   panel.hidden = false;
@@ -9588,7 +9753,7 @@ function renderGrafik(force){
   if (isProj){
     bottomNoteHtml = '<div class="gf-proj-note"><strong>Catatan:</strong> ' + esc(GF_PROJ_NOTE) + '</div>';
   } else if (isHyb){
-    bottomNoteHtml = '<div class="gf-proj-note"><strong>Ket (*):</strong> Stok aktual <strong>' + esc(tglShort) + '</strong> belum tersedia (' + prog.est + '/' + prog.tot + ' PLTU); nilai menggunakan estimasi proyeksi hingga realisasi terbarui.</div>';
+    bottomNoteHtml = '<div class="gf-proj-note"><strong>Ket (*):</strong> Stok aktual <strong>' + esc(tglShort) + '</strong> belum tersedia (' + prog.est + '/' + prog.tot + ' PLTU); nilai menggunakan estimasi proyeksi hingga realisasi terbaru.</div>';
   }
   el.innerHTML = '<div class="gf-shell">' + kpiHtml + ctrl
     + '<div class="gf-grid">' + regs.map(r => {
@@ -9618,8 +9783,14 @@ function gfPaint(){
   GF.raf = requestAnimationFrame(() => { GF.raf = 0; renderGrafik(true); });
 }
 
-function pageFromHash(){ const m = /^#\/?([a-z]+)/.exec(location.hash || ''); return m && PAGE_IDS.includes(m[1]) ? m[1] : 'grafik'; }
+function pageFromHash(){
+  const m = /^#\/?([a-z]+)/.exec(location.hash || '');
+  const raw = m ? m[1] : '';
+  if (raw === 'radar') return 'beranda';
+  return PAGE_IDS.includes(raw) ? raw : 'grafik';
+}
 function showPage(id){
+  if (id === 'radar') id = 'beranda';
   if (!PAGE_IDS.includes(id)) id = 'grafik';
   S.page = id;
   document.documentElement.setAttribute('data-page', id);
@@ -9631,6 +9802,7 @@ function showPage(id){
   document.documentElement.classList.remove('nav-open');
   closePops(); hpClose(); renderNav();
   window.scrollTo(0, 0);
+  if (id === 'beranda') renderHome();
   if (id === 'sim') renderSim(true);
   if (id === 'grafik') renderGrafik(true);
   if (id === 'jadwal'){
@@ -9638,7 +9810,11 @@ function showPage(id){
     requestAnimationFrame(() => { fitWidth(); afterRender(); });
   } else renderDrawer();
 }
-function go(id){ if (location.hash === '#/' + id) showPage(id); else location.hash = '#/' + id; }
+function go(id){
+  if (id === 'radar') id = 'beranda';
+  if (location.hash === '#/' + id) showPage(id);
+  else location.hash = '#/' + id;
+}
 function setNavMin(on){ document.documentElement.classList.toggle('nav-min', !!on); lsSet('sulm_navmin', on ? '1' : '0');
   setTimeout(() => { if (S.page === 'jadwal') fitWidth(); if (S.page === 'grafik') renderGrafik(true); }, 30); }
 function bindNav(){
@@ -9651,18 +9827,59 @@ function bindNav(){
 }
 function bindPages(){
   window.addEventListener('hashchange', () => showPage(pageFromHash()));
-  /* Beranda: kartu & baris pintasan */
-  $id('hmBody').addEventListener('click', e => {
-    const dq = e.target.closest('[data-act="dq"]'); if (dq){ e.stopPropagation(); $id('dqChip').click(); return; }
-    const rr = e.target.closest('.rd-row');
-    if (rr){ radarOpen[rr.closest('.rd-i').dataset.k] = true; rdFilter = 'att'; renderRadar(); go('radar'); return; }
-    const pr = e.target.closest('[data-pr]');
-    if (pr){ const p = pr.dataset.pr; resetFilters();
-      if (p === 'late'){ S.onlyLate = true; $id('tgLate').classList.add('on'); } else S.preset = p;
-      go('jadwal'); render(); return; }
-    const g = e.target.closest('[data-go]');
-    if (g){ if (g.dataset.lv){ rdFilter = g.dataset.lv; renderRadar(); } else if (g.dataset.go === 'radar'){ rdFilter = 'att'; renderRadar(); } go(g.dataset.go); }
-  });
+  /* Halaman Terpadu Ringkasan & Risiko (#pg-beranda) */
+  const pgBeranda = $id('pg-beranda');
+  if (pgBeranda){
+    pgBeranda.addEventListener('click', e => {
+      const dq = e.target.closest('[data-act="dq"]');
+      if (dq){ e.stopPropagation(); const c = $id('dqChip'); if (c) c.click(); return; }
+      const rdf = e.target.closest('[data-rdf]');
+      if (rdf){
+        const f = rdf.dataset.rdf;
+        rdFilter = (rdFilter === f) ? 'att' : f;
+        renderHome();
+        const rc = $id('hmRadCard');
+        if (rc && rc.scrollIntoView) rc.scrollIntoView({ behavior:'smooth', block:'nearest' });
+        return;
+      }
+      const rdp = e.target.closest('.rdp-f');
+      if (rdp && rdp.dataset.f){ rdFilter = rdp.dataset.f; renderHome(); return; }
+      const expBtn = e.target.closest('[data-rdexp]');
+      if (expBtn){
+        const openFlag = expBtn.dataset.rdexp === '1';
+        Object.keys(ASSESS || {}).forEach(k => { radarOpen[k] = openFlag; });
+        renderHome();
+        return;
+      }
+      const rBtn = e.target.closest('.rd-btns button');
+      if (rBtn){
+        const art = rBtn.closest('.rd-i');
+        const k = art && art.dataset.k;
+        if (!k) return;
+        const a = rBtn.dataset.a;
+        if (a === 'insp'){ openPltuInsp(k, 'all'); }
+        else if (a === 'jadwal'){ gfJumpPltu(k, 'jadwal'); }
+        else if (a === 'sim'){ gfJumpPltu(k, 'sim'); }
+        else { gfJumpPltu(k, 'hop'); }
+        return;
+      }
+      const rr = e.target.closest('.rd-row');
+      if (rr){
+        const art = rr.closest('.rd-i');
+        if (art && art.dataset.k){ radarOpen[art.dataset.k] = !radarOpen[art.dataset.k]; renderHome(); }
+        return;
+      }
+      const pr = e.target.closest('[data-pr]');
+      if (pr){
+        const p = pr.dataset.pr; resetFilters();
+        if (p === 'late'){ S.onlyLate = true; const tl = $id('tgLate'); if (tl) tl.classList.add('on'); } else S.preset = p;
+        showPage('jadwal'); go('jadwal'); render();
+        return;
+      }
+      const g = e.target.closest('[data-go]');
+      if (g){ showPage(g.dataset.go); go(g.dataset.go); }
+    });
+  }
 }
 
 function dqInput(){
@@ -10046,11 +10263,10 @@ function buildCmdKItems(qRaw){
   /* 4. Halaman & Aksi Cepat */
   const navActs = [
     { t:'Buka Grafik HOP (Utama)', s:'Monitoring bar HOP Sulawesi & MAPANA', k:'grafik hop chart utama', fn:() => go('grafik') },
+    { t:'Buka Ringkasan & Risiko', s:'KPI program bulanan, deteksi dini PLTU kritis & prioritas mitigasi', k:'beranda ringkasan pasokan pantauan risiko radar kritis kpi', fn:() => go('beranda') },
     { t:'Cek Pengiriman Late Loading', s:'Buka Jadwal Pasokan dengan filter Late Loading aktif', k:'late loading terlambat jadwal', fn:() => { resetFilters(); S.onlyLate = true; const tl = $id('tgLate'); if (tl) tl.classList.add('on'); go('jadwal'); render(); } },
-    { t:'Buka Pantauan Risiko', s:'Daftar peringatan dini PLTU kritis & batas minimum HOP', k:'pantauan risiko radar kritis', fn:() => go('radar') },
     { t:'Buka Jadwal Pasokan (Semua)', s:'Tabel Gantt pengapalan seluruh PLTU', k:'jadwal pasokan pengiriman gantt', fn:() => { resetFilters(); go('jadwal'); render(); } },
     { t:'Buka Simulasi HOP (What-If)', s:'Simulasikan percepatan, tunda, atau pengalihan kargo', k:'simulasi hop skenario mitigasi', fn:() => go('sim') },
-    { t:'Buka Ringkasan Pasokan', s:'Ringkasan KPI program bulanan & status pasokan', k:'beranda ringkasan pasokan kpi', fn:() => go('beranda') },
     { t:'Muat Ulang Data Terbaru', s:'Tarik pembaruan langsung dari Google Sheets', k:'sync refresh muat ulang data', fn:() => pullFromSheets(true) },
     { t:'Ganti Tema Terang / Gelap', s:'Beralih mode warna antarmuka & grafik', k:'tema dark light gelap terang', fn:() => { const b = $id('btnTheme'); if (b) b.click(); } }
   ];
@@ -10227,5 +10443,5 @@ function bindMissionUX(){
   setInterval(() => { if (SYNC.scriptToken) pullFromSheets(false); }, SYNC.refreshMinutes * 60000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4bc796ccbda6d0a',t:'MTc5MjIxMDQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4ec69aa8bd668c3',t:'MTc5MjcxMzExNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4bc796ccbda6d0a',t:'MTc5MjIxMDQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4ee1165b8a3a301',t:'MTc5MjczMDQ3MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
