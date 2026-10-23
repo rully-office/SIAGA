@@ -2102,6 +2102,177 @@ html[data-theme="dark"] .gf-inp-prog.full strong{color:#34D399}
 .gf-tt-sh span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gf-tt-sh span:last-child{flex:none;color:#E2E8F0;font-weight:600}
 .gf-tt-more{font-size:10px;color:rgba(255,255,255,.55);font-style:italic;margin-top:1px}
+.gf-tt-hint{margin-top:6px;padding-top:5px;border-top:1px solid rgba(255,255,255,.12);font-size:10px;font-weight:600;color:#93C5FD;letter-spacing:.01em}
+
+/* ══ v56 · UI/UX MISSION-CONTROL UPGRADE ══ */
+html[data-page="grafik"] .tb-today{display:none !important}
+#nvTheme{display:none !important}
+.gf-shell{max-width:clamp(700px,calc((100vh - 210px) * 16 / 9),980px)}
+
+/* Topbar Command Palette Trigger & Sync Heartbeat */
+.tb-cmdk{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 9px 0 10px;border-radius:8px;
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.82);
+  font:inherit;font-size:11.5px;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s}
+.tb-cmdk:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.28);color:#fff}
+.tb-cmdk svg{flex:none;opacity:.8}
+.tb-cmdk kbd{font:700 9.5px/1 var(--font);padding:3px 5px;border-radius:4px;background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.85);letter-spacing:.02em}
+@media (max-width:980px){ .tb-cmdk .ck-lbl,.tb-cmdk kbd{display:none} .tb-cmdk{padding:0 8px} }
+@keyframes gfSpin{to{transform:rotate(360deg)}}
+.tb-ico.spinning{animation:gfSpin .85s linear infinite;pointer-events:none;opacity:.8}
+.tb-sync.stale{border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.14);color:#FDE68A}
+.tb-sync.stale .sdt{background:#FBBF24 !important;box-shadow:0 0 0 3px rgba(251,191,36,.22)}
+.tb-sync.snap{border-color:rgba(56,189,248,.38);background:rgba(56,189,248,.12);color:#BAE6FD}
+.tb-sync.snap .sdt{background:#38BDF8 !important}
+
+/* Executive KPI Strip above Grafik HOP */
+.gf-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 0 10px}
+.gf-kpi{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:3px;
+  padding:8px 10px 8px 12px;border-radius:10px;background:var(--surface);border:1px solid var(--border);
+  box-shadow:0 1px 2px rgba(15,23,42,.035);text-align:left;font:inherit;color:var(--fg);cursor:pointer;
+  transition:transform .12s,border-color .15s,box-shadow .15s;overflow:hidden}
+.gf-kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3.5px;background:var(--accent)}
+.gf-kpi:hover{border-color:var(--border-2);box-shadow:0 4px 12px rgba(15,23,42,.08);transform:translateY(-1px)}
+.gf-kpi.k-emerg::before{background:#DC2626}
+.gf-kpi.k-emerg.hot{border-color:rgba(220,38,38,.32);background:linear-gradient(90deg,rgba(220,38,38,.055),transparent 65%),var(--surface)}
+.gf-kpi.k-siaga::before{background:#D97706}
+.gf-kpi.k-siaga.hot{border-color:rgba(217,119,6,.3);background:linear-gradient(90deg,rgba(217,119,6,.05),transparent 65%),var(--surface)}
+.gf-kpi.k-sail::before{background:#0D9488}
+.gf-kpi.k-late::before{background:#E11D48}
+.gf-kpi.k-late.ok::before,.gf-kpi.k-emerg.ok::before{background:#10B981}
+.gf-kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:4px}
+.gf-kpi-val{font-size:15px;font-weight:800;line-height:1.2;letter-spacing:-.015em;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gf-kpi.k-emerg.hot .gf-kpi-val{color:#DC2626}
+.gf-kpi.k-siaga.hot .gf-kpi-val{color:#B45309}
+html[data-theme="dark"] .gf-kpi.k-emerg.hot .gf-kpi-val{color:#F87171}
+html[data-theme="dark"] .gf-kpi.k-siaga.hot .gf-kpi-val{color:#FBBF24}
+.gf-kpi-val small{font-size:11px;font-weight:600;color:var(--fg-2);margin-left:2px}
+.gf-kpi-sub{font-size:10.5px;color:var(--fg-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+@media (max-width:920px){ .gf-kpis{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (max-width:580px){ .gf-kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
+/* Time-Scrubber & Quick Horizon Presets */
+.gf-scrub{display:inline-flex;align-items:center;border:1px solid var(--border-2);border-radius:8px;background:var(--surface-2);overflow:hidden;height:28px}
+.gf-scrub .gf-dt{border:0;border-left:1px solid var(--border);border-right:1px solid var(--border);border-radius:0;height:26px;background:var(--surface);padding:0 6px}
+.gf-sbtn{border:0;background:transparent;color:var(--fg-2);width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font:700 11px/1 var(--font);cursor:pointer;transition:background .12s,color .12s}
+.gf-sbtn:hover:not(:disabled){background:var(--accent-soft);color:var(--accent)}
+.gf-sbtn:disabled{opacity:.35;cursor:not-allowed}
+.gf-qgrp{display:inline-flex;align-items:center;gap:4px}
+.gf-qbtn{height:26px;padding:0 8px;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--fg-2);font:600 11px/1 var(--font);cursor:pointer;white-space:nowrap}
+.gf-qbtn:hover{border-color:var(--accent);color:var(--accent)}
+.gf-qbtn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+
+/* Clickable Input Progress Badge & Popover */
+.gf-inp-wrap{position:relative;display:inline-flex}
+button.gf-inp-prog{cursor:pointer;font-family:inherit;transition:filter .12s,border-color .15s}
+button.gf-inp-prog:hover{filter:brightness(.97);border-color:var(--accent)}
+.gf-inp-pop{position:absolute;left:0;top:calc(100% + 6px);z-index:45;width:min(360px,88vw);background:var(--surface);
+  border:1px solid var(--border-2);border-radius:11px;box-shadow:0 14px 32px rgba(15,23,42,.22);padding:11px 12px;text-align:left}
+.gf-ip-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;font-weight:800;color:var(--fg);margin-bottom:6px}
+.gf-ip-bar{height:5px;border-radius:999px;background:var(--surface-3);overflow:hidden;margin-bottom:9px}
+.gf-ip-bar>i{display:block;height:100%;background:linear-gradient(90deg,#10B981,#059669);border-radius:999px}
+.gf-ip-sec{margin-top:7px}
+.gf-ip-sttl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:4px}
+.gf-ip-list{display:flex;flex-wrap:wrap;gap:4px;max-height:148px;overflow-y:auto}
+.gf-ip-item{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:6px;border:1px solid var(--border);
+  background:var(--surface-2);color:var(--fg);font:600 11px/1.2 var(--font);cursor:pointer}
+.gf-ip-item:hover{border-color:var(--accent);color:var(--accent)}
+.gf-ip-item small{font-weight:500;color:var(--muted);font-size:10px}
+.gf-ip-item.est{border-color:rgba(217,119,6,.32);background:rgba(217,119,6,.06)}
+.gf-ip-item.ok{border-color:rgba(16,185,129,.28);background:rgba(16,185,129,.06)}
+
+/* Slide-Over PLTU Inspector */
+.pi-scrim{position:fixed;inset:0;z-index:128;background:rgba(9,16,28,.38);backdrop-filter:blur(1.5px)}
+.pi-panel{position:fixed;top:0;right:0;bottom:0;z-index:130;width:min(440px,95vw);background:var(--surface);
+  border-left:1px solid var(--border-2);box-shadow:-14px 0 36px rgba(0,0,0,.22);display:flex;flex-direction:column;overflow:hidden}
+.pi-hd{padding:14px 16px 11px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.pi-ttl{display:flex;flex-direction:column;gap:3px;min-width:0}
+.pi-ttl-r{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.pi-ttl h3{margin:0;font-size:16.5px;font-weight:800;letter-spacing:-.01em;color:var(--fg)}
+.pi-sub{font-size:11.5px;color:var(--fg-2)}
+.pi-bdg{padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.04em}
+.pi-bdg.norm{background:rgba(22,115,255,.13);color:#1560BD}
+.pi-bdg.siaga{background:rgba(217,119,6,.16);color:#B45309}
+.pi-bdg.emerg{background:rgba(220,38,38,.15);color:#DC2626}
+html[data-theme="dark"] .pi-bdg.norm{background:rgba(59,130,246,.2);color:#93C5FD}
+html[data-theme="dark"] .pi-bdg.siaga{background:rgba(251,191,36,.2);color:#FDE68A}
+html[data-theme="dark"] .pi-bdg.emerg{background:rgba(248,113,113,.22);color:#FCA5A5}
+.pi-nav{padding:8px 16px 9px;background:var(--surface-2);border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
+.pi-nav-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.pi-modes{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}
+.pi-mbtn{border:1px solid var(--border-2);background:var(--surface);color:var(--fg-2);border-radius:999px;padding:2.5px 8px;
+  font:700 10.5px/1.3 var(--font);cursor:pointer;white-space:nowrap;transition:all .12s}
+.pi-mbtn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.pi-mbtn:disabled{opacity:.38;cursor:not-allowed}
+.pi-mbtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.pi-mbtn.m-emerg.on{background:#DC2626;border-color:#DC2626;color:#fff}
+.pi-mbtn.m-siaga.on{background:#D97706;border-color:#D97706;color:#fff}
+.pi-step{display:inline-flex;align-items:center;gap:4px;margin-left:auto}
+.pi-sbtn{border:1px solid var(--border-2);background:var(--surface);color:var(--fg);border-radius:7px;height:24px;padding:0 7px;
+  font:700 11px/1 var(--font);cursor:pointer;display:inline-flex;align-items:center;gap:3px}
+.pi-sbtn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.pi-sbtn:disabled{opacity:.35;cursor:not-allowed}
+.pi-scnt{font-size:11px;font-weight:800;color:var(--fg-2);min-width:38px;text-align:center}
+.pi-chips{display:flex;align-items:center;gap:5px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.pi-chip{flex:none;display:inline-flex;align-items:center;gap:4px;padding:3.5px 8px;border-radius:7px;border:1px solid var(--border);
+  background:var(--surface);color:var(--fg-2);font:600 11px/1.2 var(--font);cursor:pointer;white-space:nowrap}
+.pi-chip:hover{border-color:var(--accent);color:var(--accent)}
+.pi-chip.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:800}
+.pi-chip.c-emerg.on{border-color:#DC2626;background:rgba(220,38,38,.11);color:#DC2626}
+.pi-chip.c-siaga.on{border-color:#D97706;background:rgba(217,119,6,.12);color:#B45309}
+html[data-theme="dark"] .pi-chip.c-emerg.on{color:#FCA5A5;border-color:#F87171;background:rgba(248,113,113,.16)}
+html[data-theme="dark"] .pi-chip.c-siaga.on{color:#FDE68A;border-color:#FBBF24;background:rgba(251,191,36,.16)}
+.pi-chip small{font-size:10px;opacity:.85}
+.pi-acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:9px 16px;background:var(--surface);border-bottom:1px solid var(--border)}
+.pi-act{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:7px 8px;border-radius:8px;
+  border:1px solid var(--border-2);background:var(--surface);color:var(--fg);font:700 11.5px/1.15 var(--font);cursor:pointer;white-space:nowrap}
+.pi-act:hover{border-color:var(--accent);color:var(--accent)}
+.pi-act.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.pi-act.pri:hover{filter:brightness(1.07);color:#fff}
+.pi-body{flex:1;overflow-y:auto;padding:13px 16px 20px;display:flex;flex-direction:column;gap:12px}
+.pi-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pi-m{padding:9px 11px;border-radius:9px;border:1px solid var(--border);background:var(--surface-2)}
+.pi-m-l{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.pi-m-v{font-size:16px;font-weight:800;color:var(--fg);margin-top:2px;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.pi-m-s{font-size:11px;color:var(--fg-2);margin-top:2px}
+.pi-alert{padding:8px 11px;border-radius:8px;font-size:11.5px;line-height:1.4;font-weight:600;border:1px solid var(--border)}
+.pi-alert.warn{background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.28);color:#B91C1C}
+.pi-alert.siaga{background:rgba(217,119,6,.08);border-color:rgba(217,119,6,.28);color:#B45309}
+.pi-alert.ok{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.28);color:#047857}
+html[data-theme="dark"] .pi-alert.warn{color:#FCA5A5}
+html[data-theme="dark"] .pi-alert.siaga{color:#FDE68A}
+html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
+.pi-box{border:1px solid var(--border);border-radius:10px;padding:10px 11px;background:var(--surface)}
+.pi-box-h{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--fg-2);margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
+.pi-vlist{display:flex;flex-direction:column;gap:5px}
+.pi-v{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:7px;background:var(--surface-2);border:1px solid transparent;font-size:11.5px}
+.pi-v.jump{cursor:pointer}
+.pi-v.jump:hover{border-color:var(--accent);background:var(--accent-soft)}
+.pi-v-l{min-width:0;display:flex;flex-direction:column;gap:1px}
+.pi-v-l b{font-weight:700;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pi-v-l small{font-size:10.5px;color:var(--fg-2)}
+.pi-v-r{flex:none;text-align:right;font-weight:700;font-size:11px;color:var(--fg)}
+.pi-v-r small{display:block;font-weight:600;font-size:10px;color:var(--muted)}
+.pi-empty{font-size:11.5px;color:var(--muted);padding:4px 0}
+
+/* Global Command Palette (Ctrl+K) */
+.ck-scrim{position:fixed;inset:0;z-index:150;background:rgba(8,15,26,.46);backdrop-filter:blur(2px);display:flex;align-items:flex-start;justify-content:center;padding:10vh 14px 20px}
+.ck-box{width:min(560px,100%);background:var(--surface);border:1px solid var(--border-2);border-radius:13px;box-shadow:0 22px 54px rgba(0,0,0,.32);overflow:hidden;display:flex;flex-direction:column;max-height:74vh}
+.ck-top{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border)}
+.ck-top svg{flex:none;color:var(--muted)}
+.ck-inp{flex:1;border:0;background:transparent;color:var(--fg);font:600 13.5px/1.3 var(--font);outline:none}
+.ck-inp::placeholder{color:var(--muted);font-weight:500}
+.ck-esc{font:700 10px/1 var(--font);padding:4px 6px;border-radius:5px;background:var(--surface-2);border:1px solid var(--border);color:var(--muted);cursor:pointer}
+.ck-list{flex:1;overflow-y:auto;padding:6px}
+.ck-grp{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:6px 9px 3px}
+.ck-it{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:0;border-radius:8px;
+  background:transparent;color:var(--fg);font:inherit;font-size:12.5px;text-align:left;cursor:pointer}
+.ck-it:hover,.ck-it.sel{background:var(--accent-soft);color:var(--accent)}
+.ck-it-l{min-width:0;display:flex;align-items:center;gap:8px;overflow:hidden}
+.ck-it-l b{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ck-it-l small{font-size:11px;color:var(--fg-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ck-it-r{flex:none;font-size:11px;font-weight:700;color:var(--muted)}
+.ck-foot{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-top:1px solid var(--border);background:var(--surface-2);font-size:10.5px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -2158,6 +2329,11 @@ html[data-theme="dark"] .gf-inp-prog.full strong{color:#34D399}
   <select class="cst" id="fPeriode" title="Periode bulan" hidden></select><span class="modebadge" id="modeBadge"></span>
   <span class="tb-br"></span>
   <div class="tb-sp"></div>
+  <button class="tb-cmdk" id="btnCmdK" type="button" title="Pencarian cepat PLTU, kapal, pemasok, &amp; halaman (Ctrl+K)">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2"/></svg>
+    <span class="ck-lbl">Cari PLTU / kapal…</span>
+    <kbd>Ctrl K</kbd>
+  </button>
   <div class="tb-today"><input type="date" id="todayPick" aria-label="Tanggal acuan">
     <button class="tb-txt" id="btnToday" type="button" title="Kembali ke hari ini">Hari ini</button></div>
   <div class="tb-sync" id="tbSync" title="Sumber data"><span class="sdt"></span><span id="syncTxt" class="syncT">Memuat…</span></div>
@@ -2247,6 +2423,9 @@ html[data-theme="dark"] .gf-inp-prog.full strong{color:#34D399}
 <div id="dqPanel" role="dialog" aria-label="Kualitas data" hidden></div>
 <div id="hopPop"></div>
 <div id="tt"></div>
+<div class="pi-scrim" id="pltuInspScrim" hidden></div>
+<aside class="pi-panel" id="pltuInsp" role="dialog" aria-modal="false" aria-label="Panel Inspeksi PLTU" hidden></aside>
+<div class="ck-scrim" id="cmdK" role="dialog" aria-modal="true" aria-label="Pencarian cepat" hidden></div>
 
 <!-- Halaman Login -->
 <div id="authGate" class="on" role="dialog" aria-modal="true" aria-labelledby="agTitle">
@@ -3419,15 +3598,21 @@ function updateKPI(rows){
   const catatanStok = '';
   let hopKpi = '';
   if (HOPBY){
+    const mRef = typeof gfModel === 'function' ? gfModel('SULMAPANA', S.today || (typeof gfTgl === 'function' ? gfTgl() : null)) : null;
+    const efMap = {};
+    if (mRef && mRef.rows) mRef.rows.forEach(r => { if (!r.isGroup) efMap[r.nm] = r.ef; });
     const list = [];
     Object.keys(HOPBY).forEach(u => {
-      if (unitPick && !unitPick[u]) return;         // ikut filter PLTU
-      const w = hopWatch(HOPBY[u]); if (w){ w.u = u; list.push(w); }
+      if (unitPick && !unitPick[u]) return;
+      const w0 = hopWatch(HOPBY[u]);
+      const vEf = (efMap[u] != null && isFinite(efMap[u])) ? efMap[u] : (w0 ? w0.v : hopKini(HOPBY[u]));
+      const lvl = vEf < 0 ? 3 : vEf < 10 ? 2 : vEf < 15 ? 1 : (w0 && w0.dE ? 0 : -1);
+      if (lvl >= 0) list.push({ u:u, v:vEf, lvl:lvl, dK:w0 && w0.dK, dE:w0 && w0.dE, dS:w0 && w0.dS });
     });
     list.sort(hopSort);
     const em = list.filter(x => x.lvl >= 2), si = list.filter(x => x.lvl === 1);
     const worst = list[0];
-    const tip1 = 'Merah: HOP di bawah 10 hari · oranye: 10–15 hari. Dihitung per ' + fmtShort(S.today) + '.'
+    const tip1 = 'Merah: HOP di bawah 10 hari · oranye: 10–15 hari. Dihitung per ' + fmtShort(S.today) + ' (selaras Grafik HOP).'
       + (unitPick ? '\nHanya ' + pltuLbl() + ' (sedang difilter).' : '\nSemua PLTU.')
       + catatanStok;
     hopKpi = `<div class="kpi" title="${tip1.replace(/"/g,'&quot;')}"><div class="kpi-l">HOP perlu perhatian${chip}${chipSup}</div>
@@ -3471,23 +3656,25 @@ function updateKPI(rows){
   let hopTotKpi = '';
   const ht = hopTotals(unitPick);
   if (ht){
-    const tg = (HOPDATA.updated ? hopDate(HOPDATA.updated) : '—');
+    const tg = ht.tgl ? hopDate(ht.tgl) : (HOPDATA.updated ? hopDate(HOPDATA.updated) : '—');
     const mt = v => nf(Math.round(v)) + ' MT';
     const hr = v => nf(Math.round(v * 10) / 10);
+    const modeKet = ht.isProj ? ('proyeksi ' + tg) : (ht.estCount > 0 ? (tg + ' · aktual + estimasi*') : ('aktual ' + tg));
     const dasar = (unitPick
-        ? 'Stok ' + pltuLbl() + ' dibagi pemakaian maksnya '
-        : 'Stok ' + ht.n + ' PLTU digabung, dibagi pemakaian maks totalnya ')
-      + mt(ht.sK) + '/hari (sheet Grafik, ' + tg + ').';
-    const tipEf = 'HOP efektif — stok yang sudah ada di pelabuhan.\n' + dasar
+        ? 'Stok ' + pltuLbl() + ' dibagi pembagi stock-nya '
+        : 'Stok ' + ht.n + ' PLTU digabung, dibagi pembagi stock totalnya ')
+      + mt(ht.sK) + '/hari (' + modeKet + ').';
+    const subEf = ht.isProj ? ('Proyeksi stok · ' + tg) : (ht.estCount > 0 ? ('Stok per ' + tg + ' (Aktual + Est*)') : ('Stok di pelabuhan · ' + tg));
+    const tipEf = 'HOP efektif — stok efektif tertimbang seluruh PLTU (selaras dengan Grafik HOP).\n' + dasar
                 + '\nStok efektif ' + mt(ht.mtEf) + ' ÷ ' + mt(ht.sK) + '/hari = ' + hr(ht.mtEf / ht.sK) + ' hari.' + catatanStok;
-    const tipTot = 'HOP total — termasuk stok apung & kapal yang berlayar.\n' + dasar
+    const tipTot = 'HOP total — termasuk stok apung (koreksi bongkar) & kapal berstatus Sailing.\n' + dasar
                  + '\nEfektif ' + mt(ht.mtEf) + ' + apung ' + mt(ht.mtAp) + ' + sailing ' + mt(ht.mtSl)
                  + ' = ' + mt(ht.mtHt) + ' → ' + hr(ht.mtHt / ht.sK) + ' hari.' + catatanStok;
     hopTotKpi =
       `<div class="kpi" title="${tipEf.replace(/"/g,'&quot;')}">
         <div class="kpi-l">HOP efektif${chip}${chipSup}</div>
         <div class="kpi-v num">${hr(ht.mtEf / ht.sK)}<small>hr</small></div>
-        <div class="kpi-s">Stok di pelabuhan</div></div>
+        <div class="kpi-s">${esc(subEf)}</div></div>
       <div class="kpi" title="${tipTot.replace(/"/g,'&quot;')}">
         <div class="kpi-l">HOP total${chip}${chipSup}</div>
         <div class="kpi-v num">${hr(ht.mtHt / ht.sK)}<small>hr</small></div>
@@ -3540,12 +3727,24 @@ function simResetSemua(){
 }
 
 /* ── SINKRONISASI GOOGLE SHEETS ─────────────────────────────────────────── */
+let LAST_SYNC_TS = 0, LAST_CACHE_TS = 0, SYNC_META = { kind:'', text:'', title:'' }, PULL_BUSY = false;
 function setStatus(kind, text, title){
-  if (kind === 'live') DATA_MODE = 'live';   // v31
+  const bs = document.getElementById('btnSync');
+  const isSnap = kind === 'busy' && /^Data tersimpan/.test(String(text || ''));
+  if (bs) bs.classList.toggle('spinning', kind === 'busy' && !isSnap);
+  PULL_BUSY = (kind === 'busy' && !isSnap);
+  if (kind === 'live'){
+    DATA_MODE = 'live';
+    LAST_SYNC_TS = Date.now();
+  }
+  const effKind = isSnap ? 'snap' : (kind || '');
+  SYNC_META = { kind:effKind, text:String(text || ''), title:String(title || '') };
   const el = document.getElementById('tbSync');
-  el.className = 'tb-sync' + (kind ? ' ' + kind : '');
+  if (!el) return;
+  el.className = 'tb-sync' + (effKind ? ' ' + effKind : '');
   document.getElementById('syncTxt').textContent = text;
   if (title) el.title = title;
+  if (kind === 'live' && typeof updateFreshnessUI === 'function') updateFreshnessUI();
 }
 
 /* tanggal dikenali dari ISO, "Date(…)", serial, atau dd/mm/yyyy */
@@ -3770,6 +3969,7 @@ function terapkanCache(c, sh){
   HOPDATA = c.hop || null; HOP_SRC = 'cache';
   PERIODE = c.periode || null; S.periode = sh;
   try { const ps = JSON.parse(cacheGet(LS_PERS) || 'null'); if (ps && ps.length) PERIODS = saringPeriode(ps); } catch(_){}   // v35
+  LAST_CACHE_TS = Number(c.at) || 0;
   CACHE_AT = new Date(c.at || Date.now()).toLocaleString('id-ID', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
   DATA_MODE = 'cache'; MEMUAT = null;   // v31
   keepFilters(); render();
@@ -4145,25 +4345,48 @@ function hopWatch(h){
 /* pick = daftar unit Stock yang ikut dihitung (mengikuti filter PLTU); kosong = semua unit */
 function hopTotals(pick){
   if (!HOPDATA || !HOPDATA.units) return null;
+  /* Selaraskan 100% dengan mesin Grafik HOP (gfModel) pada tanggal acuan aktif,
+     sehingga HOP efektif & HOP total di Ringkasan Pasokan dan KPI Grafik HOP selalu identik. */
+  if (HOPBY && typeof gfModel === 'function'){
+    if (typeof simEnsureNext === 'function') simEnsureNext();
+    if (typeof gfEnsurePrev === 'function') gfEnsurePrev();
+    const refTgl = S.today || (typeof gfTgl === 'function' ? gfTgl() : null);
+    const m = gfModel('SULMAPANA', refTgl);
+    if (m && m.rows){
+      let mtEf = 0, mtAp = 0, mtSl = 0, mtHt = 0, sK = 0, n = 0, estCnt = 0;
+      m.rows.forEach(r => {
+        if (r.isGroup) return;
+        if (pick && !pick[r.nm]) return;
+        const K = Number(r.burn) || 0;
+        if (!K) return;
+        n++; sK += K;
+        if (r.est) estCnt++;
+        mtEf += r.ef * K;
+        mtAp += r.ap * K;
+        mtSl += r.sl * K;
+        mtHt += (r.ef + r.ap + r.sl) * K;
+      });
+      if (n && sK){
+        return { mtEf:mtEf, mtAp:mtAp, mtSl:mtSl, mtHt:mtHt, sK:sK, n:n, tgl:m.isoDate, estCount:estCnt, isProj:m.isProj };
+      }
+    }
+  }
   let mtEf=0, mtAp=0, mtSl=0, mtHt=0, sK=0, n=0, ada=false;
   HOPDATA.units.forEach(u => {
-    if (pick && !pick[u.pltu]) return;               // sedang difilter ke PLTU lain
+    if (pick && !pick[u.pltu]) return;
     const K = Number(u.bagi) || 0;
-    if (!K) return;                                   // tanpa konsumsi maks tidak bisa dihitung
+    if (!K) return;
     let d = Number(u.efektif) || 0;
-    /* Pagi hari input stok (laporan WA unit, ±15.00 WIB) belum masuk → Grafik D = 0.
-       Ganti dengan stok efektif TERAKHIR yang terisi (base = hari sebelumnya) supaya
-       KPI tidak jatuh; begitu input hari ini masuk, d = hari ini lagi. */
     if (!(d > 0) && Number(u.base) > 0) d = Number(u.base);
     const e = Number(u.apung)||0, f = Number(u.sailing)||0;
     if (u.efektif == null && u.apung == null && u.sailing == null && u.base == null) return;
     ada = true; n++; sK += K;
     mtEf += d*K; mtAp += e*K; mtSl += f*K;
-    mtHt += (d + e + f) * K;                          // sama dgn rumus Grafik H (=sum D:F)
+    mtHt += (d + e + f) * K;
   });
   if (!ada || !sK) return null;
   if (!mtHt) mtHt = mtEf + mtAp + mtSl;
-  return { mtEf:mtEf, mtAp:mtAp, mtSl:mtSl, mtHt:mtHt, sK:sK, n:n };
+  return { mtEf:mtEf, mtAp:mtAp, mtSl:mtSl, mtHt:mtHt, sK:sK, n:n, tgl:HOPDATA.updated || S.today, estCount:0, isProj:false };
 }
 function hopSort(a, b){
   return (b.lvl - a.lvl)
@@ -4987,17 +5210,19 @@ const svgI = k => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" s
 function renderNav(){
   const el = $id('nvList'); if (!el) return;
   const hot = Object.keys(ASSESS).filter(k => ASSESS[k].level === 'kritis' || ASSESS[k].level === 'tinggi').length;
-  const it = (id, t, ic, badge) => `<button type="button" class="nv-i${S.page === id ? ' on' : ''}" data-pg="${id}" title="${esc(t)}"${S.page === id ? ' aria-current="page"' : ''}>${svgI(ic)}<span class="nv-t">${esc(t)}</span>${badge ? '<span class="nv-b" title="PLTU risiko kritis / tinggi">' + badge + '</span>' : ''}</button>`;
-  const soon = (t, ic) => `<button type="button" class="nv-i" disabled title="${esc(t)} — segera hadir">${svgI(ic)}<span class="nv-t">${esc(t)}</span><span class="nv-soon">Segera</span></button>`;
+  const lateCnt = (typeof ROWS !== 'undefined' && Array.isArray(ROWS)) ? ROWS.filter(hasLate).length : 0;
+  const it = (id, t, ic, badge, bTitle) => `<button type="button" class="nv-i${S.page === id ? ' on' : ''}" data-pg="${id}" title="${esc(t)}"${S.page === id ? ' aria-current="page"' : ''}>${svgI(ic)}<span class="nv-t">${esc(t)}</span>${badge ? '<span class="nv-b" title="' + esc(bTitle || '') + '">' + badge + '</span>' : ''}</button>`;
   const tb = $id('tabbar');
   if (tb){
     const t = (id, lb, ic, bd) => `<button type="button" class="tb-i${S.page === id ? ' on' : ''}" data-pg="${id}"${S.page === id ? ' aria-current="page"' : ''}>${svgI(ic)}<span>${lb}</span>${bd ? '<b>' + bd + '</b>' : ''}</button>`;
-    tb.innerHTML = t('grafik', 'Grafik', 'chart') + t('beranda', 'Ringkasan', 'grid') + t('radar', 'Risiko', 'radar', hot || '') + t('jadwal', 'Jadwal', 'gantt') + t('hop', 'HOP', 'trend') + t('sim', 'Simulasi', 'sim');
+    tb.innerHTML = t('grafik', 'Grafik', 'chart') + t('beranda', 'Ringkasan', 'grid') + t('radar', 'Risiko', 'radar', hot || '') + t('jadwal', 'Jadwal', 'gantt', lateCnt || '') + t('hop', 'HOP', 'trend') + t('sim', 'Simulasi', 'sim');
   }
-  el.innerHTML = it('grafik', 'Grafik HOP', 'chart') + it('beranda', 'Ringkasan Pasokan', 'grid') + it('radar', 'Pantauan Risiko', 'radar', hot || '')
-    + it('jadwal', 'Jadwal Pengiriman', 'gantt') + it('hop', 'Proyeksi HOP', 'trend') + it('sim', 'Simulasi HOP', 'sim')
-    + '<div class="nv-g">Segera</div>'
-    + soon('Catatan Tindak Lanjut', 'list') + soon('Laporan', 'doc') + soon('Data Master', 'db');
+  el.innerHTML = it('grafik', 'Grafik HOP', 'chart')
+    + it('beranda', 'Ringkasan Pasokan', 'grid')
+    + it('radar', 'Pantauan Risiko', 'radar', hot || '', 'PLTU risiko kritis / tinggi')
+    + it('jadwal', 'Jadwal Pasokan', 'gantt', lateCnt || '', 'Pengapalan late loading aktif')
+    + it('hop', 'Proyeksi HOP', 'trend')
+    + it('sim', 'Simulasi HOP', 'sim');
 }
 /* ══════════════════════════════════════════════════════════════════════════
    SIMULASI HOP (v52) — "bagaimana kalau…" untuk HOP hari ini s.d. akhir bulan depan.
@@ -8002,9 +8227,9 @@ function gfMakeGroupRow(label, regRows, gapTop){
 }
 
 /* susun data grafik dengan skala X seragam (standar 100) untuk SULMAPANA / Sulawesi / MAPANA */
-function gfModel(reg){
+function gfModel(reg, optDate){
   if (!HOPDATA || !HOPBY) return null;
-  const realToday = gfRealToday(), targetDate = gfTgl();
+  const realToday = gfRealToday(), targetDate = optDate || gfTgl();
   const isProj = !!(targetDate && targetDate > realToday);
   const prog = gfInputProgress(targetDate);
   const actualMap = isProj ? null : gfCollectActualShips(targetDate, realToday);
@@ -8750,9 +8975,383 @@ function gfShowCanvasTT(cvs, e){
     if (r.sailList.length > 5) html += '<div class="gf-tt-more">…dan ' + (r.sailList.length - 5) + ' tongkang lainnya</div>';
     html += '</div>';
   }
+  html += '<div class="gf-tt-hint">Klik baris untuk buka Panel Inspeksi · Jadwal · Simulasi ›</div>';
   tt.innerHTML = html;
   tt.classList.add('gf-tt', 'on');
   moveTT(e);
+}
+
+function gfHitPltuBand(cvs, e){
+  const hit = cvs && cvs._gfHit;
+  if (!hit || !hit.bands || !hit.bands.length) return null;
+  const rect = cvs.getBoundingClientRect();
+  if (!rect || !rect.height) return null;
+  const ry = (e.clientY - rect.top) / rect.height;
+  for (let i = 0; i < hit.bands.length; i++){
+    const b = hit.bands[i];
+    if (ry >= b.y0 && ry <= b.y1) return b;
+  }
+  return null;
+}
+
+function gfAddDays(isoStr, delta){
+  const d = toDate(isoStr);
+  if (!d) return isoStr;
+  return iso(new Date(d.getFullYear(), d.getMonth(), d.getDate() + delta));
+}
+
+function gfStepDate(delta){
+  const cur = gfTgl(), bnd = gfProjBounds();
+  if (!cur) return;
+  let nxt = gfAddDays(cur, delta);
+  if (bnd.min && nxt < bnd.min) nxt = bnd.min;
+  if (bnd.max && nxt > bnd.max) nxt = bnd.max;
+  if (nxt !== cur){ hideTT(); gfCloseInpPop(); gfPickDate(nxt); }
+}
+
+function gfCloseInpPop(){
+  GF.inpOpen = false;
+  const pop = $id('gfInpPop');
+  if (pop) pop.hidden = true;
+}
+
+function gfKpiStripHTML(mAll, tgl, realToday){
+  if (!mAll || !mAll.rows) return '';
+  let gSul = null, gMap = null, burnSum = 0, mtEf = 0, mtTot = 0;
+  let sailCnt = 0, sailMt = 0, portCnt = 0, portMt = 0;
+  const emerg = [], siaga = [];
+  mAll.rows.forEach(r => {
+    if (r.isGroup){
+      if (r.label === 'SULAWESI') gSul = r;
+      else if (r.label === 'MAPANA') gMap = r;
+      return;
+    }
+    const b = Number(r.burn) || 0;
+    if (b > 0){
+      burnSum += b;
+      mtEf += r.ef * b;
+      mtTot += (r.ef + r.ap + r.sl) * b;
+    }
+    if (r.ef < 10) emerg.push(r);
+    else if (r.ef < 15) siaga.push(r);
+    sailCnt += (r.sailCnt || 0);
+    sailMt += (r.sailMt || 0);
+    if (r.portList && r.portList.length){
+      portCnt += r.portList.length;
+      r.portList.forEach(p => { portMt += (Number(p.vol) || 0); });
+    }
+  });
+  emerg.sort((a, b) => a.ef - b.ef);
+  siaga.sort((a, b) => a.ef - b.ef);
+  const hopEf = burnSum > 0 ? (mtEf / burnSum) : 0;
+  const hopAll = burnSum > 0 ? (mtTot / burnSum) : 0;
+  const hopSul = gSul ? gSul.hopReg : 0, hopMap = gMap ? gMap.hopReg : 0;
+  const tipReg = 'HOP Stock Efektif tertimbang (selaras dengan Ringkasan Pasokan): '
+    + gfN(Math.round(mtEf)) + ' MT ÷ ' + gfN(Math.round(burnSum)) + ' MT/hari = ' + gfF1(hopEf) + ' hari'
+    + ' · HOP Total (termasuk apung & sailing): ' + gfF1(hopAll) + ' hari.';
+  const emergSub = emerg.length
+    ? emerg.slice(0, 3).map(r => r.nm + ' (' + gfF1(r.ef) + ')').join(', ') + (emerg.length > 3 ? ' +' + (emerg.length - 3) : '')
+    : 'Seluruh PLTU ≥ 10 HOP ✓';
+  const nearBreach = Object.keys(ASSESS || {})
+    .map(k => Object.assign({ k:k }, ASSESS[k]))
+    .filter(a => a && a.breachDate && a.hopNow >= (a.cfg ? a.cfg.minHop : 15))
+    .sort((a, b) => a.breachDate < b.breachDate ? -1 : 1)[0];
+  const siagaSub = siaga.length
+    ? siaga.slice(0, 3).map(r => r.nm + ' (' + gfF1(r.ef) + ')').join(', ') + (siaga.length > 3 ? ' +' + (siaga.length - 3) : '')
+    : (nearBreach ? ('Terdekat <15 hr: ' + nearBreach.k + ' · ' + fmtShort(nearBreach.breachDate)) : 'Tidak ada unit 10–15 HOP ✓');
+  const lateRows = Array.isArray(ROWS) ? ROWS.filter(hasLate) : [];
+  const lateUnits = new Set();
+  lateRows.forEach(rw => { const u = unitOf(rw) || rw.pltu; if (u) lateUnits.add(u); });
+  const lateSub = lateRows.length
+    ? ('Berdampak ' + lateUnits.size + ' PLTU · Klik cek jadwal ›')
+    : 'Tidak ada keterlambatan muat ✓';
+  return '<div class="gf-kpis" role="region" aria-label="Indikator Eksekutif Pasokan">'
+    + '<button type="button" class="gf-kpi k-reg" data-gfkpi="reg" title="' + esc(tipReg) + '">'
+      + '<span class="gf-kpi-lbl">HOP Stock Efektif</span>'
+      + '<span class="gf-kpi-val">' + gfF1(hopEf) + '<small>hr · Total ' + gfF1(hopAll) + ' hr</small></span>'
+      + '<span class="gf-kpi-sub">Sulawesi ' + gfF1(hopSul) + ' · MAPANA ' + gfF1(hopMap) + ' hr</span>'
+    + '</button>'
+    + '<button type="button" class="gf-kpi k-emerg ' + (emerg.length ? 'hot' : 'ok') + '" data-gfkpi="emerg" title="Klik untuk mengurutkan dari HOP terendah &amp; menelusuri seluruh PLTU Emergency">'
+      + '<span class="gf-kpi-lbl">Emergency (&lt;10 HOP)</span>'
+      + '<span class="gf-kpi-val">' + emerg.length + '<small>PLTU</small></span>'
+      + '<span class="gf-kpi-sub">' + esc(emergSub) + '</span>'
+    + '</button>'
+    + '<button type="button" class="gf-kpi k-siaga ' + (siaga.length ? 'hot' : '') + '" data-gfkpi="siaga" title="Klik untuk menelusuri seluruh PLTU Siaga (10–15 HOP)">'
+      + '<span class="gf-kpi-lbl">Siaga (10–15 HOP)</span>'
+      + '<span class="gf-kpi-val">' + siaga.length + '<small>PLTU</small></span>'
+      + '<span class="gf-kpi-sub">' + esc(siagaSub) + '</span>'
+    + '</button>'
+    + '<button type="button" class="gf-kpi k-sail" data-gfkpi="sail" title="Klik untuk melihat seluruh kapal berlayar di Jadwal Pasokan">'
+      + '<span class="gf-kpi-lbl">Armada Sailing</span>'
+      + '<span class="gf-kpi-val">' + sailCnt + '<small>tkg · ' + gfF1(sailMt / 1000) + ' RB MT</small></span>'
+      + '<span class="gf-kpi-sub">' + (portCnt ? ('+' + portCnt + ' di pelabuhan (' + gfF1(portMt / 1000) + ' RB MT)') : '0 kapal antri/bongkar di pelabuhan') + '</span>'
+    + '</button>'
+    + '<button type="button" class="gf-kpi k-late ' + (lateRows.length ? 'hot' : 'ok') + '" data-gfkpi="late" title="Klik untuk memfilter pengapalan Late Loading di Jadwal Pasokan">'
+      + '<span class="gf-kpi-lbl">Late Loading</span>'
+      + '<span class="gf-kpi-val">' + lateRows.length + '<small>pengapalan</small></span>'
+      + '<span class="gf-kpi-sub">' + esc(lateSub) + '</span>'
+    + '</button>'
+  + '</div>';
+}
+
+function gfInpPopHTML(mAll, tglShort, prog){
+  if (!mAll || !prog) return '';
+  const pltus = mAll.rows.filter(r => !r.isGroup);
+  const estList = pltus.filter(r => r.est);
+  const actList = pltus.filter(r => !r.est);
+  const pct = prog.tot > 0 ? Math.round((prog.act / prog.tot) * 100) : 100;
+  return '<div class="gf-inp-pop" id="gfInpPop"' + (GF.inpOpen ? '' : ' hidden') + '>'
+    + '<div class="gf-ip-hd"><span>Kelengkapan Input · ' + esc(tglShort) + '</span><span>' + prog.act + '/' + prog.tot + ' PLTU (' + pct + '%)</span></div>'
+    + '<div class="gf-ip-bar"><i style="width:' + pct + '%"></i></div>'
+    + (estList.length
+      ? ('<div class="gf-ip-sec"><div class="gf-ip-sttl">Belum Input — Estimasi Proyeksi* (' + estList.length + ')</div><div class="gf-ip-list">'
+        + estList.map(r => '<button type="button" class="gf-ip-item est" data-gfopenpltu="' + esc(r.nm) + '" data-gfinpmode="est" title="Klik untuk buka Panel Inspeksi PLTU ' + esc(r.nm) + '">'
+          + esc(r.nm) + ' <small>' + gfF1(r.ef) + ' hr*</small></button>').join('')
+        + '</div></div>')
+      : '')
+    + (actList.length
+      ? ('<div class="gf-ip-sec"><div class="gf-ip-sttl">Sudah Input Aktual ✓ (' + actList.length + ')</div><div class="gf-ip-list">'
+        + actList.map(r => '<button type="button" class="gf-ip-item ok" data-gfopenpltu="' + esc(r.nm) + '" title="Klik untuk buka Panel Inspeksi PLTU ' + esc(r.nm) + '">'
+          + esc(r.nm) + ' <small>' + gfF1(r.ef) + ' hr ✓</small></button>').join('')
+        + '</div></div>')
+      : '')
+  + '</div>';
+}
+
+function gfPltuSparkSVG(u, realToday, selDate){
+  const pm = gfCollectProjShips(realToday);
+  const uShips = (pm && pm[u.pltu]) || [];
+  const h = HOPBY && HOPBY[u.pltu];
+  const ser = (h && h.seri) || {};
+  const startIso = (selDate && selDate < realToday) ? selDate : realToday;
+  let spanDays = 21;
+  if (selDate && selDate > gfAddDays(startIso, 18)){
+    const diff = Math.round((toDate(selDate) - toDate(startIso)) / 86400000);
+    spanDays = Math.min(45, Math.max(21, diff + 4));
+  }
+  const pts = [];
+  for (let i = 0; i <= spanDays; i++){
+    const dIso = gfAddDays(startIso, i);
+    let v;
+    if (dIso <= realToday && gfHasActualOnDate(u, h, dIso)){
+      v = (ser[dIso] && ser[dIso].v != null && isFinite(ser[dIso].v)) ? Number(ser[dIso].v) : Number(u.base || 0);
+    } else {
+      v = gfEvalProjOnDate(u, uShips, dIso, realToday).ef;
+    }
+    pts.push({ d:dIso, v:Math.max(0, Number(v) || 0) });
+  }
+  if (!pts.length) return '';
+  const W = 388, H = 122, padL = 30, padR = 12, padT = 14, padB = 22;
+  const cw = W - padL - padR, ch = H - padT - padB;
+  let maxV = 22;
+  pts.forEach(p => { if (p.v > maxV) maxV = p.v; });
+  maxV = Math.ceil(maxV * 1.12 / 5) * 5;
+  const xp = i => padL + (pts.length > 1 ? (i / (pts.length - 1)) * cw : cw / 2);
+  const yp = v => padT + ch - Math.min(1, Math.max(0, v / maxV)) * ch;
+  const poly = pts.map((p, i) => xp(i).toFixed(1) + ',' + yp(p.v).toFixed(1)).join(' ');
+  const area = padL + ',' + (padT + ch) + ' ' + poly + ' ' + xp(pts.length - 1).toFixed(1) + ',' + (padT + ch);
+  const y15 = yp(15), y10 = yp(10);
+  const selIdx = pts.findIndex(p => p.d === selDate);
+  let arrDots = '';
+  for (let i = 1; i < pts.length; i++){
+    if (pts[i].v - pts[i - 1].v > 0.35){
+      arrDots += '<circle cx="' + xp(i).toFixed(1) + '" cy="' + yp(pts[i].v).toFixed(1) + '" r="3.1" fill="#0D9488" stroke="#fff" stroke-width="1"/>';
+    }
+  }
+  const midIdx = Math.floor((pts.length - 1) / 2);
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" height="122" role="img" aria-label="Tren HOP ' + esc(u.pltu) + '">'
+    + '<line x1="' + padL + '" y1="' + (padT + ch) + '" x2="' + (W - padR) + '" y2="' + (padT + ch) + '" stroke="var(--border-2)" stroke-width="1"/>'
+    + (15 <= maxV ? '<line x1="' + padL + '" y1="' + y15.toFixed(1) + '" x2="' + (W - padR) + '" y2="' + y15.toFixed(1) + '" stroke="#10B981" stroke-dasharray="3 3" stroke-width="1.1"/><text x="' + (padL - 4) + '" y="' + (y15 + 3).toFixed(1) + '" font-size="8.5" font-weight="700" fill="#10B981" text-anchor="end">15</text>' : '')
+    + (10 <= maxV ? '<line x1="' + padL + '" y1="' + y10.toFixed(1) + '" x2="' + (W - padR) + '" y2="' + y10.toFixed(1) + '" stroke="#D97706" stroke-dasharray="3 3" stroke-width="1.1"/><text x="' + (padL - 4) + '" y="' + (y10 + 3).toFixed(1) + '" font-size="8.5" font-weight="700" fill="#D97706" text-anchor="end">10</text>' : '')
+    + '<text x="' + (padL - 4) + '" y="' + (padT + 4) + '" font-size="8.5" fill="var(--muted)" text-anchor="end">' + maxV + '</text>'
+    + '<polygon points="' + area + '" fill="rgba(22,115,255,.11)"/>'
+    + '<polyline points="' + poly + '" fill="none" stroke="#1673FF" stroke-width="2.1" stroke-linejoin="round" stroke-linecap="round"/>'
+    + arrDots
+    + (selIdx >= 0 ? '<line x1="' + xp(selIdx).toFixed(1) + '" y1="' + padT + '" x2="' + xp(selIdx).toFixed(1) + '" y2="' + (padT + ch) + '" stroke="var(--accent)" stroke-dasharray="2 2" stroke-width="1.2"/><circle cx="' + xp(selIdx).toFixed(1) + '" cy="' + yp(pts[selIdx].v).toFixed(1) + '" r="4" fill="#1673FF" stroke="#fff" stroke-width="1.5"/>' : '')
+    + '<text x="' + padL + '" y="' + (H - 5) + '" font-size="9" fill="var(--muted)">' + esc(fmtShort(pts[0].d)) + '</text>'
+    + '<text x="' + xp(midIdx).toFixed(1) + '" y="' + (H - 5) + '" font-size="9" fill="var(--muted)" text-anchor="middle">' + esc(fmtShort(pts[midIdx].d)) + '</text>'
+    + '<text x="' + (W - padR) + '" y="' + (H - 5) + '" font-size="9" fill="var(--muted)" text-anchor="end">' + esc(fmtShort(pts[pts.length - 1].d)) + '</text>'
+  + '</svg>';
+}
+
+let INSP_PLTU = null, INSP_MODE = 'all', INSP_LIST = [];
+function gfInspBuildGroups(mAll){
+  const all = (mAll && mAll.rows ? mAll.rows.filter(x => !x.isGroup) : []);
+  const emerg = all.filter(x => x.ef < 10).slice().sort((a, b) => a.ef - b.ef);
+  const siaga = all.filter(x => x.ef >= 10 && x.ef < 15).slice().sort((a, b) => a.ef - b.ef);
+  const est = all.filter(x => x.est);
+  return { all:all, emerg:emerg, siaga:siaga, est:est };
+}
+function inspStep(delta){
+  if (!INSP_PLTU || !INSP_LIST || INSP_LIST.length < 2) return;
+  const idx = INSP_LIST.findIndex(x => x.nm === INSP_PLTU);
+  const cur = idx < 0 ? 0 : idx;
+  const nxt = (cur + delta + INSP_LIST.length) % INSP_LIST.length;
+  openPltuInsp(INSP_LIST[nxt].nm, INSP_MODE);
+}
+function gfFindRowIndex(pltuName, nom, sup){
+  if (!Array.isArray(ROWS) || !ROWS.length) return -1;
+  const cNom = String(nom || '').toLowerCase().trim();
+  const cSup = String(sup || '').toLowerCase().trim();
+  for (let i = 0; i < ROWS.length; i++){
+    const rw = ROWS[i];
+    if ((unitOf(rw) || rw.pltu) !== pltuName) continue;
+    const rNom = String(rw.nom || '').toLowerCase();
+    const rSup = String(rw.sup || '').toLowerCase();
+    if (cNom && cNom !== 'tbn' && rNom && (rNom.includes(cNom) || cNom.includes(rNom))) return i;
+    if ((!cNom || cNom === 'tbn') && cSup && rSup.includes(cSup)) return i;
+  }
+  return -1;
+}
+
+function openPltuInsp(pltuName, optMode){
+  if (!HOPDATA || !HOPBY || !pltuName) return;
+  const uMap = gfUnitMap();
+  const canon = (typeof uMap[pltuName] === 'string' && uMap[pltuName]) ? uMap[pltuName] : String(pltuName);
+  const u = (HOPDATA.units || []).find(x => x.pltu === canon || x.pltu.toLowerCase() === canon.toLowerCase() || x.pltu.toLowerCase() === String(pltuName).toLowerCase());
+  if (!u) return;
+  hideTT();
+  gfCloseInpPop();
+  INSP_PLTU = u.pltu;
+  const mAll = gfModel('SULMAPANA');
+  const r = mAll && mAll.rows ? mAll.rows.find(x => !x.isGroup && x.nm === u.pltu) : null;
+  if (!r) return;
+  const grps = gfInspBuildGroups(mAll);
+  let mode = optMode || INSP_MODE || 'all';
+  if (!grps[mode] || !grps[mode].some(x => x.nm === u.pltu)) mode = 'all';
+  INSP_MODE = mode;
+  INSP_LIST = grps[mode] || grps.all;
+  const curIdx = Math.max(0, INSP_LIST.findIndex(x => x.nm === u.pltu));
+  const navBarHtml = '<div class="pi-nav">'
+      + '<div class="pi-nav-top">'
+        + '<div class="pi-modes" role="tablist" aria-label="Kelompok PLTU">'
+          + '<button type="button" class="pi-mbtn m-emerg' + (mode === 'emerg' ? ' on' : '') + '" data-inspmode="emerg"' + (grps.emerg.length ? '' : ' disabled') + ' title="Telusuri PLTU Emergency (&lt;10 HOP)">Emergency (' + grps.emerg.length + ')</button>'
+          + '<button type="button" class="pi-mbtn m-siaga' + (mode === 'siaga' ? ' on' : '') + '" data-inspmode="siaga"' + (grps.siaga.length ? '' : ' disabled') + ' title="Telusuri PLTU Siaga (10–15 HOP)">Siaga (' + grps.siaga.length + ')</button>'
+          + (mode === 'est' ? '<button type="button" class="pi-mbtn on" data-inspmode="est">Belum Input (' + grps.est.length + ')</button>' : '')
+          + '<button type="button" class="pi-mbtn' + (mode === 'all' ? ' on' : '') + '" data-inspmode="all" title="Telusuri seluruh PLTU">Semua (' + grps.all.length + ')</button>'
+        + '</div>'
+        + '<div class="pi-step">'
+          + '<button type="button" class="pi-sbtn" data-inspstep="-1"' + (INSP_LIST.length < 2 ? ' disabled' : '') + ' title="PLTU sebelumnya (Tombol ←)">◀</button>'
+          + '<span class="pi-scnt">' + (curIdx + 1) + ' / ' + INSP_LIST.length + '</span>'
+          + '<button type="button" class="pi-sbtn" data-inspstep="1"' + (INSP_LIST.length < 2 ? ' disabled' : '') + ' title="PLTU berikutnya (Tombol →)">▶</button>'
+        + '</div>'
+      + '</div>'
+      + '<div class="pi-chips" id="piChips">'
+        + INSP_LIST.map((it, ix) => {
+          const cCls = it.ef < 10 ? ' c-emerg' : (it.ef < 15 ? ' c-siaga' : '');
+          return '<button type="button" class="pi-chip' + cCls + (it.nm === u.pltu ? ' on' : '') + '" data-inspgo="' + esc(it.nm) + '">'
+            + (ix + 1) + '. ' + esc(it.nm) + ' <small>(' + gfF1(it.ef) + ')</small></button>';
+        }).join('')
+      + '</div>'
+    + '</div>';
+  const realToday = gfRealToday(), selDate = gfTgl();
+  const isProj = !!(selDate && selDate > realToday);
+  const stCls = r.ef < 10 ? 'emerg' : (r.ef < 15 ? 'siaga' : 'norm');
+  const stLbl = r.ef < 10 ? 'EMERGENCY (<10 HOP)' : (r.ef < 15 ? 'SIAGA (10–15 HOP)' : 'NORMAL (≥15 HOP)');
+  const regLbl = wilOf(u.pltu) === 'SULAWESI' ? 'Regional Sulawesi' : 'Regional MAPANA';
+  const basisTxt = isProj
+    ? ('Proyeksi · ' + fmtShort(selDate))
+    : (r.est ? ('Estimasi Proyeksi* · ' + fmtShort(selDate) + (r.lastActTgl ? ' (aktual terakhir ' + fmtShort(r.lastActTgl) + ')' : '')) : ('Aktual · ' + fmtShort(selDate)));
+  const dClean = String(r.dTxt || '0,0').replace(/^\+/, '');
+  const dBadge = r.dir === 'up'
+    ? '<span style="font-size:11.5px;color:#10B981;font-weight:700">▲ +' + esc(dClean) + ' hr</span>'
+    : (r.dir === 'down' ? '<span style="font-size:11.5px;color:#EF4444;font-weight:700">▼ ' + esc(dClean) + ' hr</span>' : '<span style="font-size:11.5px;color:var(--muted);font-weight:700">● 0,0 hr</span>');
+  const a = ASSESS && ASSESS[u.pltu];
+  let alertHtml = '';
+  if (r.ef < 10){
+    alertHtml = '<div class="pi-alert warn">⚠️ Stok berada di bawah ambang Emergency (10 HOP).' + (a && a.stockoutDate ? ' Risiko habis stok tanpa pasokan baru pada <b>' + esc(fmtShort(a.stockoutDate)) + '</b>.' : ' Prioritaskan percepatan sandar/bongkar tongkang terdekat.') + '</div>';
+  } else if (r.ef < 15){
+    alertHtml = '<div class="pi-alert siaga">⚡ Stok dalam rentang Siaga (10–15 HOP). Pantau ketepatan ETA tongkang sailing agar segera kembali ≥ 15 HOP.</div>';
+  } else if (a && a.breachDate && a.hopNow >= (a.cfg ? a.cfg.minHop : 15)){
+    alertHtml = '<div class="pi-alert siaga">📅 Saat ini Normal, namun diproyeksikan menyentuh &lt;15 HOP pada <b>' + esc(fmtShort(a.breachDate)) + '</b> bila tidak ada tambahan jadwal.</div>';
+  } else {
+    alertHtml = '<div class="pi-alert ok">✓ Pasokan terkendali ≥ 15 HOP sepanjang horizon pantauan.</div>';
+  }
+  const totHop = r.ef + r.ap + r.sl;
+  const totMt = (r.efMt || 0) + (r.apMt || 0) + (r.slMt || 0);
+  const renderVesselItem = (v, isSail) => {
+    const ri = gfFindRowIndex(u.pltu, v.nom, v.sup);
+    const jumpAttr = ri >= 0 ? (' class="pi-v jump" data-inspri="' + ri + '" title="Klik untuk sorot baris kapal ini di Jadwal Pasokan"') : ' class="pi-v"';
+    const rightSub = isSail
+      ? (v.eta ? ('ETA ' + esc(fmtShort(v.eta)) + (v.nHari != null ? ' (' + v.nHari + ' hr)' : '')) : 'ETA belum tercatat')
+      : (esc(v.status || 'Pelabuhan') + ' · ' + gfF1(v.hop || 0) + ' hr');
+    return '<div' + jumpAttr + '>'
+      + '<div class="pi-v-l"><b>' + esc(v.nom || 'TBN') + '</b><small>Pemasok: ' + esc(v.sup || '—') + (ri >= 0 ? ' · Lihat di Jadwal ›' : '') + '</small></div>'
+      + '<div class="pi-v-r">' + gfN(v.vol || 0) + ' MT<small>' + rightSub + '</small></div>'
+    + '</div>';
+  };
+  const portHtml = (r.portList && r.portList.length)
+    ? '<div class="pi-vlist">' + r.portList.map(p => renderVesselItem(p, false)).join('') + '</div>'
+    : '<div class="pi-empty">Tidak ada kapal sedang bongkar / antri di pelabuhan.</div>';
+  const sailHtml = (r.sailList && r.sailList.length)
+    ? '<div class="pi-vlist">' + r.sailList.map(s => renderVesselItem(s, true)).join('') + '</div>'
+    : '<div class="pi-empty">Tidak ada tongkang berstatus Sailing saat ini.</div>';
+
+  const panel = $id('pltuInsp'), scrim = $id('pltuInspScrim');
+  if (!panel || !scrim) return;
+  panel.innerHTML = '<div class="pi-hd">'
+      + '<div class="pi-ttl"><div class="pi-ttl-r"><h3>PLTU ' + esc(u.pltu) + '</h3><span class="pi-bdg ' + stCls + '">' + stLbl + '</span></div>'
+      + '<div class="pi-sub">' + esc(regLbl) + ' · ' + esc(basisTxt) + '</div></div>'
+      + '<button type="button" class="dr-x" id="piClose" title="Tutup (Esc)">✕</button>'
+    + '</div>'
+    + navBarHtml
+    + '<div class="pi-acts">'
+      + '<button type="button" class="pi-act pri" data-inspact="jadwal" title="Buka Jadwal Gantt khusus PLTU ' + esc(u.pltu) + '">📅 Jadwal Gantt</button>'
+      + '<button type="button" class="pi-act" data-inspact="sim" title="Uji skenario percepatan / pengalihan kapal di Simulasi HOP">🧪 Simulasi Mitigasi</button>'
+      + '<button type="button" class="pi-act" data-inspact="hop" title="Lihat halaman Proyeksi HOP rinci">📈 Proyeksi Detail</button>'
+    + '</div>'
+    + '<div class="pi-body">'
+      + alertHtml
+      + '<div class="pi-grid">'
+        + '<div class="pi-m"><div class="pi-m-l">Stock Efektif</div><div class="pi-m-v">' + gfF1(r.ef) + ' hr ' + dBadge + '</div><div class="pi-m-s">' + gfN(r.efMt || 0) + ' MT</div></div>'
+        + '<div class="pi-m"><div class="pi-m-l">Stock Apung</div><div class="pi-m-v">' + gfF1(r.ap) + ' hr</div><div class="pi-m-s">' + gfN(r.apMt || 0) + ' MT · ' + (r.portList ? r.portList.length : 0) + ' kapal</div></div>'
+        + '<div class="pi-m"><div class="pi-m-l">Stock Sailing</div><div class="pi-m-v">' + gfF1(r.sl) + ' hr</div><div class="pi-m-s">' + gfN(r.slMt || 0) + ' MT · ' + (r.sailList ? r.sailList.length : 0) + ' tongkang</div></div>'
+        + '<div class="pi-m"><div class="pi-m-l">Total Pasokan</div><div class="pi-m-v">' + gfF1(totHop) + ' hr</div><div class="pi-m-s">' + gfN(totMt) + ' MT · Pembagi ' + gfN(r.burn || 0) + ' MT/hr</div></div>'
+      + '</div>'
+      + '<div class="pi-box"><div class="pi-box-h"><span>Lintasan Proyeksi HOP (21 Hari)</span><span style="font-weight:600;text-transform:none;color:var(--muted)">● kedatangan kargo</span></div>'
+        + gfPltuSparkSVG(u, realToday, selDate)
+      + '</div>'
+      + '<div class="pi-box"><div class="pi-box-h"><span>Kapal di Pelabuhan (' + (r.portList ? r.portList.length : 0) + ')</span></div>' + portHtml + '</div>'
+      + '<div class="pi-box"><div class="pi-box-h"><span>Tongkang Sailing (' + (r.sailList ? r.sailList.length : 0) + ')</span></div>' + sailHtml + '</div>'
+    + '</div>';
+  scrim.hidden = false;
+  panel.hidden = false;
+  const onChip = panel.querySelector('.pi-chip.on');
+  if (onChip && onChip.scrollIntoView) onChip.scrollIntoView({ block:'nearest', inline:'center' });
+}
+
+function closePltuInsp(){
+  INSP_PLTU = null;
+  const panel = $id('pltuInsp'), scrim = $id('pltuInspScrim');
+  if (panel) panel.hidden = true;
+  if (scrim) scrim.hidden = true;
+}
+
+function gfJumpPltu(pltuName, target){
+  if (!pltuName) return;
+  closePltuInsp();
+  const navSync = pg => {
+    if (location.hash !== '#/' + pg) location.hash = '#/' + pg;
+    showPage(pg);
+  };
+  if (target === 'jadwal'){
+    resetFilters();
+    const names = [...new Set(ROWS.map(r => r.pltu))].filter(n => unitOf({ pltu:n }) === pltuName);
+    S.pltu = new Set(names.length ? names : [pltuName]);
+    msRefreshAll();
+    navSync('jadwal');
+    render();
+    toast('Filter Jadwal Pasokan: PLTU ' + pltuName);
+  } else if (target === 'sim'){
+    SIM.sel = pltuName;
+    navSync('sim');
+    renderSim(true);
+    toast('Simulasi HOP difokuskan ke PLTU ' + pltuName);
+  } else if (target === 'hop'){
+    HPSEL = pltuName;
+    navSync('hop');
+    renderHopPage();
+  }
 }
 
 function gfInitOnce(){
@@ -8767,6 +9366,47 @@ function gfInitOnce(){
     im.src = p[1];
     GF.imgs[p[0]] = im;
   });
+  const scrim = $id('pltuInspScrim'), panel = $id('pltuInsp');
+  if (scrim) scrim.addEventListener('click', closePltuInsp);
+  if (panel){
+    panel.addEventListener('click', e => {
+      if (e.target.closest('#piClose')){ closePltuInsp(); return; }
+      const stp = e.target.closest('[data-inspstep]');
+      if (stp){ inspStep(Number(stp.dataset.inspstep) || 0); return; }
+      const goBtn = e.target.closest('[data-inspgo]');
+      if (goBtn){ openPltuInsp(goBtn.dataset.inspgo, INSP_MODE); return; }
+      const mdBtn = e.target.closest('[data-inspmode]');
+      if (mdBtn){
+        const nmMode = mdBtn.dataset.inspmode;
+        const m0 = gfModel('SULMAPANA');
+        const grps = gfInspBuildGroups(m0);
+        const lst = grps[nmMode] || [];
+        if (lst.length){
+          const keep = lst.find(x => x.nm === INSP_PLTU);
+          openPltuInsp(keep ? keep.nm : lst[0].nm, nmMode);
+        }
+        return;
+      }
+      const act = e.target.closest('[data-inspact]');
+      if (act && INSP_PLTU){ gfJumpPltu(INSP_PLTU, act.dataset.inspact); return; }
+      const vRow = e.target.closest('[data-inspri]');
+      if (vRow){
+        const ri = Number(vRow.dataset.inspri);
+        closePltuInsp();
+        jumpToRow(ri);
+      }
+    });
+    let tx0 = 0, ty0 = 0;
+    panel.addEventListener('touchstart', e => {
+      if (e.touches && e.touches[0]){ tx0 = e.touches[0].clientX; ty0 = e.touches[0].clientY; }
+    }, { passive:true });
+    panel.addEventListener('touchend', e => {
+      if (!INSP_PLTU || !e.changedTouches || !e.changedTouches[0]) return;
+      if (e.target && e.target.closest && e.target.closest('.pi-chips')) return;
+      const dx = e.changedTouches[0].clientX - tx0, dy = e.changedTouches[0].clientY - ty0;
+      if (Math.abs(dx) > 52 && Math.abs(dx) > Math.abs(dy) * 1.5) inspStep(dx < 0 ? 1 : -1);
+    }, { passive:true });
+  }
   const el = $id('gfBody');
   if (el){
     el.addEventListener('mousemove', e => {
@@ -8776,8 +9416,57 @@ function gfInitOnce(){
     });
     el.addEventListener('mouseleave', () => { if (tt && tt.classList.contains('gf-tt')) hideTT(); });
     el.addEventListener('click', e => {
+      const openBtn = e.target.closest('[data-gfopenpltu]');
+      if (openBtn){ e.stopPropagation(); openPltuInsp(openBtn.dataset.gfopenpltu, openBtn.dataset.gfinpmode || 'all'); return; }
+      const inpBtn = e.target.closest('[data-gfinppop]');
+      if (inpBtn){
+        e.stopPropagation();
+        GF.inpOpen = !GF.inpOpen;
+        const pop = $id('gfInpPop');
+        if (pop) pop.hidden = !GF.inpOpen;
+        return;
+      }
+      if (!e.target.closest('#gfInpPop')) gfCloseInpPop();
       const cv = e.target && e.target.closest ? e.target.closest('canvas.gf-c') : null;
-      if (cv){ gfShowCanvasTT(cv, e); return; }
+      if (cv){
+        const hitBand = gfHitPltuBand(cv, e);
+        if (hitBand && hitBand.r && hitBand.r.nm) openPltuInsp(hitBand.r.nm, 'all');
+        return;
+      }
+      const stepBtn = e.target.closest('[data-gfstep]');
+      if (stepBtn){ gfStepDate(Number(stepBtn.dataset.gfstep) || 0); return; }
+      const qPick = e.target.closest('[data-gfpick]');
+      if (qPick){
+        const off = Number(qPick.dataset.gfpick) || 0;
+        if (off === 0) goToday();
+        else gfPickDate(gfAddDays(gfRealToday(), off));
+        return;
+      }
+      const kpiBtn = e.target.closest('[data-gfkpi]');
+      if (kpiBtn){
+        const k = kpiBtn.dataset.gfkpi;
+        if (k === 'reg'){
+          GF.view = 'gabung'; GF.sort = 'def'; renderGrafik(true);
+        } else if (k === 'emerg'){
+          const m0 = gfModel('SULMAPANA');
+          const em = m0 && m0.rows ? m0.rows.filter(r => !r.isGroup && r.ef < 10).sort((a, b) => a.ef - b.ef) : [];
+          GF.sort = 'asc'; renderGrafik(true);
+          if (em.length) openPltuInsp(em[0].nm, 'emerg');
+          else toast('Seluruh PLTU berada di atas ambang Emergency (≥ 10 HOP)');
+        } else if (k === 'siaga'){
+          const m0 = gfModel('SULMAPANA');
+          const sg = m0 && m0.rows ? m0.rows.filter(r => !r.isGroup && r.ef >= 10 && r.ef < 15).sort((a, b) => a.ef - b.ef) : [];
+          if (sg.length){ GF.sort = 'asc'; renderGrafik(true); openPltuInsp(sg[0].nm, 'siaga'); }
+          else { rdFilter = 'att'; renderRadar(); go('radar'); }
+        } else if (k === 'sail'){
+          resetFilters(); S.preset = 'sail'; go('jadwal'); render();
+        } else if (k === 'late'){
+          resetFilters(); S.onlyLate = true;
+          const tl = $id('tgLate'); if (tl) tl.classList.add('on');
+          go('jadwal'); render();
+        }
+        return;
+      }
       const tb = e.target.closest('[data-gftoday]');
       if (tb){ goToday(); return; }
       const vb = e.target.closest('[data-gfview]');
@@ -8804,10 +9493,14 @@ function gfInitOnce(){
     el.addEventListener('change', e => {
       if (e.target && e.target.id === 'gfDatePick' && e.target.value){
         hideTT();
+        gfCloseInpPop();
         gfPickDate(e.target.value);
       }
     });
   }
+  document.addEventListener('click', e => {
+    if (GF.inpOpen && (!e.target.closest || !e.target.closest('.gf-inp-wrap'))) gfCloseInpPop();
+  });
   if (typeof MutationObserver !== 'undefined' && typeof document !== 'undefined' && document.documentElement){
     const mo = new MutationObserver(() => {
       if (S.page === 'grafik') renderGrafik(true);
@@ -8841,29 +9534,42 @@ function renderGrafik(force){
   const isHyb = !!(prog && prog.est > 0);
   const tglD = tgl ? toDate(tgl) : null;
   const tglShort = tglD ? (tglD.getDate() + ' ' + BLN[tglD.getMonth()]) : '';
+  const mAll = gfModel('SULMAPANA');
   let modeHtml;
   if (isProj){
     modeHtml = '<span class="gf-mode proj">Proyeksi</span>';
   } else if (isHyb){
     modeHtml = '<span class="gf-mode hyb" title="PLTU bertanda (*) belum input stok aktual tanggal ini; menggunakan estimasi proyeksi sementara">Aktual + Estimasi*</span>'
-      + '<span class="gf-inp-prog partial" title="Progres input Stock Efektif aktual tanggal ' + esc(tglShort) + ': ' + prog.act + ' dari ' + prog.tot + ' PLTU sudah input">Input ' + esc(tglShort) + ': <strong>' + prog.act + '/' + prog.tot + '</strong> PLTU</span>';
+      + '<span class="gf-inp-wrap"><button type="button" class="gf-inp-prog partial" data-gfinppop="1" title="Klik untuk melihat daftar PLTU yang sudah &amp; belum input tanggal ' + esc(tglShort) + '">Input ' + esc(tglShort) + ': <strong>' + prog.act + '/' + prog.tot + '</strong> PLTU ▾</button>'
+      + gfInpPopHTML(mAll, tglShort, prog) + '</span>';
   } else {
     modeHtml = '<span class="gf-mode ok">Aktual</span>'
       + (tgl === realToday && prog && prog.tot > 0
-        ? '<span class="gf-inp-prog full" title="Seluruh PLTU sudah menginput Stock Efektif aktual hari ini">Input ' + esc(tglShort) + ': <strong>' + prog.act + '/' + prog.tot + '</strong> PLTU ✓</span>'
+        ? '<span class="gf-inp-wrap"><button type="button" class="gf-inp-prog full" data-gfinppop="1" title="Klik untuk melihat rincian kelengkapan input seluruh PLTU">Input ' + esc(tglShort) + ': <strong>' + prog.act + '/' + prog.tot + '</strong> PLTU ✓ ▾</button>' + gfInpPopHTML(mAll, tglShort, prog) + '</span>'
         : '');
   }
   const needAdjLoad = ((typeof SIM !== 'undefined' && SIM.nextState === 'loading') || GF.prevState === 'loading');
   const maxD = bnd.max ? toDate(bnd.max) : null;
   const maxLbl = maxD ? (maxD.getDate() + ' ' + BLN[maxD.getMonth()] + ' ' + maxD.getFullYear()) : '';
+  const t3 = gfAddDays(realToday, 3), t7 = gfAddDays(realToday, 7);
+  const atMin = !!(bnd.min && tgl <= bnd.min), atMax = !!(bnd.max && tgl >= bnd.max);
   const vBtn = (v, lb, ttl) => '<button type="button" class="' + (GF.view === v ? 'on' : '') + '" data-gfview="' + v + '" title="' + ttl + '">' + lb + '</button>';
   const sBtn = (v, lb, ttl) => '<button type="button" class="' + (GF.sort === v ? 'on' : '') + '" data-gfsort="' + v + '" title="' + ttl + '">' + lb + '</button>';
+  const kpiHtml = gfKpiStripHTML(mAll, tgl, realToday);
   const ctrl = '<div class="gf-ctrl">'
     + '<div class="gf-ctrl-g">'
       + '<span class="gf-ctrl-l">Tanggal:</span>'
-      + '<input type="date" class="gf-dt" id="gfDatePick" aria-label="Pilih tanggal aktual atau proyeksi" min="' + esc(bnd.min || '') + '" max="' + esc(bnd.max || '') + '" value="' + esc(tgl || '') + '">'
+      + '<div class="gf-scrub" role="group" aria-label="Navigasi tanggal grafik">'
+        + '<button type="button" class="gf-sbtn" data-gfstep="-1"' + (atMin ? ' disabled' : '') + ' title="Mundur 1 hari (Alt+←)">◀</button>'
+        + '<input type="date" class="gf-dt" id="gfDatePick" aria-label="Pilih tanggal aktual atau proyeksi" min="' + esc(bnd.min || '') + '" max="' + esc(bnd.max || '') + '" value="' + esc(tgl || '') + '">'
+        + '<button type="button" class="gf-sbtn" data-gfstep="1"' + (atMax ? ' disabled' : '') + ' title="Maju 1 hari (Alt+→)">▶</button>'
+      + '</div>'
+      + '<div class="gf-qgrp" role="group" aria-label="Pintasan horizon waktu">'
+        + '<button type="button" class="gf-qbtn' + (tgl === realToday ? ' on' : '') + '" data-gfpick="0" title="Tanggal aktual hari ini">Hari ini</button>'
+        + ((!bnd.max || t3 <= bnd.max) ? '<button type="button" class="gf-qbtn' + (tgl === t3 ? ' on' : '') + '" data-gfpick="3" title="Proyeksi 3 hari ke depan">+3 hr</button>' : '')
+        + ((!bnd.max || t7 <= bnd.max) ? '<button type="button" class="gf-qbtn' + (tgl === t7 ? ' on' : '') + '" data-gfpick="7" title="Proyeksi 7 hari ke depan">+7 hr</button>' : '')
+      + '</div>'
       + modeHtml
-      + (tgl !== realToday ? '<button type="button" class="gf-today" data-gftoday="1" title="Kembali ke tanggal hari ini">Hari ini</button>' : '')
       + (needAdjLoad ? '<span class="gf-bound">⏳ Sinkronisasi lintas bulan…</span>' : (maxLbl ? '<span class="gf-bound" title="Batas simulasi proyeksi lintas bulan">s.d. ' + esc(maxLbl) + '</span>' : ''))
     + '</div>'
     + '<div class="gf-ctrl-g">'
@@ -8884,7 +9590,7 @@ function renderGrafik(force){
   } else if (isHyb){
     bottomNoteHtml = '<div class="gf-proj-note"><strong>Ket (*):</strong> Stok aktual <strong>' + esc(tglShort) + '</strong> belum tersedia (' + prog.est + '/' + prog.tot + ' PLTU); nilai menggunakan estimasi proyeksi hingga realisasi terbarui.</div>';
   }
-  el.innerHTML = '<div class="gf-shell">' + ctrl
+  el.innerHTML = '<div class="gf-shell">' + kpiHtml + ctrl
     + '<div class="gf-grid">' + regs.map(r => {
       const h0 = r === 'SULMAPANA' ? 1240 : 900;
       const clsC = r === 'SULMAPANA' ? 'gf-c gf-c-all' : 'gf-c';
@@ -8895,7 +9601,7 @@ function renderGrafik(force){
     + bottomNoteHtml + '</div>';
   regs.forEach(r => {
     const c = $id('gfC-' + r); if (!c) return;
-    const m = gfModel(r); if (!m) return;
+    const m = r === 'SULMAPANA' ? mAll : gfModel(r); if (!m) return;
     const lh = m.lh || 900;
     const cssW = c.clientWidth || 920;
     const dpr = Math.min(2.5, Math.max(2, window.devicePixelRatio || 1));
@@ -8906,6 +9612,7 @@ function renderGrafik(force){
   });
 }
 function gfPaint(){
+  if (typeof updateKPI === 'function' && $id('kpis') && Array.isArray(ROWS) && ROWS.length) updateKPI(ROWS);
   if (S.page !== 'grafik'){ GF.dirty = true; return; }
   if (GF.raf) return;
   GF.raf = requestAnimationFrame(() => { GF.raf = 0; renderGrafik(true); });
@@ -8915,7 +9622,10 @@ function pageFromHash(){ const m = /^#\/?([a-z]+)/.exec(location.hash || ''); re
 function showPage(id){
   if (!PAGE_IDS.includes(id)) id = 'grafik';
   S.page = id;
+  document.documentElement.setAttribute('data-page', id);
   if (typeof gfSyncPicker === 'function') gfSyncPicker();
+  if (typeof gfCloseInpPop === 'function') gfCloseInpPop();
+  hideTT();
   PAGE_IDS.forEach(p => { const e = $id('pg-' + p); if (e) e.hidden = (p !== id); });
   $id('pgTitle').textContent = TITLES[id];
   document.documentElement.classList.remove('nav-open');
@@ -9208,6 +9918,259 @@ async function callAuthServer(params){
   });
 })();
 
+/* ══ v56 · COMMAND PALETTE (Ctrl+K) + DETAK UMUR DATA & AUTO-SYNC PINTAR ══ */
+let LAST_REAL_TODAY = gfRealToday();
+function fmtAgeShort(ms){
+  const m = Math.max(0, Math.floor(ms / 60000));
+  if (m < 1) return 'baru saja';
+  if (m < 60) return m + ' mnt lalu';
+  const h = Math.floor(m / 60), rm = m % 60;
+  return h + ' jam' + (rm ? ' ' + rm + ' mnt' : '') + ' lalu';
+}
+function updateFreshnessUI(){
+  const el = document.getElementById('tbSync'), tx = document.getElementById('syncTxt');
+  if (!el || !tx) return;
+  if (PULL_BUSY) return;
+  if (DATA_MODE === 'live' && LAST_SYNC_TS > 0){
+    const age = Date.now() - LAST_SYNC_TS;
+    const stale = age >= 15 * 60 * 1000;
+    el.className = 'tb-sync ' + (stale ? 'stale' : 'live');
+    tx.textContent = 'Live · ' + fmtAgeShort(age);
+    el.title = (SYNC_META.title ? SYNC_META.title + '\n' : '')
+      + 'Umur data: ' + fmtAgeShort(age) + (stale ? ' — klik ⟳ untuk memuat ulang sekarang.' : ' (auto-sync aktif).');
+  } else if (DATA_MODE === 'cache' && LAST_CACHE_TS > 0){
+    const age = Date.now() - LAST_CACHE_TS;
+    tx.textContent = 'Cache · ' + fmtAgeShort(age);
+  }
+}
+function checkCalendarRollover(){
+  const nowIso = gfRealToday();
+  if (nowIso && nowIso !== LAST_REAL_TODAY){
+    LAST_REAL_TODAY = nowIso;
+    if (!GF.tglPilih && !S.todayPilih){
+      GF.tgl = nowIso;
+      if (DATES && DATES.length){
+        S.today = nowIso < DATES[0] ? DATES[0] : (nowIso > DATES[DATES.length - 1] ? DATES[DATES.length - 1] : nowIso);
+      } else {
+        S.today = nowIso;
+      }
+      buildHop();
+      gfSyncPicker();
+      render();
+      if (S.page === 'grafik') renderGrafik(true);
+    }
+  }
+}
+function smartAutoSync(){
+  checkCalendarRollover();
+  updateFreshnessUI();
+  if (!SYNC.scriptToken || PULL_BUSY) return;
+  const isSandboxed = (() => { try { return window.origin === 'null' || location.protocol === 'about:' || location.protocol === 'data:'; } catch(_){ return true; } })();
+  if (isSandboxed) return;
+  const age = LAST_SYNC_TS > 0 ? (Date.now() - LAST_SYNC_TS) : Infinity;
+  if (age >= 5 * 60 * 1000) pullFromSheets(false);
+}
+
+let CMDK = { open:false, items:[], sel:0 };
+function buildCmdKItems(qRaw){
+  const q = String(qRaw || '').toLowerCase().trim();
+  const out = [];
+  /* 1. PLTU */
+  if (HOPDATA && HOPDATA.units){
+    const mAll = gfModel('SULMAPANA');
+    const rMap = {};
+    if (mAll && mAll.rows) mAll.rows.forEach(r => { if (!r.isGroup) rMap[r.nm] = r; });
+    HOPDATA.units.forEach(u => {
+      const r = rMap[u.pltu];
+      const st = r ? (r.ef < 10 ? 'Emergency' : (r.ef < 15 ? 'Siaga' : 'Normal')) : '';
+      const reg = wilOf(u.pltu) === 'SULAWESI' ? 'Sulawesi' : 'MAPANA';
+      const hay = ('pltu ' + u.pltu + ' ' + reg + ' ' + st).toLowerCase();
+      if (!q || hay.includes(q)){
+        out.push({
+          grp:'PLTU (Inspeksi & Tindakan)',
+          ico:'⚡',
+          title:'PLTU ' + u.pltu,
+          sub:reg + (r ? (' · ' + st + (r.est ? ' · Estimasi*' : '')) : ''),
+          right:r ? (gfF1(r.ef) + ' HOP') : '—',
+          act:() => {
+            if (S.page !== 'grafik'){
+              if (location.hash !== '#/grafik') location.hash = '#/grafik';
+              showPage('grafik');
+            }
+            openPltuInsp(u.pltu);
+          }
+        });
+      }
+    });
+  }
+  /* 2. Kapal / Pengapalan (ROWS) */
+  if (Array.isArray(ROWS) && ROWS.length){
+    let shipAdded = 0;
+    for (let i = 0; i < ROWS.length && shipAdded < (q ? 10 : 4); i++){
+      const rw = ROWS[i];
+      if (!rw || (!rw.nom && !rw.sup)) continue;
+      if (!q && rw.status !== 'Sailing' && !hasLate(rw)) continue;
+      const hay = ((rw.nom || '') + ' ' + (rw.sup || '') + ' ' + (rw.pltu || '') + ' ' + (rw.status || '') + (hasLate(rw) ? ' late terlambat' : '')).toLowerCase();
+      if (!q || hay.includes(q)){
+        shipAdded++;
+        out.push({
+          grp:'Armada & Pengapalan',
+          ico:'🚢',
+          title:(rw.nom || 'TBN') + ' → ' + (rw.pltu || '—'),
+          sub:(rw.sup || '—') + ' · ' + (rw.status || 'Terjadwal') + (rw.vol ? (' · ' + gfN(rw.vol) + ' MT') : ''),
+          right:rw.etaPod ? ('ETA ' + fmtShort(rw.etaPod)) : ('Baris ' + rw.row),
+          act:() => jumpToRow(i)
+        });
+      }
+    }
+  }
+  /* 3. Pemasok (ketika mengetik kueri) */
+  if (q && Array.isArray(ROWS)){
+    const sups = new Map();
+    ROWS.forEach(rw => { const s = String(rw.sup || '').trim(); if (s) sups.set(s, (sups.get(s) || 0) + 1); });
+    let supAdded = 0;
+    sups.forEach((cnt, s) => {
+      if (supAdded < 4 && s.toLowerCase().includes(q)){
+        supAdded++;
+        out.push({
+          grp:'Filter Pemasok di Jadwal',
+          ico:'🏭',
+          title:'Pemasok: ' + s,
+          sub:'Saring ' + cnt + ' jadwal pengapalan dari pemasok ini',
+          right:cnt + ' baris',
+          act:() => { resetFilters(); S.sup = new Set([s]); msRefreshAll(); go('jadwal'); render(); }
+        });
+      }
+    });
+  }
+  /* 4. Halaman & Aksi Cepat */
+  const navActs = [
+    { t:'Buka Grafik HOP (Utama)', s:'Monitoring bar HOP Sulawesi & MAPANA', k:'grafik hop chart utama', fn:() => go('grafik') },
+    { t:'Cek Pengiriman Late Loading', s:'Buka Jadwal Pasokan dengan filter Late Loading aktif', k:'late loading terlambat jadwal', fn:() => { resetFilters(); S.onlyLate = true; const tl = $id('tgLate'); if (tl) tl.classList.add('on'); go('jadwal'); render(); } },
+    { t:'Buka Pantauan Risiko', s:'Daftar peringatan dini PLTU kritis & batas minimum HOP', k:'pantauan risiko radar kritis', fn:() => go('radar') },
+    { t:'Buka Jadwal Pasokan (Semua)', s:'Tabel Gantt pengapalan seluruh PLTU', k:'jadwal pasokan pengiriman gantt', fn:() => { resetFilters(); go('jadwal'); render(); } },
+    { t:'Buka Simulasi HOP (What-If)', s:'Simulasikan percepatan, tunda, atau pengalihan kargo', k:'simulasi hop skenario mitigasi', fn:() => go('sim') },
+    { t:'Buka Ringkasan Pasokan', s:'Ringkasan KPI program bulanan & status pasokan', k:'beranda ringkasan pasokan kpi', fn:() => go('beranda') },
+    { t:'Muat Ulang Data Terbaru', s:'Tarik pembaruan langsung dari Google Sheets', k:'sync refresh muat ulang data', fn:() => pullFromSheets(true) },
+    { t:'Ganti Tema Terang / Gelap', s:'Beralih mode warna antarmuka & grafik', k:'tema dark light gelap terang', fn:() => { const b = $id('btnTheme'); if (b) b.click(); } }
+  ];
+  navActs.forEach(a => {
+    if (!q || (a.t + ' ' + a.s + ' ' + a.k).toLowerCase().includes(q)){
+      out.push({ grp:'Navigasi & Tindakan Cepat', ico:'⌘', title:a.t, sub:a.s, right:'↵', act:a.fn });
+    }
+  });
+  return out.slice(0, 24);
+}
+function renderCmdKList(){
+  const listEl = $id('ckList');
+  if (!listEl) return;
+  const items = CMDK.items;
+  if (!items.length){
+    listEl.innerHTML = '<div style="padding:18px 12px;text-align:center;color:var(--muted);font-size:12.5px">Tidak ditemukan hasil yang cocok.</div>';
+    return;
+  }
+  if (CMDK.sel >= items.length) CMDK.sel = 0;
+  if (CMDK.sel < 0) CMDK.sel = items.length - 1;
+  let lastGrp = '', html = '';
+  items.forEach((it, idx) => {
+    if (it.grp !== lastGrp){ lastGrp = it.grp; html += '<div class="ck-grp">' + esc(it.grp) + '</div>'; }
+    html += '<button type="button" class="ck-it' + (idx === CMDK.sel ? ' sel' : '') + '" data-ckidx="' + idx + '">'
+      + '<span class="ck-it-l"><span>' + it.ico + '</span><b>' + esc(it.title) + '</b><small>' + esc(it.sub) + '</small></span>'
+      + '<span class="ck-it-r">' + esc(it.right || '') + '</span></button>';
+  });
+  listEl.innerHTML = html;
+  const activeEl = listEl.querySelector('.ck-it.sel');
+  if (activeEl && activeEl.scrollIntoView) activeEl.scrollIntoView({ block:'nearest' });
+}
+function openCmdK(){
+  const wrap = $id('cmdK');
+  if (!wrap) return;
+  hideTT();
+  gfCloseInpPop();
+  CMDK.open = true;
+  CMDK.sel = 0;
+  CMDK.items = buildCmdKItems('');
+  wrap.innerHTML = '<div class="ck-box">'
+    + '<div class="ck-top">'
+      + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2"/></svg>'
+      + '<input class="ck-inp" id="ckInp" type="text" spellcheck="false" autocomplete="off" placeholder="Ketik nama PLTU, kapal/tongkang, pemasok, atau perintah…">'
+      + '<button type="button" class="ck-esc" id="ckEsc">Esc</button>'
+    + '</div>'
+    + '<div class="ck-list" id="ckList"></div>'
+    + '<div class="ck-foot"><span>↑↓ Pilih · ↵ Eksekusi · Esc Tutup</span><span>Pintasan Global: Ctrl+K</span></div>'
+  + '</div>';
+  wrap.hidden = false;
+  renderCmdKList();
+  const inp = $id('ckInp');
+  if (inp) setTimeout(() => inp.focus(), 10);
+}
+function closeCmdK(){
+  CMDK.open = false;
+  const wrap = $id('cmdK');
+  if (wrap) wrap.hidden = true;
+}
+function bindMissionUX(){
+  const btn = $id('btnCmdK'), wrap = $id('cmdK');
+  if (btn) btn.addEventListener('click', openCmdK);
+  if (wrap){
+    wrap.addEventListener('click', e => {
+      if (e.target === wrap || e.target.closest('#ckEsc')){ closeCmdK(); return; }
+      const itBtn = e.target.closest('[data-ckidx]');
+      if (itBtn){
+        const it = CMDK.items[Number(itBtn.dataset.ckidx)];
+        closeCmdK();
+        if (it && it.act) it.act();
+      }
+    });
+    wrap.addEventListener('input', e => {
+      if (e.target && e.target.id === 'ckInp'){
+        CMDK.sel = 0;
+        CMDK.items = buildCmdKItems(e.target.value);
+        renderCmdKList();
+      }
+    });
+  }
+  document.addEventListener('keydown', e => {
+    const authOn = $id('authGate') && $id('authGate').classList.contains('on');
+    if (authOn) return;
+    if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === 'k'){
+      e.preventDefault();
+      if (CMDK.open) closeCmdK(); else openCmdK();
+      return;
+    }
+    if (CMDK.open){
+      if (e.key === 'Escape'){ e.preventDefault(); closeCmdK(); return; }
+      if (e.key === 'ArrowDown'){ e.preventDefault(); CMDK.sel++; renderCmdKList(); return; }
+      if (e.key === 'ArrowUp'){ e.preventDefault(); CMDK.sel--; renderCmdKList(); return; }
+      if (e.key === 'Enter' && CMDK.items[CMDK.sel]){
+        e.preventDefault();
+        const chosen = CMDK.items[CMDK.sel];
+        closeCmdK();
+        chosen.act();
+        return;
+      }
+      return;
+    }
+    if (e.key === 'Escape'){
+      if (INSP_PLTU){ closePltuInsp(); return; }
+      if (GF.inpOpen){ gfCloseInpPop(); return; }
+    }
+    if (INSP_PLTU && !e.altKey && !e.ctrlKey && !e.metaKey && !/INPUT|SELECT|TEXTAREA/.test((document.activeElement && document.activeElement.tagName) || '')){
+      if (e.key === 'ArrowLeft'){ e.preventDefault(); inspStep(-1); return; }
+      if (e.key === 'ArrowRight'){ e.preventDefault(); inspStep(1); return; }
+    }
+    if (S.page === 'grafik' && e.altKey && !/INPUT|SELECT|TEXTAREA/.test((document.activeElement && document.activeElement.tagName) || '')){
+      if (e.key === 'ArrowLeft'){ e.preventDefault(); gfStepDate(-1); }
+      else if (e.key === 'ArrowRight'){ e.preventDefault(); gfStepDate(1); }
+    }
+  });
+  setInterval(() => { checkCalendarRollover(); updateFreshnessUI(); }, 15000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') smartAutoSync();
+  });
+  window.addEventListener('online', smartAutoSync);
+}
+
 (function init(){
   document.getElementById('btnSync').addEventListener('click', () => pullFromSheets(true));
   document.getElementById('tbSync').addEventListener('click', () => {
@@ -9264,5 +10227,5 @@ async function callAuthServer(params){
   setInterval(() => { if (SYNC.scriptToken) pullFromSheets(false); }, SYNC.refreshMinutes * 60000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4bc796ccbda6d0a',t:'MTc5MjIxMDQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4ec2a2c79bdc626',t:'MTc5MjcxMDUxNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4bc796ccbda6d0a',t:'MTc5MjIxMDQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4ec69aa8bd668c3',t:'MTc5MjcxMzExNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
