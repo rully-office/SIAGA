@@ -2274,30 +2274,93 @@ html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
 .ck-it-r{flex:none;font-size:11px;font-weight:700;color:var(--muted)}
 .ck-foot{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-top:1px solid var(--border);background:var(--surface-2);font-size:10.5px;color:var(--muted)}
 
-/* ══ v57: Unified Ringkasan & Pantauan Risiko (#pg-beranda) ══ */
-#pg-beranda{display:flex;flex-direction:column;gap:12px}
+/* ══ v57: Unified Ringkasan & Pantauan Risiko (#pg-beranda) — Proper Executive Layout ══ */
+#pg-beranda{display:flex;flex-direction:column;gap:14px;width:100%;max-width:1580px;margin:0 auto;padding:14px 20px 30px}
 #pg-beranda[hidden]{display:none}
-.hm-prog{margin-top:0 !important}
-.hm-prog .card-h{justify-content:space-between;flex-wrap:wrap;gap:6px}
-.hm-prog-meta{font-size:11.5px;font-weight:600;color:var(--fg-2);text-transform:none;letter-spacing:0}
-.hm-cards .hm-c{transition:border-color .15s,box-shadow .15s,transform .12s,background .15s;position:relative}
-.hm-cards .hm-c:hover{transform:translateY(-1px)}
-.hm-cards .hm-c.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,var(--surface));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 22%,transparent)}
-.hm-c-tag{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:0;text-transform:none;padding:2px 6px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
-.hm-cards .hm-c.on .hm-c-tag{background:var(--accent);color:#fff}
-.hm-mid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:12px;align-items:stretch}
-@media (max-width:980px){ .hm-mid{grid-template-columns:1fr} }
-.hm-mid>.card{display:flex;flex-direction:column}
+#hmAlert:empty{display:none}
+#pg-beranda .hm-alert{margin-bottom:0}
+#hmBody{display:flex;flex-direction:column;gap:14px;min-width:0}
+.hm-sec{display:flex;flex-direction:column;gap:8px;min-width:0}
+.hm-sec-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:0 2px}
+.hm-sec-hd h2{margin:0;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:7px}
+.hm-sec-hd h2::before{content:"";width:3.5px;height:12px;border-radius:2px;background:var(--accent);display:inline-block}
+.hm-prog-meta{font-size:11.5px;font-weight:600;color:var(--fg-2);padding:2px 9px;border-radius:999px;background:var(--surface);border:1px solid var(--border)}
+.hm-sec-hint{font-size:11px;color:var(--muted);font-weight:600}
+
+/* Baris 1: 4 Kartu KPI Program (tanpa kotak bertumpuk / box-in-box) */
+#pg-beranda #kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;background:none;border:0}
+#pg-beranda #kpis .kpi{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:12px;padding:12px 15px;display:flex;flex-direction:column;justify-content:space-between;gap:4px;min-height:88px;box-shadow:0 1px 2px rgba(11,29,50,.03)}
+#pg-beranda #kpis .kpi:nth-child(2){border-top-color:#0EA5E9}
+#pg-beranda #kpis .kpi:nth-child(3){border-top-color:#6366F1}
+#pg-beranda #kpis .kpi:nth-child(4){border-top-color:#10B981}
+#pg-beranda #kpis .kpi-l{font-size:10.5px;font-weight:800;letter-spacing:.06em;color:var(--fg-2)}
+#pg-beranda #kpis .kpi-v{font-size:24px;font-weight:800;line-height:1.12;font-variant-numeric:tabular-nums;color:var(--fg)}
+#pg-beranda #kpis .kpi-v small{font-size:12px;font-weight:700;color:var(--muted);margin-left:4px}
+#pg-beranda #kpis .kpi-s{font-size:11.5px;color:var(--fg-2);line-height:1.35}
+
+/* Baris 2: 5 Kartu Sebaran Risiko (skala tipografi & tinggi selaras Baris 1) */
+#pg-beranda .hm-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+#pg-beranda .hm-cards .hm-c{min-height:88px;padding:12px 14px;border-radius:12px;justify-content:space-between;gap:4px;transition:border-color .15s,box-shadow .15s,transform .12s,background .15s;box-shadow:0 1px 2px rgba(11,29,50,.03)}
+#pg-beranda .hm-cards .hm-c:hover{transform:translateY(-1px);border-color:var(--accent);box-shadow:0 4px 12px rgba(11,29,50,.08)}
+#pg-beranda .hm-cards .hm-c.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,var(--surface));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 22%,transparent)}
+#pg-beranda .hm-l{font-size:10.5px;white-space:nowrap}
+#pg-beranda .hm-n{font-size:25px;font-weight:800;line-height:1.12}
+#pg-beranda .hm-s{font-size:11px;line-height:1.35;-webkit-line-clamp:1}
+.hm-c-tag{margin-left:auto;font-size:9.5px;font-weight:700;letter-spacing:0;text-transform:none;padding:1.5px 6px;border-radius:999px;background:var(--surface-2);color:var(--muted);flex:none}
+#pg-beranda .hm-cards .hm-c.on .hm-c-tag{background:var(--accent);color:#fff}
+
+/* Baris 3: 2 Kolom Sejajar Sama Tinggi (Prioritas Tindak Lanjut + Status Armada) */
+.hm-mid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(320px,1fr);gap:14px;align-items:stretch}
+.hm-mid>.card,.hm-mid .fk{margin:0 !important;display:flex;flex-direction:column;height:100%}
+.fk-body{flex:1;display:flex;flex-direction:column;justify-content:flex-start}
+.fk-foot{margin-top:auto;padding-top:10px;border-top:1px dashed var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
 .hm-ok-box{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;background:color-mix(in srgb,#10B981 10%,var(--surface-2));border:1px solid color-mix(in srgb,#10B981 28%,var(--border));font-size:12.5px;line-height:1.5;color:var(--fg)}
 .hm-ok-ico{flex:none;width:24px;height:24px;border-radius:50%;background:#10B981;color:#fff;font-weight:800;font-size:13px;display:inline-flex;align-items:center;justify-content:center}
-.hm-rad{display:flex;flex-direction:column;gap:10px}
-.hm-rad-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#pg-beranda .hm-rows{display:flex;flex-direction:column;gap:2px;flex:1;justify-content:space-between}
+#pg-beranda .hm-r{padding:8px 10px;border:0;border-radius:8px;background:var(--surface-2);margin:0;gap:9px;transition:background .12s,transform .1s}
+#pg-beranda .hm-r + .hm-r{margin-top:3px}
+#pg-beranda .hm-r:hover{background:color-mix(in srgb,var(--accent) 10%,var(--surface-2))}
+.hm-dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--muted)}
+.hm-dot.d-late{background:var(--c-late)}
+.hm-dot.d-apung{background:#64748B}
+.hm-dot.d-sail{background:#0EA5E9}
+.hm-dot.d-load{background:#F59E0B}
+.hm-dot.d-eta7{background:#10B981}
+.hm-dot.d-warn{background:#EF4444}
+.hm-dot.d-muted{background:#94A3B8}
+.hm-cnt{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;padding:1.5px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--border);min-width:30px;text-align:center;color:var(--fg)}
+#pg-beranda .hm-r.late .hm-cnt{background:var(--h-emerg-bg);border-color:color-mix(in srgb,var(--c-late) 35%,var(--border));color:var(--c-late)}
+
+/* Baris 4: Matriks Pantauan Risiko & Mitigasi per PLTU */
+.hm-rad{display:flex;flex-direction:column;gap:10px;padding:15px 16px}
+.hm-rad-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:8px;border-bottom:1px solid var(--border)}
 .hm-rad-acts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.hm-rad-q{height:28px;width:190px;padding:0 10px;border-radius:999px;border:1px solid var(--border-2);background:var(--surface-2);color:var(--fg);font:inherit;font-size:12px;outline:none}
+.hm-rad-q{height:30px;width:210px;padding:0 12px;border-radius:999px;border:1px solid var(--border-2);background:var(--surface-2);color:var(--fg);font:inherit;font-size:12px;outline:none}
 .hm-rad-q:focus{border-color:var(--accent);background:var(--surface)}
-.hm-exp-btn{height:28px;padding:0 11px;border-radius:999px;border:1px solid var(--border-2);background:var(--surface-2);color:var(--fg-2);font:700 11.5px/1 var(--font);cursor:pointer;white-space:nowrap}
+.hm-exp-btn{height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--border-2);background:var(--surface-2);color:var(--fg-2);font:700 11.5px/1 var(--font);cursor:pointer;white-space:nowrap}
 .hm-exp-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--surface)}
-.rd-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.hm-rad .rdp-top{margin-bottom:0}
+.hm-rad .rd-list{margin-top:2px}
+.hm-rad .rd-row{position:relative;padding:10px 32px 10px 14px}
+.hm-rad .rd-row::after{content:"▾";position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);transition:transform .16s ease,color .16s ease;pointer-events:none}
+.hm-rad .rd-i.open .rd-row::after{transform:translateY(-50%) rotate(180deg);color:var(--accent)}
+.rd-btns{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.rd-btns button[data-a="insp"]{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 35%,var(--border-2));color:var(--accent)}
+.rd-btns button[data-a="insp"]:hover{background:var(--accent);color:#fff}
+
+@media (max-width:1180px){
+  #pg-beranda #kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #pg-beranda .hm-cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .hm-mid{grid-template-columns:1fr}
+}
+@media (max-width:780px){
+  #pg-beranda{padding:10px 12px 24px;gap:12px}
+  #hmBody{gap:12px}
+  #pg-beranda .hm-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  #pg-beranda .hm-c.l-so{grid-column:1 / -1}
+  .hm-rad .rd-row{padding-right:14px}
+  .hm-rad .rd-row::after{display:none}
+}
 </style>
 </head>
 <body>
@@ -2377,7 +2440,10 @@ html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
 
 <section class="page" id="pg-beranda" aria-label="Ringkasan &amp; Risiko" hidden>
   <div id="hmAlert"></div>
-  <div class="card hm-prog"><div class="card-h"><h2>Ringkasan Pasokan &amp; Program Bulan Ini</h2><span class="hm-prog-meta" id="hmProgMeta"></span></div><div class="kpis" id="kpis"></div></div>
+  <div class="hm-sec">
+    <div class="hm-sec-hd"><h2>Ringkasan Pasokan &amp; Program Bulan Ini</h2><span class="hm-prog-meta" id="hmProgMeta"></span></div>
+    <div class="kpis" id="kpis"></div>
+  </div>
   <div id="hmBody"><div class="pg-busy">Memuat data…</div></div>
 </section>
 
@@ -5112,9 +5178,13 @@ const METODE_HTML = '<details class="metode"><summary>Ketentuan &amp; cara baca 
 function fokusHTML(){
   const items = Object.keys(ASSESS).map(k => Object.assign({ k:k }, ASSESS[k]));
   const F = EW.fokus(items);
+  const endLbl = (Array.isArray(DATES) && DATES.length) ? hopDate(DATES[DATES.length - 1]) : 'akhir bulan';
+  const footHtml = `<div class="fk-foot"><span>Dievaluasi otomatis dari ${items.length} PLTU · Horizon s.d. ${esc(endLbl)}</span>`
+    + `<span>Ambang: Kritis &lt;10 hr · Siaga 10–15 hr</span></div>`;
   if (!F.n){
     return `<div class="card fk"><div class="card-h"><h2>Prioritas Tindak Lanjut</h2></div>`
-      + `<div class="hm-ok-box"><span class="hm-ok-ico" aria-hidden="true">✓</span><div><b>Seluruh PLTU Terkendali</b><br>Tidak terdeteksi defisit tonase maupun keterlambatan kedatangan kritis hingga akhir horizon pantauan. Lanjutkan pemantauan rutin keberangkatan tongkang sesuai jadwal.</div></div></div>`;
+      + `<div class="fk-body"><div class="hm-ok-box"><span class="hm-ok-ico" aria-hidden="true">✓</span><div><b>Seluruh PLTU Terkendali</b><br>Tidak terdeteksi defisit tonase maupun keterlambatan kedatangan kritis hingga ${esc(endLbl)}. Lanjutkan pemantauan rutin keberangkatan tongkang sesuai jadwal.</div></div></div>`
+      + footHtml + `</div>`;
   }
   const list = a => a.map(x => esc(x.k)).join(', '), mt = n => nfi(n) + ' MT';
   const rows = [];
@@ -5129,8 +5199,9 @@ function fokusHTML(){
   if (F.donor.length){ const d = F.donor.slice(0, 2);
     rows.push(['Opsi pengalihan kargo', `${d.map(x => '<b>' + esc(x.k) + '</b> (cadangan ± ' + mt(x.surplusMT) + ' di atas batas aman)').join(' dan ')} memiliki stok yang cukup longgar. Pertimbangkan pengalihan sebagian pengiriman ke PLTU kritis apabila spesifikasi batubara dan rute pelayaran memungkinkan.`]); }
   if (F.basi.length) rows.push(['Pembaruan data stok', `Data stok dasar ${list(F.basi)} belum diperbarui ≥ 2 hari. Mohon perbarui laporan stok agar urutan prioritas ini tetap akurat.`]);
-  return `<div class="card fk"><div class="card-h"><h2>Prioritas Tindak Lanjut</h2></div>`
-    + rows.map((r, i) => `<div class="fk-r"><span class="fk-n">${i + 1}</span><div><div class="fk-t">${r[0]}</div><div class="fk-d">${r[1]}</div></div></div>`).join('') + '</div>';
+  return `<div class="card fk"><div class="card-h"><h2>Prioritas Tindak Lanjut</h2></div><div class="fk-body">`
+    + rows.map((r, i) => `<div class="fk-r"><span class="fk-n">${i + 1}</span><div><div class="fk-t">${r[0]}</div><div class="fk-d">${r[1]}</div></div></div>`).join('')
+    + `</div>` + footHtml + `</div>`;
 }
 let rdFilter = 'att', rdQuery = '';
 function renderRadar(){
@@ -5159,19 +5230,19 @@ function renderHome(){
   const card = l => {
     const isOn = rdFilter === l;
     return `<button type="button" class="hm-c l-${l}${isOn ? ' on' : ''}" data-rdf="${l}" title="Klik untuk menyaring daftar PLTU kategori ${esc(LV[l].s)}">`
-      + `<span class="hm-l"><i aria-hidden="true">${LV[l].ic}</i>${LV[l].s}<span class="hm-c-tag">${isOn ? 'Aktif ✓' : 'Saring'}</span></span>`
+      + `<span class="hm-l"><i aria-hidden="true">${LV[l].ic}</i>${LV[l].s}${isOn ? '<span class="hm-c-tag">Aktif ✓</span>' : ''}</span>`
       + `<span class="hm-n">${cnt[l]}<small>PLTU</small></span>`
       + `<span class="hm-s" title="${esc(nm(l))}">${esc(nm(l))}</span></button>`;
   };
   const soOn = rdFilter === 'so';
   const prs = [
-    ['late', 'Late loading', ROWS.filter(hasLate).length],
-    ['apung', PRESET.apung.t, ROWS.filter(PRESET.apung.f).length],
-    ['sail', PRESET.sail.t, ROWS.filter(PRESET.sail.f).length],
-    ['load', PRESET.load.t, ROWS.filter(PRESET.load.f).length],
-    ['eta7', PRESET.eta7.t, ROWS.filter(PRESET.eta7.f).length],
-    ['novol', PRESET.novol.t, ROWS.filter(PRESET.novol.f).length],
-    ['nonom', PRESET.nonom.t, ROWS.filter(PRESET.nonom.f).length]
+    ['late', 'Late loading', ROWS.filter(hasLate).length, 'd-late'],
+    ['apung', PRESET.apung.t, ROWS.filter(PRESET.apung.f).length, 'd-apung'],
+    ['sail', PRESET.sail.t, ROWS.filter(PRESET.sail.f).length, 'd-sail'],
+    ['load', PRESET.load.t, ROWS.filter(PRESET.load.f).length, 'd-load'],
+    ['eta7', PRESET.eta7.t, ROWS.filter(PRESET.eta7.f).length, 'd-eta7'],
+    ['novol', PRESET.novol.t, ROWS.filter(PRESET.novol.f).length, 'd-warn'],
+    ['nonom', PRESET.nonom.t, ROWS.filter(PRESET.nonom.f).length, 'd-muted']
   ];
   const dqBad = DQ && DQ.level === 'bad' ? DQ.issues.filter(i => i.sev === 'bad')[0] : null;
   if (alEl){
@@ -5201,36 +5272,39 @@ function renderHome(){
   const near = items.filter(i => i.breachDate).sort((a, b) => a.breachDate < b.breachDate ? -1 : 1)[0];
   const cfg = EW.CFG;
 
-  el.innerHTML = `<div class="hm-cards">${['kritis', 'tinggi', 'waspada', 'terkendali'].map(card).join('')}
-      <button type="button" class="hm-c l-so${soOn ? ' on' : ''}" data-rdf="so" title="Klik untuk menyaring PLTU berpotensi Stock out">
-        <span class="hm-l"><i aria-hidden="true">■</i>Stock out<span class="hm-c-tag">${soOn ? 'Aktif ✓' : 'Saring'}</span></span>
-        <span class="hm-n">${so.length}<small>PLTU</small></span>
-        <span class="hm-s">${so.length ? 'terdekat: ' + esc(so[0].k) + ', ' + hopDate(so[0].stockoutDate) : 'tidak ada s.d. ' + hopDate(DATES[DATES.length - 1])}</span>
-      </button></div>
+  el.innerHTML = `<div class="hm-sec">
+      <div class="hm-sec-hd"><h2>Peta Sebaran Risiko Dini PLTU</h2><span class="hm-sec-hint">${rdFilter !== 'att' && rdFilter !== 'all' ? 'Filter aktif — klik ulang kartu untuk melepas' : 'Klik kartu untuk menyaring matriks risiko'}</span></div>
+      <div class="hm-cards">${['kritis', 'tinggi', 'waspada', 'terkendali'].map(card).join('')}
+        <button type="button" class="hm-c l-so${soOn ? ' on' : ''}" data-rdf="so" title="Klik untuk menyaring PLTU berpotensi Stock out">
+          <span class="hm-l"><i aria-hidden="true"></i>Stock out${soOn ? '<span class="hm-c-tag">Aktif ✓</span>' : ''}</span>
+          <span class="hm-n">${so.length}<small>PLTU</small></span>
+          <span class="hm-s">${so.length ? 'terdekat: ' + esc(so[0].k) + ', ' + hopDate(so[0].stockoutDate) : 'aman s.d. ' + hopDate(DATES[DATES.length - 1])}</span>
+        </button></div>
+    </div>
     <div class="hm-mid">
       ${fokusHTML()}
       <div class="card">
         <div class="card-h"><h2>Status Armada &amp; Pintasan Jadwal</h2><button type="button" class="lnk" data-go="jadwal">Buka jadwal ›</button></div>
-        <div class="hm-rows">${prs.map(([k, t, n]) => `<button type="button" class="hm-r${(k === 'late' || k === 'novol') && n ? ' late' : ''}" data-pr="${k}"><span>${esc(t)}</span><b>${n}</b><i>›</i></button>`).join('')}</div>
+        <div class="hm-rows">${prs.map(([k, t, n, dotCls]) => `<button type="button" class="hm-r${(k === 'late' || k === 'novol') && n ? ' late' : ''}" data-pr="${k}"><i class="hm-dot ${dotCls}" aria-hidden="true"></i><span>${esc(t)}</span><b class="hm-cnt">${n}</b><i>›</i></button>`).join('')}</div>
       </div>
     </div>
     <div class="card hm-rad" id="hmRadCard">
       <div class="hm-rad-hd">
         <div>
-          <h2 style="margin:0">Daftar Pantauan Risiko &amp; Mitigasi per PLTU</h2>
-          ${near ? `<div class="rd-note" style="margin-top:3px">Batas minimum terdekat: <b>${esc(near.k)}</b>, ${near.hopNow < cfg.minHop ? 'sudah terlewati' : hopDate(near.breachDate)}</div>` : ''}
+          <h2 style="margin:0">Matriks Pantauan Risiko &amp; Mitigasi per PLTU</h2>
+          ${near ? `<div class="rd-note" style="margin-top:4px">Batas minimum terdekat: <b>${esc(near.k)}</b> (${near.hopNow < cfg.minHop ? 'sudah terlewati' : hopDate(near.breachDate)})</div>` : `<div class="rd-note" style="margin-top:4px">Klik baris PLTU untuk membuka rincian penyebab, jadwal kapal berikutnya, &amp; rekomendasi tindak lanjut.</div>`}
         </div>
         <div class="hm-rad-acts">
           <input type="search" class="hm-rad-q" id="rdSearch" placeholder="Cari PLTU / pemasok…" value="${esc(rdQuery)}" aria-label="Cari PLTU di daftar risiko">
           ${shown.length ? `<button type="button" class="hm-exp-btn" data-rdexp="${allOpen ? '0' : '1'}">${allOpen ? 'Tutup Semua Rincian' : 'Buka Semua Rincian'}</button>` : ''}
         </div>
       </div>
-      <div class="rdp-top" style="margin-bottom:2px">${defs.filter(d => d[0] !== 'nodata' || d[2] > 0).map(([k, t, n]) =>
+      <div class="rdp-top">${defs.filter(d => d[0] !== 'nodata' || d[2] > 0).map(([k, t, n]) =>
         `<button type="button" class="rdp-f${rdFilter === k ? ' on' : ''}" data-f="${k}">${esc(t)} <b>${n}</b></button>`).join('')}</div>
       ${S.sup ? '<div class="rd-note"><b>Filter pemasok aktif: hanya menghitung pengiriman dari pemasok terpilih.</b></div>' : ''}
       <div class="rd-list">${shown.length ? shown.map(a => rdRowHTML(a, a.k, !!radarOpen[a.k])).join('')
         : '<div class="rd-empty">' + (qNorm ? 'Tidak ada PLTU yang cocok dengan pencarian "' + esc(rdQuery) + '".' : (rdFilter === 'att' ? 'Seluruh PLTU berada dalam kondisi terkendali sampai ' + hopDate(DATES[DATES.length - 1]) + '.' : 'Tidak ada PLTU pada kategori ini.')) + '</div>'}</div>
-      <div style="margin-top:4px">${METODE_HTML}</div>
+      <div style="margin-top:2px">${METODE_HTML}</div>
     </div>`;
 
   const qInp = el.querySelector('#rdSearch');
@@ -10443,5 +10517,5 @@ function bindMissionUX(){
   setInterval(() => { if (SYNC.scriptToken) pullFromSheets(false); }, SYNC.refreshMinutes * 60000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4bc796ccbda6d0a',t:'MTc5MjIxMDQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4ee1165b8a3a301',t:'MTc5MjczMDQ3MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4bc796ccbda6d0a',t:'MTc5MjIxMDQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4ee1e695803229b',t:'MTc5MjczMTAwNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
