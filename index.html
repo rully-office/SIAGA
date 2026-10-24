@@ -2069,12 +2069,10 @@ html[data-theme="dark"] .gf-proj-note strong{color:#5CC8FF}
 .gf-card .card-h{align-items:center;margin-bottom:8px}
 .gf-card .card-h h2{font-size:13.5px;letter-spacing:-.01em}
 .gf-exp{margin-left:auto}
-.gf-exp .sm-exp-m{min-width:348px;max-width:min(440px,calc(100vw - 28px));padding:6px}
-.gf-exp .sm-exp-m button{display:flex;align-items:center;justify-content:space-between;gap:14px;font-weight:600;padding:8px 10px}
-.gf-exp .sm-exp-m button>span{display:flex;flex-direction:column;gap:2px;min-width:0}
-.gf-exp .sm-exp-m button>span>b{font-size:12.5px;font-weight:700;color:var(--fg);line-height:1.28}
-.gf-exp .sm-exp-m button>span>em{font-style:normal;font-size:10.8px;font-weight:500;color:var(--muted);line-height:1.25}
-.gf-exp .sm-exp-m button small{flex:none;font-size:10px;font-weight:700;letter-spacing:.03em;padding:2.5px 7px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);color:var(--fg-2)}
+.gf-exp .sm-exp-m{min-width:340px;max-width:min(440px,calc(100vw - 28px));padding:5px}
+.gf-exp .sm-exp-m button{display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:12.5px;font-weight:600;color:var(--fg);padding:7px 10px;line-height:1.3}
+.gf-exp .sm-exp-m button>span{min-width:0}
+.gf-exp .sm-exp-m button small{flex:none;font-size:10px;font-weight:700;letter-spacing:.03em;padding:2px 7px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);color:var(--fg-2)}
 .gf-exp-sep{height:1px;background:var(--border);margin:4px 6px}
 .gf-c{width:100%;height:auto;aspect-ratio:16/9;display:block;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
 .gf-c.gf-c-all{aspect-ratio:1600/1240}
@@ -2760,12 +2758,12 @@ const EW = (function(){
     bongkarDays: 3     // muatan dibagi rata ke N hari sejak ETA POD (asumsi)
   };
   const DAY = 86400000, pad = n => String(n).padStart(2, '0');
-  const toD = s => new Date(s + 'T00:00:00Z');
+  const toD = s => new Date(String(s || '') + 'T00:00:00Z');
   const isoD = d => d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate());
   const addDays = (s, n) => isoD(new Date(toD(s).getTime() + n * DAY));
-  const diffDays = (a, b) => Math.round((toD(a) - toD(b)) / DAY);          // a − b
-  const r1 = x => Math.round(x * 10) / 10;
-  const nf = n => Math.round(n).toLocaleString('id-ID');
+  const diffDays = (a, b) => { if (!a || !b) return null; const n = Math.round((toD(a) - toD(b)) / DAY); return isFinite(n) ? n : null; };
+  const r1 = x => isFinite(Number(x)) ? Math.round(Number(x) * 10) / 10 : 0;
+  const nf = n => (n != null && isFinite(Number(n))) ? Math.round(Number(n)).toLocaleString('id-ID') : '—';
   const CERT = { 'Proses Bongkar':'di_pelabuhan', 'Tiba/Antri':'di_pelabuhan', 'Sailing':'berlayar', 'Sailing to POL':'berlayar',
                  'Proses Loading':'belum_berangkat', 'Menunggu Loading':'belum_berangkat', 'Menunggu':'belum_berangkat' };
   const CERT_TXT = { di_pelabuhan:'sudah di pelabuhan', berlayar:'sedang berlayar', belum_berangkat:'belum berangkat dari pelabuhan muat', tidak_diketahui:'status belum diperbarui' };
@@ -2868,7 +2866,8 @@ const EW = (function(){
     const lastDate = dates[dates.length - 1];
     const vals = fut.map(d => ({ d:d, v:h.seri[d].v, arr:h.seri[d].arr || 0 }));
     const oNow = h.seri[today];
-    out.hopNow = (oNow && oNow.v != null) ? oNow.v : u.base;
+    out.hopNow = (ctx.hopNow != null && isFinite(Number(ctx.hopNow))) ? Number(ctx.hopNow) : ((oNow && oNow.v != null) ? oNow.v : u.base);
+    const rk = v => String(r1(v)).replace('.', ',');
     const brk = vals.find(x => x.v < cfg.minHop), so = vals.find(x => x.v <= cfg.stockoutHop);
     out.breachDate = brk ? brk.d : null;   out.daysToBreach = brk ? diffDays(brk.d, today) : null;
     out.stockoutDate = so ? so.d : null;   out.daysToStockout = so ? diffDays(so.d, today) : null;
@@ -2881,6 +2880,13 @@ const EW = (function(){
                           n:up.filter(s => s.awal === nxt.awal).length };
     out.inPortMT = Math.round(up.filter(s => s.cert === 'di_pelabuhan').reduce((a, s) => a + s.vol, 0));
     const firstArr = vals.find(x => x.arr > 0);
+    const arrShip = firstArr
+      ? (up.find(x => x.awal === firstArr.d) || up.find(x => x.days && x.days.indexOf(firstArr.d) >= 0) || null)
+      : null;
+    const lateShip = out.breachDate
+      ? (up.find(x => x.cert !== 'di_pelabuhan' && x.awal && x.awal > out.breachDate) || null)
+      : null;
+    const portShips = up.filter(x => x.cert === 'di_pelabuhan');
     let lv = 'terkendali';
     if (out.hopNow < cfg.minHop || (out.daysToStockout != null && out.daysToStockout <= cfg.soonDays)) lv = 'kritis';
     else if (out.daysToBreach != null && out.daysToBreach <= cfg.soonDays) lv = 'tinggi';
@@ -2888,21 +2894,29 @@ const EW = (function(){
     out.level = lv;
     if (out.breachDate){
       if (!out.next) out.gapDays = diffDays(lastDate, out.breachDate);
-      else out.gapDays = Math.max(0, diffDays(out.next.date, out.breachDate));
+      else out.gapDays = Math.max(0, diffDays(out.next.date, out.breachDate) || 0);
       out.bufferDays = out.next ? diffDays(out.breachDate, out.next.date) : null;
     }
     /* faktor penyebab — disusun dengan bahasa operasional yang jelas */
     const F = out.factors;
     if (out.breachDate){
-      if (out.hopNow < cfg.minHop) F.push('Stok saat ini sudah berada di bawah batas minimum (' + r1(out.hopNow) + ' hari dari standar minimal ' + cfg.minHop + ' hari).');
+      if (out.hopNow < cfg.minHop) F.push('Stok saat ini berada di bawah batas minimum (' + rk(out.hopNow) + ' hari dari standar minimal ' + cfg.minHop + ' hari).');
       if (!firstArr) F.push('Belum ada jadwal kapal masuk hingga ' + fmt(lastDate) + '.');
-      else if (firstArr.d > out.breachDate) F.push('Kapal terdekat dijadwalkan tiba pada ' + fmt(firstArr.d) + ', sedangkan stok diperkirakan turun di bawah batas minimum pada ' + fmt(out.breachDate) + '.');
-      else if (out.hopNow >= cfg.minHop) F.push('Pasokan yang masuk mulai ' + fmt(firstArr.d) + ' belum mencukupi untuk menahan stok di atas batas minimum (masih kurang sekitar ' + nf(out.gapMT) + ' MT).');
+      else if (firstArr.d > out.breachDate){
+        if (arrShip && arrShip.cert === 'di_pelabuhan'){
+          F.push('Penambahan stok dari pembongkaran kapal di pelabuhan baru terhitung mulai ' + fmt(firstArr.d) + '.');
+        } else {
+          const etaTiba = (lateShip && lateShip.awal) || (arrShip && arrShip.awal) || firstArr.d;
+          F.push(out.hopNow < cfg.minHop
+            ? ('Kapal berikutnya dijadwalkan tiba pada ' + fmt(etaTiba) + '.')
+            : ('Kapal terdekat dijadwalkan tiba pada ' + fmt(etaTiba) + ', sedangkan stok diperkirakan turun di bawah batas minimum pada ' + fmt(out.breachDate) + '.'));
+        }
+      } else if (out.hopNow >= cfg.minHop) F.push('Pasokan yang masuk mulai ' + fmt(firstArr.d) + ' belum mencukupi untuk menahan stok di atas batas minimum (masih kurang sekitar ' + nf(out.gapMT) + ' MT).');
     }
     const hist = (u.hist || []).map(p => p[1]);
     if (hist.length >= 2){
       const n = Math.min(7, hist.length - 1), dlt = hist[hist.length - 1] - hist[hist.length - 1 - n];
-      if (dlt < -0.5) F.push('Stok mengalami penurunan sekitar ' + r1(-dlt) + ' hari dalam ' + n + ' hari terakhir.');
+      if (dlt < -0.5) F.push('Stok mengalami penurunan sekitar ' + rk(-dlt) + ' hari dalam ' + n + ' hari terakhir.');
     }
     const ratio = (u.pakai > 0 && u.bagi > 0) ? u.pakai / u.bagi : null;
     if (ratio != null && ratio >= 0.95) F.push('Pemakaian harian saat ini cukup tinggi, mendekati kapasitas konsumsi maksimum (' + Math.round(ratio * 100) + '%).');
@@ -2922,20 +2936,53 @@ const EW = (function(){
     out.volShortMT = Math.max(0, Math.round((cfg.minHop - vEnd) * u.bagi));
     out.timingOnly = vEnd >= cfg.minHop;
     out.surplusMT = lv === 'terkendali' ? Math.max(0, Math.round((mn.v - cfg.waspadaHop) * u.bagi)) : 0;
-    const kunci = firstArr ? (up.find(x => x.awal === firstArr.d) || out.next) : null;
-    out.keyShip = kunci ? { date:kunci.awal, nom:kunci.nom, sup:kunci.sup, mt:kunci.vol, status:kunci.status, cert:kunci.cert } : null;
+    const kunciSrc = lateShip || arrShip || nxt || null;
+    const kunciDate = kunciSrc ? (kunciSrc.awal || kunciSrc.date || null) : null;
+    const kunciMt = kunciSrc ? (kunciSrc.vol != null ? kunciSrc.vol : (kunciSrc.mt || 0)) : 0;
+    out.keyShip = (kunciSrc && kunciDate)
+      ? { date:kunciDate, nom:kunciSrc.nom, sup:kunciSrc.sup, mt:kunciMt, status:kunciSrc.status, cert:kunciSrc.cert }
+      : null;
     if (out.breachDate) out.cause = !firstArr ? 'tanpa_pasokan' : (firstArr.d > out.breachDate ? 'telat' : 'kurang_volume');
     if (lv !== 'terkendali' && out.cause){
       const hk = mt => String(r1(mt / u.bagi)).replace('.', ',');
+      let inPortHandled = false;
       if (out.cause === 'telat'){
-        const sl = diffDays(kunci.awal, out.breachDate);
-        out.slipDays = sl;
-        const aksi = kunci.cert === 'belum_berangkat' ? 'Percepat proses muat dan keberangkatan ' + nama(kunci) + ' agar dapat tiba' : 'Koordinasikan percepatan pelayaran dan prioritas sandar ' + nama(kunci) + ' agar tiba';
-        const tgt = ' paling lambat ' + fmt(out.breachDate) + ' (jadwal saat ini ' + fmt(kunci.awal) + ', perlu maju ' + sl + ' hari)';
-        if (out.timingOnly) A.push('Total volume pengiriman di jadwal sudah mencukupi, namun waktu tibanya perlu dipercepat. ' + aksi + tgt + ' agar stok tetap terjaga di atas batas minimum.');
-        else {
-          A.push(aksi + tgt + ' untuk menahan penurunan stok.');
-          A.push('Total volume di jadwal juga masih kurang sekitar ' + nf(out.volShortMT) + ' MT (setara ± ' + hk(out.volShortMT) + ' hari pemakaian). Perlu penjadwalan pengiriman tambahan untuk sisa periode.');
+        if (arrShip && arrShip.cert === 'di_pelabuhan' && out.inPortMT > 0){
+          inPortHandled = true;
+          const pLbl = portShips[0] ? (' (' + nama(portShips[0]) + (portShips.length > 1 ? ', dkk.' : '') + ')') : '';
+          A.push('Terdapat ' + nf(out.inPortMT) + ' MT batubara pada kapal yang sudah tiba/antri di pelabuhan' + pLbl + '. Prioritaskan sandar dan percepat proses bongkar agar stok segera naik di atas batas minimum.');
+          if (lateShip && lateShip.awal){
+            if (out.timingOnly){
+              A.push('Kawal ketepatan pelayaran ' + nama(lateShip) + ' (jadwal tiba ' + fmt(lateShip.awal) + ') agar pemulihan stok berlanjut tanpa jeda.');
+            } else {
+              A.push('Percepat kedatangan ' + nama(lateShip) + ' (jadwal tiba ' + fmt(lateShip.awal) + ') dan jadwalkan tambahan pasokan sekitar ' + nf(out.volShortMT) + ' MT (± ' + hk(out.volShortMT) + ' hari pemakaian).');
+            }
+          } else if (!out.timingOnly && out.volShortMT > 0){
+            A.push('Total volume di jadwal masih kurang sekitar ' + nf(out.volShortMT) + ' MT (setara ± ' + hk(out.volShortMT) + ' hari pemakaian). Perlu penjadwalan pengiriman tambahan.');
+          }
+        } else {
+          const shipTgt = lateShip || ((arrShip && arrShip.awal) ? arrShip : null);
+          const shipDate = shipTgt ? shipTgt.awal : (firstArr ? firstArr.d : null);
+          const sl = (shipDate && out.breachDate) ? diffDays(shipDate, out.breachDate) : null;
+          if (sl != null && sl > 0) out.slipDays = sl;
+          const aksi = (shipTgt && shipTgt.cert === 'belum_berangkat')
+            ? ('Percepat proses muat dan keberangkatan ' + nama(shipTgt) + ' agar dapat tiba')
+            : ('Koordinasikan percepatan pelayaran dan prioritas sandar ' + nama(shipTgt) + ' agar tiba');
+          let tgt = '';
+          if (shipDate && sl != null && sl > 0){
+            tgt = out.breachDate > today
+              ? (' paling lambat ' + fmt(out.breachDate) + ' (jadwal saat ini ' + fmt(shipDate) + ', perlu maju ' + sl + ' hari)')
+              : (' lebih awal dari jadwal saat ini ' + fmt(shipDate) + ' (' + sl + ' hari lagi)');
+          } else if (shipDate){
+            tgt = ' sesuai jadwal ' + fmt(shipDate);
+          }
+          if (out.timingOnly){
+            const endGoal = out.hopNow < cfg.minHop ? ' agar stok segera pulih ke atas batas minimum.' : ' agar stok tetap terjaga di atas batas minimum.';
+            A.push('Total volume pengiriman di jadwal sudah mencukupi, namun waktu tibanya perlu dipercepat. ' + aksi + tgt + endGoal);
+          } else {
+            A.push(aksi + tgt + ' untuk menahan penurunan stok.');
+            A.push('Total volume di jadwal juga masih kurang sekitar ' + nf(out.volShortMT) + ' MT (setara ± ' + hk(out.volShortMT) + ' hari pemakaian). Perlu penjadwalan pengiriman tambahan untuk sisa periode.');
+          }
         }
       } else if (out.cause === 'tanpa_pasokan'){
         const need = Math.max(out.gapMT, out.volShortMT);
@@ -2943,27 +2990,28 @@ const EW = (function(){
       } else {
         A.push('Jadwal tiba kapal sudah sesuai, tetapi volumenya masih kurang sekitar ' + nf(out.gapMT) + ' MT (setara ± ' + hk(out.gapMT) + ' hari pemakaian). Pertimbangkan penambahan tonase muatan atau pengiriman kapal tambahan.');
       }
-      if (out.inPortMT > 0) A.push('Terdapat ' + nf(out.inPortMT) + ' MT batubara pada kapal yang sudah tiba/antri di pelabuhan. Prioritaskan proses bongkar agar segera menambah stok.');
-      if (kunci && kunci.cert !== 'di_pelabuhan' && kunci.cert !== 'berlayar')
-        A.push('Pantau kepastian jadwal berangkat ' + nama(kunci) + ' (' + CERT_TXT[kunci.cert] + '), karena keterlambatan 1 hari setara konsumsi sekitar ' + nf(u.bagi) + ' MT.');
+      if (out.inPortMT > 0 && !inPortHandled) A.push('Terdapat ' + nf(out.inPortMT) + ' MT batubara pada kapal yang sudah tiba/antri di pelabuhan. Prioritaskan proses bongkar agar segera menambah stok.');
+      const watchShip = lateShip || kunciSrc;
+      if (watchShip && watchShip.cert !== 'di_pelabuhan' && watchShip.cert !== 'berlayar' && CERT_TXT[watchShip.cert])
+        A.push('Pantau kepastian jadwal berangkat ' + nama(watchShip) + ' (' + CERT_TXT[watchShip.cert] + '), karena keterlambatan 1 hari setara konsumsi sekitar ' + nf(u.bagi) + ' MT.');
       if (age >= 2) A.push('Perbarui data stok harian pada sheet Stock agar perhitungan ini sesuai dengan kondisi terbaru di lapangan.');
       A.length = Math.min(A.length, 3);
     }
     /* ringkasan kondisi PLTU */
     let ex = u.pltu + ': ';
-    if (lv === 'terkendali') ex += 'stok diproyeksikan tetap aman di atas batas minimum (' + cfg.minHop + ' hari) hingga ' + fmt(lastDate) + ', dengan posisi terendah ' + r1(mn.v) + ' hari pada ' + fmt(mn.d) + '.';
-    else if (out.hopNow < cfg.minHop) ex += 'stok saat ini sudah berada di bawah batas minimum (' + r1(out.hopNow) + ' hari).' + (so ? ' Jika tidak ada percepatan pasokan, stok diperkirakan habis (stock out) pada ' + fmt(so.d) + '.' : '');
+    if (lv === 'terkendali') ex += 'stok diproyeksikan tetap aman di atas batas minimum (' + cfg.minHop + ' hari) hingga ' + fmt(lastDate) + ', dengan posisi terendah ' + rk(mn.v) + ' hari pada ' + fmt(mn.d) + '.';
+    else if (out.hopNow < cfg.minHop) ex += 'stok saat ini berada di bawah batas minimum (' + rk(out.hopNow) + ' hari).' + (so ? ' Jika tidak ada percepatan pasokan, stok diperkirakan habis (stock out) pada ' + fmt(so.d) + '.' : '');
     else if (out.breachDate){
       ex += 'stok diperkirakan turun melewati batas minimum (' + cfg.minHop + ' hari) pada ' + fmt(out.breachDate) + ' (' + out.daysToBreach + ' hari lagi)'
          + (out.next ? (out.next.date > out.breachDate ? ', sebelum kapal berikutnya tiba pada ' + fmt(out.next.date) : ', meskipun pengiriman ' + fmt(out.next.date) + ' sudah diperhitungkan') : ', dan belum ada jadwal pengiriman berikutnya')
          + '.' + (so ? ' Stok diperkirakan habis (stock out) pada ' + fmt(so.d) + '.' : '');
-    } else ex += 'proyeksi HOP sempat turun ke ' + r1(mn.v) + ' hari pada ' + fmt(mn.d) + ' (masih di atas batas minimum ' + cfg.minHop + ' hari, namun di bawah batas aman ' + cfg.waspadaHop + ' hari).';
+    } else ex += 'proyeksi HOP sempat turun ke ' + rk(mn.v) + ' hari pada ' + fmt(mn.d) + ' (masih di atas batas minimum ' + cfg.minHop + ' hari, namun di bawah batas aman ' + cfg.waspadaHop + ' hari).';
     if (cr.length) ex += ' Catatan data: ' + cr.join(', ') + '.';
     out.explain = ex;
-    out.assumptions = 'Stok akhir hari = stok awal + pasokan masuk − pemakaian harian. Stok dasar ' + r1(u.base) + ' hr per ' + fmt(u.tgl)
+    out.assumptions = 'Stok akhir hari = stok awal + pasokan masuk − pemakaian harian. Stok dasar ' + rk(u.base) + ' hr per ' + fmt(u.tgl)
       + ' (sheet Stock). Pemakaian harian = ' + (ratio != null ? Math.round(ratio * 100) + '% dari konsumsi maks' : 'angka standar') + ' (' + nf(u.bagi) + ' MT/hari), diasumsikan tetap. '
       + 'Volume muatan dibagi rata ' + cfg.bongkarDays + ' hari sejak ETA POD. Pengiriman berstatus Cancel tidak dihitung; baris ganda dihitung satu kali.';
-    out.basis = 'Stok awal ' + r1(u.base) + ' hr per ' + fmt(u.tgl) + ' · konsumsi maks ' + nf(u.bagi) + ' MT/hari' + (ratio != null ? ' (pemakaian ' + Math.round(ratio * 100) + '%)' : ' (angka standar)')
+    out.basis = 'Stok awal ' + rk(u.base) + ' hr per ' + fmt(u.tgl) + ' · konsumsi maks ' + nf(u.bagi) + ' MT/hari' + (ratio != null ? ' (pemakaian ' + Math.round(ratio * 100) + '%)' : ' (angka standar)')
       + ' · batas minimum ' + cfg.minHop + ' hr & batas aman ' + cfg.waspadaHop + ' hr';
     return out;
   }
@@ -2974,7 +3022,7 @@ const EW = (function(){
     const tot = risk.reduce((t, a) => t + a.gapMT, 0), srt = risk.slice().sort((x, y) => y.gapMT - x.gapMT);
     let cum = 0; const core = [];
     for (const a of srt){ if (core.length && cum / (tot || 1) >= 0.8) break; core.push(a); cum += a.gapMT; }
-    const waktu = risk.filter(a => a.cause === 'telat' && a.timingOnly && a.keyShip);
+    const waktu = risk.filter(a => a.cause === 'telat' && a.timingOnly && a.keyShip && a.slipDays != null && isFinite(a.slipDays) && a.slipDays > 0);
     const sup = {};
     risk.filter(a => a.keyShip && a.keyShip.sup).forEach(a => { const k = a.keyShip.sup; (sup[k] = sup[k] || { sup:k, units:[], mt:0 }); sup[k].units.push(nm(a)); sup[k].mt += a.keyShip.mt || 0; });
     const pemasok = Object.keys(sup).map(k => sup[k]).filter(x => x.units.length >= 2).sort((x, y) => y.units.length - x.units.length || y.mt - x.mt);
@@ -3041,12 +3089,12 @@ const HARI = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
 const HARI2 = ['Mg','Sn','Sl','Rb','Km','Jm','Sb'];
 const BLN  = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 const BLN_PANJANG = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];   // v33
-const toDate = s => new Date(s + 'T00:00:00');
+const toDate = s => s ? new Date(String(s).slice(0, 10) + 'T00:00:00') : new Date(NaN);
 const iso = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-const fmt = s => { const d = toDate(s); return HARI[d.getDay()] + ', ' + d.getDate() + ' ' + BLN[d.getMonth()]; };
-const fmtShort = s => { const d = toDate(s); return d.getDate() + ' ' + BLN[d.getMonth()]; };
+const fmt = s => { if (!s) return '—'; const d = toDate(s); return isNaN(d.getTime()) ? String(s) : (HARI[d.getDay()] + ', ' + d.getDate() + ' ' + BLN[d.getMonth()]); };
+const fmtShort = s => { if (!s) return '—'; const d = toDate(s); return isNaN(d.getTime()) ? String(s) : (d.getDate() + ' ' + BLN[d.getMonth()]); };
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const nf = n => (n==null? '—' : n.toLocaleString('id-ID'));
+const nf = n => (n == null || !isFinite(Number(n)) ? '—' : Number(n).toLocaleString('id-ID'));
 
 let DATES = [], ROWS = [], IDX = {};   // v31: mulai kosong — diisi tarikan live / update terakhir
 /* Kategori apa pun yang berawalan "Tambahan …" (mis. "Tambahan Agustus",
@@ -4486,7 +4534,7 @@ function hopSort(a, b){
       || String(a.dK || a.dE || a.dS || '9999').localeCompare(String(b.dK || b.dE || b.dS || '9999'))
       || (a.v - b.v);
 }
-function hopDate(s){ const d = toDate(s); return d.getDate() + ' ' + BLN[d.getMonth()]; }
+function hopDate(s){ if (!s) return '—'; const d = toDate(s); return isNaN(d.getTime()) ? String(s) : (d.getDate() + ' ' + BLN[d.getMonth()]); }
 
 const BONGKAR_HARI = 3;   // v24: volume tiap kiriman dibagi rata ke N hari sejak tiba (bongkar + pencatatan bertahap)
 const tglPlus = (iso, n) => { const d = toDate(iso); d.setDate(d.getDate() + n);
@@ -4521,15 +4569,7 @@ function buildHop(){
   const gfEfByU = {};
   if (mSync && mSync.rows) mSync.rows.forEach(r => { if (!r.isGroup) gfEfByU[r.nm] = r.ef; });
   Object.keys(by).forEach(k => {
-    const a = EW.assess(by[k], SHIPBY[k] || [], { today:S.today, dates:DATES, fmt:hopDate });
-    if (a && a.level !== 'nodata' && gfEfByU[k] != null && isFinite(gfEfByU[k])){
-      a.hopNow = gfEfByU[k];
-      if (a.hopNow < a.cfg.minHop) a.level = 'kritis';
-      else if (a.level === 'kritis' && !(a.daysToStockout != null && a.daysToStockout <= a.cfg.soonDays)){
-        a.level = (a.daysToBreach != null && a.daysToBreach <= a.cfg.soonDays) ? 'tinggi'
-          : ((a.daysToBreach != null || (a.minHop != null && a.minHop < a.cfg.waspadaHop)) ? 'waspada' : 'terkendali');
-      }
-    }
+    const a = EW.assess(by[k], SHIPBY[k] || [], { today:S.today, dates:DATES, fmt:hopDate, hopNow:gfEfByU[k] });
     ASSESS[k] = a;
   });
   gfPaint();
@@ -5110,7 +5150,7 @@ const LV = {
   nodata:    { t:'Data belum memadai',  s:'Data kurang', ic:'?', cls:'lv-nodata' }
 };
 let radarAll = false; const radarOpen = {}; let RADAR_DELTA = null, RADAR_BASE_AT = null;
-const nfi = n => nf(Math.round(n));
+const nfi = n => (n == null || !isFinite(Number(n)) ? '—' : nf(Math.round(Number(n))));
 function radarSnapshot(){                       // pembanding "sejak pembaruan sebelumnya" — hanya di browser ini
   try {
     const key = 'sulm_radar_' + String(S.periode || 'x').replace(/[^A-Za-z0-9]+/g, '_'), now = Date.now(), H6 = 6 * 3600e3;
@@ -5173,7 +5213,7 @@ function rdDetailHTML(a, k){
       <div><div class="rd-k">Rekomendasi</div>${li(a.actions.length ? a.actions : ['Tidak ada tindakan khusus; pantau saja.'])}</div>
     </div>
     ${a.basis ? '<div class="rd-as"><b>Dasar:</b> ' + esc(a.basis) + '</div>' : ''}
-    <div class="rd-btns"><button type="button" data-a="insp">🔍 Panel Inspeksi</button><button type="button" data-a="jadwal">📅 Lihat Jadwal</button><button type="button" data-a="hop">📈 Proyeksi HOP</button><button type="button" data-a="sim">🧪 Simulasi Mitigasi</button></div>`;
+    <div class="rd-btns"><button type="button" data-a="insp">Rincian PLTU</button><button type="button" data-a="jadwal">Lihat Jadwal</button><button type="button" data-a="hop">Proyeksi HOP</button><button type="button" data-a="sim">Simulasi HOP</button></div>`;
 }
 /* ══ Halaman Terpadu: Ringkasan & Risiko (#pg-beranda) ══ */
 const METODE_HTML = '<details class="metode"><summary>Ketentuan &amp; cara baca proyeksi (batas min. 10 hr · siaga 15 hr)</summary><ul>'
@@ -5184,12 +5224,9 @@ function fokusHTML(){
   const items = Object.keys(ASSESS).map(k => Object.assign({ k:k }, ASSESS[k]));
   const F = EW.fokus(items);
   const endLbl = (Array.isArray(DATES) && DATES.length) ? hopDate(DATES[DATES.length - 1]) : 'akhir bulan';
-  const footHtml = `<div class="fk-foot"><span>Dievaluasi otomatis dari ${items.length} PLTU · Horizon s.d. ${esc(endLbl)}</span>`
-    + `<span>Ambang: Kritis &lt;10 hr · Siaga 10–15 hr</span></div>`;
   if (!F.n){
     return `<div class="card fk"><div class="card-h"><h2>Prioritas Tindak Lanjut</h2></div>`
-      + `<div class="fk-body"><div class="hm-ok-box"><span class="hm-ok-ico" aria-hidden="true">✓</span><div><b>Seluruh PLTU Terkendali</b><br>Tidak terdeteksi defisit tonase maupun keterlambatan kedatangan kritis hingga ${esc(endLbl)}. Lanjutkan pemantauan rutin keberangkatan tongkang sesuai jadwal.</div></div></div>`
-      + footHtml + `</div>`;
+      + `<div class="fk-body"><div class="hm-ok-box"><span class="hm-ok-ico" aria-hidden="true">✓</span><div><b>Seluruh PLTU Terkendali</b><br>Tidak terdeteksi defisit tonase maupun keterlambatan kedatangan kritis hingga ${esc(endLbl)}.</div></div></div></div>`;
   }
   const list = a => a.map(x => esc(x.k)).join(', '), mt = n => nfi(n) + ' MT';
   const rows = [];
@@ -5197,16 +5234,16 @@ function fokusHTML(){
     rows.push(['Prioritas utama', `<b>${F.core.length} dari ${F.n} PLTU</b> (${list(F.core)}) menyumbang <b>${Math.round(F.coreShare * 100)}%</b> dari total kekurangan pasokan (± ${mt(F.tot)}). Utamakan penanganan pada unit ini terlebih dahulu.`]);
   else if (F.tot > 0) rows.push(['Kekurangan pasokan', `Total kekurangan pasokan diperkirakan ± ${mt(F.tot)} pada ${list(F.core)}.`]);
   if (F.waktu.length)
-    rows.push(['Percepatan jadwal kapal', `Volume pasokan untuk <b>${F.waktu.length} PLTU</b> sebenarnya sudah mencukupi, namun jadwal tibanya perlu dimajukan: ${F.waktu.map(a => esc(a.k) + ' (majukan ' + a.slipDays + ' hr)').join(', ')}. Mempercepat kedatangan kapal tersebut dapat mengamankan stok tanpa perlu tambahan kuota baru.`]);
+    rows.push(['Percepatan jadwal kapal', `Volume pasokan untuk <b>${F.waktu.length} PLTU</b> sudah mencukupi, namun jadwal tibanya perlu dimajukan: ${F.waktu.map(a => esc(a.k) + ' (majukan ' + a.slipDays + ' hr)').join(', ')}.`]);
   if (F.pemasok.length){ const p = F.pemasok[0];
-    rows.push(['Koordinasi pemasok', `Pemasok <b>${esc(p.sup)}</b> menangani pengiriman utama di <b>${p.units.length} PLTU</b> yang perlu perhatian (${esc(p.units.join(', '))}). Koordinasi terpusat dengan pemasok ini akan mempercepat tindak lanjut di seluruh unit tersebut.`]); }
+    rows.push(['Koordinasi pemasok', `Pemasok <b>${esc(p.sup)}</b> menangani pengiriman utama di <b>${p.units.length} PLTU</b> yang perlu perhatian (${esc(p.units.join(', '))}).`]); }
   if (F.tanpa.length) rows.push(['Belum ada jadwal pengiriman', `${list(F.tanpa)} belum memiliki jadwal kapal masuk. Segera tetapkan sumber pasokan dan nominasi kapalnya.`]);
   if (F.donor.length){ const d = F.donor.slice(0, 2);
-    rows.push(['Opsi pengalihan kargo', `${d.map(x => '<b>' + esc(x.k) + '</b> (cadangan ± ' + mt(x.surplusMT) + ' di atas batas aman)').join(' dan ')} memiliki stok yang cukup longgar. Pertimbangkan pengalihan sebagian pengiriman ke PLTU kritis apabila spesifikasi batubara dan rute pelayaran memungkinkan.`]); }
-  if (F.basi.length) rows.push(['Pembaruan data stok', `Data stok dasar ${list(F.basi)} belum diperbarui ≥ 2 hari. Mohon perbarui laporan stok agar urutan prioritas ini tetap akurat.`]);
+    rows.push(['Opsi pengalihan kargo', `${d.map(x => '<b>' + esc(x.k) + '</b> (cadangan ± ' + mt(x.surplusMT) + ' di atas batas aman)').join(' dan ')} memiliki stok longgar bila diperlukan pengalihan kargo.`]); }
+  if (F.basi.length) rows.push(['Pembaruan data stok', `Data stok dasar ${list(F.basi)} belum diperbarui ≥ 2 hari.`]);
   return `<div class="card fk"><div class="card-h"><h2>Prioritas Tindak Lanjut</h2></div><div class="fk-body">`
     + rows.map((r, i) => `<div class="fk-r"><span class="fk-n">${i + 1}</span><div><div class="fk-t">${r[0]}</div><div class="fk-d">${r[1]}</div></div></div>`).join('')
-    + `</div>` + footHtml + `</div>`;
+    + `</div></div>`;
 }
 let rdFilter = 'att', rdQuery = '';
 function renderRadar(){
@@ -5234,8 +5271,8 @@ function renderHome(){
   const att = items.filter(i => i.level !== 'terkendali');
   const card = l => {
     const isOn = rdFilter === l;
-    return `<button type="button" class="hm-c l-${l}${isOn ? ' on' : ''}" data-rdf="${l}" title="Klik untuk menyaring daftar PLTU kategori ${esc(LV[l].s)}">`
-      + `<span class="hm-l"><i aria-hidden="true">${LV[l].ic}</i>${LV[l].s}${isOn ? '<span class="hm-c-tag">Aktif ✓</span>' : ''}</span>`
+    return `<button type="button" class="hm-c l-${l}${isOn ? ' on' : ''}" data-rdf="${l}" title="Saring daftar PLTU kategori ${esc(LV[l].s)}">`
+      + `<span class="hm-l"><i aria-hidden="true">${LV[l].ic}</i>${LV[l].s}</span>`
       + `<span class="hm-n">${cnt[l]}<small>PLTU</small></span>`
       + `<span class="hm-s" title="${esc(nm(l))}">${esc(nm(l))}</span></button>`;
   };
@@ -5278,10 +5315,10 @@ function renderHome(){
   const cfg = EW.CFG;
 
   el.innerHTML = `<div class="hm-sec">
-      <div class="hm-sec-hd"><h2>Peta Sebaran Risiko Dini PLTU</h2><span class="hm-sec-hint">${rdFilter !== 'att' && rdFilter !== 'all' ? 'Filter aktif — klik ulang kartu untuk melepas' : 'Klik kartu untuk menyaring matriks risiko'}</span></div>
+      <div class="hm-sec-hd"><h2>Peta Sebaran Risiko Dini PLTU</h2>${rdFilter !== 'att' && rdFilter !== 'all' ? '<span class="hm-sec-hint">Filter aktif</span>' : ''}</div>
       <div class="hm-cards">${['kritis', 'tinggi', 'waspada', 'terkendali'].map(card).join('')}
-        <button type="button" class="hm-c l-so${soOn ? ' on' : ''}" data-rdf="so" title="Klik untuk menyaring PLTU berpotensi Stock out">
-          <span class="hm-l"><i aria-hidden="true"></i>Stock out${soOn ? '<span class="hm-c-tag">Aktif ✓</span>' : ''}</span>
+        <button type="button" class="hm-c l-so${soOn ? ' on' : ''}" data-rdf="so" title="Saring PLTU berpotensi Stock out">
+          <span class="hm-l"><i aria-hidden="true"></i>Stock out</span>
           <span class="hm-n">${so.length}<small>PLTU</small></span>
           <span class="hm-s">${so.length ? 'terdekat: ' + esc(so[0].k) + ', ' + hopDate(so[0].stockoutDate) : 'aman s.d. ' + hopDate(DATES[DATES.length - 1])}</span>
         </button></div>
@@ -5297,7 +5334,7 @@ function renderHome(){
       <div class="hm-rad-hd">
         <div>
           <h2 style="margin:0">Matriks Pantauan Risiko &amp; Mitigasi per PLTU</h2>
-          ${near ? `<div class="rd-note" style="margin-top:4px">Batas minimum terdekat: <b>${esc(near.k)}</b> (${near.hopNow < cfg.minHop ? 'sudah terlewati' : hopDate(near.breachDate)})</div>` : `<div class="rd-note" style="margin-top:4px">Klik baris PLTU untuk membuka rincian penyebab, jadwal kapal berikutnya, &amp; rekomendasi tindak lanjut.</div>`}
+          ${near ? `<div class="rd-note" style="margin-top:4px">Batas minimum terdekat: <b>${esc(near.k)}</b> (${near.hopNow < cfg.minHop ? 'sudah terlewati' : hopDate(near.breachDate)})</div>` : ''}
         </div>
         <div class="hm-rad-acts">
           <input type="search" class="hm-rad-q" id="rdSearch" placeholder="Cari PLTU / pemasok…" value="${esc(rdQuery)}" aria-label="Cari PLTU di daftar risiko">
@@ -9671,48 +9708,49 @@ async function grafUnduh(fmt){
   try {
     await gfTungguAset();
     if (fmt === 'mon-pptx'){
-      toast('Menyusun Monitoring Kondisi Batubara (10 slide)…');
+      toast('Menyiapkan file PPTX…');
       const bytes = await gfBuildMonitoringPptx(dt);
       const fn = dtSpc + ' Monitoring Kondisi Batubara PLTU Regional Sulmapana.pptx';
       gfSimpanBlob(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' }),
-        fn, fn + ' diunduh ✓');
+        fn, fn + ' berhasil diunduh.');
     } else if (fmt === 'sum-pptx'){
+      toast('Menyiapkan file PPTX…');
       const bytes = await gfBuildSummaryHopPptx(dt);
       const fn = dtSpc + ' PLTU Regional Sulmapana Summary Report HOP.pptx';
       gfSimpanBlob(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' }),
-        fn, fn + ' diunduh ✓');
+        fn, fn + ' berhasil diunduh.');
     } else if (fmt === 'pptx1'){
       const h1 = Math.round(2560 * 1240 / 1600);
       const p1 = await gfCanvasBytes('SULMAPANA', 'image/png', 2560, h1);
       const bytes = gfPptxBytes([p1], Math.round(12192000 * 1240 / 1600));
       const fn = dtSpc + ' HOP PLTU Regional Sulmapana (Gabung).pptx';
       gfSimpanBlob(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.presentationml.presentation' }),
-        fn, 'PPTX (gabung) diunduh ✓');
+        fn, 'PPTX (gabung) berhasil diunduh.');
     } else {
       const hg = Math.round(3200 * 1240 / 1600);
       const p1 = await gfCanvasBytes('SULMAPANA', 'image/png', 3200, hg);
       const fn = dtSpc + ' HOP PLTU Regional Sulmapana (Gabung).png';
       gfSimpanBlob(new Blob([p1], { type:'image/png' }),
-        fn, 'PNG (gabung) diunduh ✓');
+        fn, 'PNG (gabung) berhasil diunduh.');
     }
   } catch (err){ toast('Gagal mengunduh: ' + (err && err.message || err)); }
 }
 
 function gfUnduhMenu(){
   const dtSpc = gfYmdSpace(gfTgl());
-  return '<details class="sm-exp gf-exp"><summary title="Unduh laporan harian &amp; grafik HOP">⤓ Unduh</summary><div class="sm-exp-m">'
+  return '<details class="sm-exp gf-exp"><summary title="Unduh laporan &amp; grafik HOP">⤓ Unduh</summary><div class="sm-exp-m">'
     + '<button type="button" data-gf="mon-pptx" data-r="SULMAPANA">'
-      + '<span><b>' + esc(dtSpc) + ' Monitoring Kondisi Batubara PLTU Regional Sulmapana</b><em>Laporan harian lengkap · 10 slide (tabel Slide 4–9 dapat di-copy)</em></span>'
+      + '<span>' + esc(dtSpc) + ' Monitoring Kondisi Batubara PLTU Regional Sulmapana</span>'
       + '<small>PPTX</small></button>'
     + '<button type="button" data-gf="sum-pptx" data-r="SULMAPANA">'
-      + '<span><b>' + esc(dtSpc) + ' PLTU Regional Sulmapana Summary Report HOP</b><em>Ringkasan grafik HOP · 2 slide (Sulawesi &amp; MAPANA)</em></span>'
+      + '<span>' + esc(dtSpc) + ' PLTU Regional Sulmapana Summary Report HOP</span>'
       + '<small>PPTX</small></button>'
     + '<div class="gf-exp-sep" role="separator"></div>'
     + '<button type="button" data-gf="png1" data-r="SULMAPANA">'
-      + '<span><b>PNG (gabung)</b><em>Gambar resolusi tinggi Regional Sulawesi &amp; MAPANA</em></span>'
+      + '<span>PNG (gabung)</span>'
       + '<small>PNG</small></button>'
     + '<button type="button" data-gf="pptx1" data-r="SULMAPANA">'
-      + '<span><b>PPTX (gabung)</b><em>Presentasi 1 slide gabungan Sulawesi &amp; MAPANA</em></span>'
+      + '<span>PPTX (gabung)</span>'
       + '<small>PPTX</small></button>'
     + '</div></details>';
 }
@@ -9789,7 +9827,6 @@ function gfShowCanvasTT(cvs, e){
     if (r.loadList.length > 4) html += '<div class="gf-tt-more">…dan ' + (r.loadList.length - 4) + ' rencana lainnya</div>';
     html += '</div>';
   }
-  html += '<div class="gf-tt-hint">Klik baris untuk buka Panel Inspeksi · Jadwal · Simulasi ›</div>';
   tt.innerHTML = html;
   tt.classList.add('gf-tt', 'on');
   moveTT(e);
@@ -9865,20 +9902,20 @@ function gfKpiStripHTML(mAll, tgl, realToday){
     + ' · HOP Total (termasuk apung & sailing): ' + gfF1(hopAll) + ' hari.';
   const emergSub = emerg.length
     ? emerg.slice(0, 3).map(r => r.nm + ' (' + gfF1(r.ef) + ')').join(', ') + (emerg.length > 3 ? ' +' + (emerg.length - 3) : '')
-    : 'Seluruh PLTU ≥ 10 HOP ✓';
+    : 'Seluruh PLTU ≥ 10 HOP';
   const nearBreach = Object.keys(ASSESS || {})
     .map(k => Object.assign({ k:k }, ASSESS[k]))
     .filter(a => a && a.breachDate && a.hopNow >= (a.cfg ? a.cfg.minHop : 15))
     .sort((a, b) => a.breachDate < b.breachDate ? -1 : 1)[0];
   const siagaSub = siaga.length
     ? siaga.slice(0, 3).map(r => r.nm + ' (' + gfF1(r.ef) + ')').join(', ') + (siaga.length > 3 ? ' +' + (siaga.length - 3) : '')
-    : (nearBreach ? ('Terdekat <15 hr: ' + nearBreach.k + ' · ' + fmtShort(nearBreach.breachDate)) : 'Tidak ada unit 10–15 HOP ✓');
+    : (nearBreach ? ('Terdekat <15 hr: ' + nearBreach.k + ' · ' + fmtShort(nearBreach.breachDate)) : 'Tidak ada unit 10–15 HOP');
   const lateRows = Array.isArray(ROWS) ? ROWS.filter(hasLate) : [];
   const lateUnits = new Set();
   lateRows.forEach(rw => { const u = unitOf(rw) || rw.pltu; if (u) lateUnits.add(u); });
   const lateSub = lateRows.length
-    ? ('Berdampak ' + lateUnits.size + ' PLTU · Klik cek jadwal ›')
-    : 'Tidak ada keterlambatan muat ✓';
+    ? ('Berdampak pada ' + lateUnits.size + ' PLTU')
+    : 'Tidak ada keterlambatan muat';
   return '<div class="gf-kpis" role="region" aria-label="Indikator Eksekutif Pasokan">'
     + '<button type="button" class="gf-kpi k-reg" data-gfkpi="reg" title="' + esc(tipReg) + '">'
       + '<span class="gf-kpi-lbl">HOP Stock Efektif</span>'
@@ -9924,9 +9961,9 @@ function gfInpPopHTML(mAll, tglShort, prog){
         + '</div></div>')
       : '')
     + (actList.length
-      ? ('<div class="gf-ip-sec"><div class="gf-ip-sttl">Sudah Input Aktual ✓ (' + actList.length + ')</div><div class="gf-ip-list">'
-        + actList.map(r => '<button type="button" class="gf-ip-item ok" data-gfopenpltu="' + esc(r.nm) + '" title="Klik untuk buka Panel Inspeksi PLTU ' + esc(r.nm) + '">'
-          + esc(r.nm) + ' <small>' + gfF1(r.ef) + ' hr ✓</small></button>').join('')
+      ? ('<div class="gf-ip-sec"><div class="gf-ip-sttl">Sudah Input Aktual (' + actList.length + ')</div><div class="gf-ip-list">'
+        + actList.map(r => '<button type="button" class="gf-ip-item ok" data-gfopenpltu="' + esc(r.nm) + '" title="Buka rincian PLTU ' + esc(r.nm) + '">'
+          + esc(r.nm) + ' <small>' + gfF1(r.ef) + ' hr</small></button>').join('')
         + '</div></div>')
       : '')
   + '</div>';
@@ -10073,19 +10110,17 @@ function openPltuInsp(pltuName, optMode){
   const a = ASSESS && ASSESS[u.pltu];
   let alertHtml = '';
   if (r.ef < 10){
-    alertHtml = '<div class="pi-alert warn">⚠️ Stok berada di bawah ambang Emergency (10 HOP).' + (a && a.stockoutDate ? ' Risiko habis stok tanpa pasokan baru pada <b>' + esc(fmtShort(a.stockoutDate)) + '</b>.' : ' Prioritaskan percepatan sandar/bongkar tongkang terdekat.') + '</div>';
+    alertHtml = '<div class="pi-alert warn">Stok di bawah batas minimum (10 HOP).' + (a && a.stockoutDate ? ' Proyeksi habis stok tanpa tambahan pasokan pada <b>' + esc(fmtShort(a.stockoutDate)) + '</b>.' : '') + '</div>';
   } else if (r.ef < 15){
-    alertHtml = '<div class="pi-alert siaga">⚡ Stok dalam rentang Siaga (10–15 HOP). Pantau ketepatan ETA tongkang sailing agar segera kembali ≥ 15 HOP.</div>';
+    alertHtml = '<div class="pi-alert siaga">Stok berada pada rentang Siaga (10–15 HOP).</div>';
   } else if (a && a.breachDate && a.hopNow >= (a.cfg ? a.cfg.minHop : 15)){
-    alertHtml = '<div class="pi-alert siaga">📅 Saat ini Normal, namun diproyeksikan menyentuh &lt;15 HOP pada <b>' + esc(fmtShort(a.breachDate)) + '</b> bila tidak ada tambahan jadwal.</div>';
-  } else {
-    alertHtml = '<div class="pi-alert ok">✓ Pasokan terkendali ≥ 15 HOP sepanjang horizon pantauan.</div>';
+    alertHtml = '<div class="pi-alert siaga">Diproyeksikan turun ke &lt;15 HOP pada <b>' + esc(fmtShort(a.breachDate)) + '</b>.</div>';
   }
   const totHop = r.ef + r.ap + r.sl;
   const totMt = (r.efMt || 0) + (r.apMt || 0) + (r.slMt || 0);
   const renderVesselItem = (v, modeV) => {
     const ri = gfFindRowIndex(u.pltu, v.nom, v.sup);
-    const jumpAttr = ri >= 0 ? (' class="pi-v jump" data-inspri="' + ri + '" title="Klik untuk sorot baris kapal ini di Jadwal Pasokan"') : ' class="pi-v"';
+    const jumpAttr = ri >= 0 ? (' class="pi-v jump" data-inspri="' + ri + '" title="Buka baris di Jadwal Pasokan"') : ' class="pi-v"';
     const rightTop = v.vol > 0 ? (gfN(v.vol) + ' MT') : 'Vol blm diisi';
     const rightSub = modeV === 'sail'
       ? (v.eta ? ('ETA ' + esc(fmtShort(v.eta)) + (v.nHari != null ? ' (' + v.nHari + ' hr)' : '')) : 'ETA belum tercatat')
@@ -10093,19 +10128,19 @@ function openPltuInsp(pltuName, optMode){
         ? (esc(v.status || 'Rencana Loading') + (v.pol ? ' · POL ' + esc(fmtShort(v.pol)) : (v.eta ? ' · ETA ' + esc(fmtShort(v.eta)) : '')))
         : (esc(v.status || 'Antri/Bongkar') + ' · ' + gfF1(v.hop || 0) + ' hr'));
     return '<div' + jumpAttr + '>'
-      + '<div class="pi-v-l"><b>' + esc(v.nom || 'TBN') + '</b><small>Pemasok: ' + esc(v.sup || '—') + (ri >= 0 ? ' · Lihat di Jadwal ›' : '') + '</small></div>'
+      + '<div class="pi-v-l"><b>' + esc(v.nom || 'TBN') + '</b><small>' + esc(v.sup || '—') + '</small></div>'
       + '<div class="pi-v-r">' + rightTop + '<small>' + rightSub + '</small></div>'
     + '</div>';
   };
   const portHtml = (r.portList && r.portList.length)
     ? '<div class="pi-vlist">' + r.portList.map(p => renderVesselItem(p, 'port')).join('') + '</div>'
-    : '<div class="pi-empty">Tidak ada kapal sedang antri / bongkar saat ini.</div>';
+    : '<div class="pi-empty">Tidak ada kapal</div>';
   const sailHtml = (r.sailList && r.sailList.length)
     ? '<div class="pi-vlist">' + r.sailList.map(s => renderVesselItem(s, 'sail')).join('') + '</div>'
-    : '<div class="pi-empty">Tidak ada kapal berstatus Sailing saat ini.</div>';
+    : '<div class="pi-empty">Tidak ada kapal</div>';
   const loadHtml = (r.loadList && r.loadList.length)
     ? '<div class="pi-vlist">' + r.loadList.map(l => renderVesselItem(l, 'load')).join('') + '</div>'
-    : '<div class="pi-empty">Tidak ada rencana loading aktif (Menunggu/Proses Loading, Sailing to POL).</div>';
+    : '<div class="pi-empty">Tidak ada rencana loading</div>';
 
   const panel = $id('pltuInsp'), scrim = $id('pltuInspScrim');
   if (!panel || !scrim) return;
@@ -10116,9 +10151,9 @@ function openPltuInsp(pltuName, optMode){
     + '</div>'
     + navBarHtml
     + '<div class="pi-acts">'
-      + '<button type="button" class="pi-act pri" data-inspact="jadwal" title="Buka Jadwal Gantt khusus PLTU ' + esc(u.pltu) + '">📅 Jadwal Gantt</button>'
-      + '<button type="button" class="pi-act" data-inspact="sim" title="Uji skenario percepatan / pengalihan kapal di Simulasi HOP">🧪 Simulasi Mitigasi</button>'
-      + '<button type="button" class="pi-act" data-inspact="hop" title="Lihat halaman Proyeksi HOP rinci">📈 Proyeksi Detail</button>'
+      + '<button type="button" class="pi-act pri" data-inspact="jadwal">Jadwal Pasokan</button>'
+      + '<button type="button" class="pi-act" data-inspact="sim">Simulasi HOP</button>'
+      + '<button type="button" class="pi-act" data-inspact="hop">Proyeksi HOP</button>'
     + '</div>'
     + '<div class="pi-body">'
       + alertHtml
@@ -10392,7 +10427,7 @@ function renderGrafik(force){
         + ((!bnd.max || t7 <= bnd.max) ? '<button type="button" class="gf-qbtn' + (tgl === t7 ? ' on' : '') + '" data-gfpick="7" title="Proyeksi 7 hari ke depan">+7 hr</button>' : '')
       + '</div>'
       + modeHtml
-      + (needAdjLoad ? '<span class="gf-bound">⏳ Sinkronisasi lintas bulan…</span>' : (maxLbl ? '<span class="gf-bound" title="Batas simulasi proyeksi lintas bulan">s.d. ' + esc(maxLbl) + '</span>' : ''))
+      + (needAdjLoad ? '<span class="gf-bound">Memuat bulan berikutnya…</span>' : (maxLbl ? '<span class="gf-bound" title="Batas simulasi proyeksi lintas bulan">s.d. ' + esc(maxLbl) + '</span>' : ''))
     + '</div>'
     + '<div class="gf-ctrl-g">'
       + '<div class="gf-ctrl-g view"><span class="gf-ctrl-l">Tampilan:</span><div class="sm-seg sm" role="group" aria-label="Mode tampilan grafik">'
@@ -10910,7 +10945,7 @@ function buildCmdKItems(qRaw){
           grp:'Filter Pemasok di Jadwal',
           ico:'🏭',
           title:'Pemasok: ' + s,
-          sub:'Saring ' + cnt + ' jadwal pengapalan dari pemasok ini',
+          sub:cnt + ' jadwal pengapalan',
           right:cnt + ' baris',
           act:() => { resetFilters(); S.sup = new Set([s]); msRefreshAll(); go('jadwal'); render(); }
         });
@@ -10919,19 +10954,19 @@ function buildCmdKItems(qRaw){
   }
   /* 4. Halaman & Aksi Cepat */
   const navActs = [
-    { t:'Unduh Monitoring Kondisi Batubara (PPTX · 10 Slide)', s:'Laporan harian lengkap Sulmapana dengan tabel Slide 4–9 yang bisa di-copy', k:'unduh download pptx monitoring kondisi batubara laporan harian', fn:() => grafUnduh('mon-pptx') },
-    { t:'Unduh Summary Report HOP (PPTX · 2 Slide)', s:'Ringkasan grafik HOP Sulawesi & MAPANA (2 slide)', k:'unduh download pptx summary report hop ringkasan', fn:() => grafUnduh('sum-pptx') },
-    { t:'Buka Grafik HOP (Utama)', s:'Monitoring bar HOP Sulawesi & MAPANA', k:'grafik hop chart utama', fn:() => go('grafik') },
-    { t:'Buka Ringkasan & Risiko', s:'KPI program bulanan, deteksi dini PLTU kritis & prioritas mitigasi', k:'beranda ringkasan pasokan pantauan risiko radar kritis kpi', fn:() => go('beranda') },
-    { t:'Cek Pengiriman Late Loading', s:'Buka Jadwal Pasokan dengan filter Late Loading aktif', k:'late loading terlambat jadwal', fn:() => { resetFilters(); S.onlyLate = true; const tl = $id('tgLate'); if (tl) tl.classList.add('on'); go('jadwal'); render(); } },
-    { t:'Buka Jadwal Pasokan (Semua)', s:'Tabel Gantt pengapalan seluruh PLTU', k:'jadwal pasokan pengiriman gantt', fn:() => { resetFilters(); go('jadwal'); render(); } },
-    { t:'Buka Simulasi HOP (What-If)', s:'Simulasikan percepatan, tunda, atau pengalihan kargo', k:'simulasi hop skenario mitigasi', fn:() => go('sim') },
-    { t:'Muat Ulang Data Terbaru', s:'Tarik pembaruan langsung dari Google Sheets', k:'sync refresh muat ulang data', fn:() => pullFromSheets(true) },
-    { t:'Ganti Tema Terang / Gelap', s:'Beralih mode warna antarmuka & grafik', k:'tema dark light gelap terang', fn:() => { const b = $id('btnTheme'); if (b) b.click(); } }
+    { t:'Monitoring Kondisi Batubara PLTU Regional Sulmapana', s:'Unduh PPTX', k:'unduh download pptx monitoring kondisi batubara laporan harian', fn:() => grafUnduh('mon-pptx') },
+    { t:'PLTU Regional Sulmapana Summary Report HOP', s:'Unduh PPTX', k:'unduh download pptx summary report hop ringkasan', fn:() => grafUnduh('sum-pptx') },
+    { t:'Grafik HOP', s:'Halaman', k:'grafik hop chart utama', fn:() => go('grafik') },
+    { t:'Ringkasan & Risiko', s:'Halaman', k:'beranda ringkasan pasokan pantauan risiko radar kritis kpi', fn:() => go('beranda') },
+    { t:'Jadwal Pasokan — Late Loading', s:'Filter jadwal', k:'late loading terlambat jadwal', fn:() => { resetFilters(); S.onlyLate = true; const tl = $id('tgLate'); if (tl) tl.classList.add('on'); go('jadwal'); render(); } },
+    { t:'Jadwal Pasokan', s:'Halaman', k:'jadwal pasokan pengiriman gantt', fn:() => { resetFilters(); go('jadwal'); render(); } },
+    { t:'Simulasi HOP', s:'Halaman', k:'simulasi hop skenario mitigasi', fn:() => go('sim') },
+    { t:'Muat Ulang Data', s:'Google Sheets', k:'sync refresh muat ulang data', fn:() => pullFromSheets(true) },
+    { t:'Tema Terang / Gelap', s:'Tampilan', k:'tema dark light gelap terang', fn:() => { const b = $id('btnTheme'); if (b) b.click(); } }
   ];
   navActs.forEach(a => {
     if (!q || (a.t + ' ' + a.s + ' ' + a.k).toLowerCase().includes(q)){
-      out.push({ grp:'Navigasi & Tindakan Cepat', ico:'⌘', title:a.t, sub:a.s, right:'↵', act:a.fn });
+      out.push({ grp:'Navigasi & Tindakan', ico:'⌘', title:a.t, sub:a.s, right:'↵', act:a.fn });
     }
   });
   return out.slice(0, 24);
@@ -10968,11 +11003,11 @@ function openCmdK(){
   wrap.innerHTML = '<div class="ck-box">'
     + '<div class="ck-top">'
       + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2"/></svg>'
-      + '<input class="ck-inp" id="ckInp" type="text" spellcheck="false" autocomplete="off" placeholder="Ketik nama PLTU, kapal/tongkang, pemasok, atau perintah…">'
+      + '<input class="ck-inp" id="ckInp" type="text" spellcheck="false" autocomplete="off" placeholder="Cari PLTU, kapal, pemasok…">'
       + '<button type="button" class="ck-esc" id="ckEsc">Esc</button>'
     + '</div>'
     + '<div class="ck-list" id="ckList"></div>'
-    + '<div class="ck-foot"><span>↑↓ Pilih · ↵ Eksekusi · Esc Tutup</span><span>Pintasan Global: Ctrl+K</span></div>'
+    + '<div class="ck-foot"><span>↑↓ Pilih · ↵ Buka · Esc Tutup</span></div>'
   + '</div>';
   wrap.hidden = false;
   renderCmdKList();
@@ -11102,5 +11137,5 @@ function bindMissionUX(){
   setInterval(() => { if (SYNC.scriptToken) pullFromSheets(false); }, SYNC.refreshMinutes * 60000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4bc796ccbda6d0a',t:'MTc5MjIxMDQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4f7c3c188b8fcec',t:'MTc5MjgzMjE0OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4bc796ccbda6d0a',t:'MTc5MjIxMDQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4fa8005bb1d6198',t:'MTc5Mjg2MDgzMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
