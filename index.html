@@ -8032,7 +8032,7 @@ function gfSupMatch(r, ignoreSup){
 }
 function gfCleanNom(nom){
   const s = String(nom || '').trim().toUpperCase();
-  return (s && s !== '-' && s !== '—' && s !== 'TBN' && s !== 'TBA') ? s : '';
+  return (s && !/^(-+|—+|TBN|TBA|N\/?A)$/.test(s)) ? s : '';
 }
 function gfExtractRowDates(r, dates){
   const ls = [], ss = [], xs = [], allBars = [];
@@ -8294,12 +8294,12 @@ function gfCollectProjShips(realToday){
   return byUnit;
 }
 
-/* kumpulkan kapal Rencana Loading & Rencana Pasokan (Proses Loading, Menunggu Loading, Sailing to POL, Menunggu)
+/* kumpulkan kapal Rencana Loading (Proses Loading, Menunggu Loading, Sailing to POL) yang sudah jelas memiliki nominasi tongkang
    lintas bulan berjalan (N) & bulan berikutnya (N+1) untuk tooltip hover & panel klik inspeksi */
 function gfCollectLoadShips(targetDate, realToday){
   const map = gfUnitMap(), byUnit = {}, reg = gfMakeShipRegistry();
   const isProj = !!(targetDate && targetDate > realToday);
-  const rankSt = s => /^proses\s+loading$/i.test(s) ? 1 : (/^menunggu\s+loading$/i.test(s) ? 2 : (/^sailing\s+to\s+pol$/i.test(s) ? 3 : 4));
+  const rankSt = s => /^proses\s+loading$/i.test(s) ? 1 : (/^menunggu\s+loading$/i.test(s) ? 2 : 3);
   const preReg = (rows, dates, src) => {
     (rows || []).forEach(r => {
       if (!r) return;
@@ -8325,19 +8325,13 @@ function gfCollectLoadShips(targetDate, realToday){
       if (!r || gfIsCancel(r)) return;
       if (!gfSupMatch(r, true)) return;
       const st = String(r.status || '').trim();
-      const isWait = /^menunggu$/i.test(st);
-      const isActLoad = /^(menunggu\s+loading|proses\s+loading|sailing\s+to\s+pol)$/i.test(st);
-      if (!isActLoad && !isWait) return;
-      if (src === 'prev' && isWait) return;
+      if (!/^(menunggu\s+loading|proses\s+loading|sailing\s+to\s+pol)$/i.test(st)) return;
+      if (!gfCleanNom(r.nom)) return;
       const unit = map[r.pltu] || r.pltu;
       const dt = gfExtractRowDates(r, dates);
       const pol = validPlanDate(r.etaPol || (dt.ls && dt.ls[0]) || null);
       const rawPod = validPlanDate(gfEstProjPod(r, dt, realToday) || dt.rawPod || r.etaPod || r.etaRakor || null);
       const vol = Number(r.vol) || 0;
-      /* Untuk status 'Menunggu', sertakan rencana berkuota/tonase riil (>0 MT) atau kapal bernama yang sudah punya jadwal POL;
-         kecualikan baris kosong sisa Carry Over TBN 0 MT */
-      if (isWait && !(vol > 0) && !(gfCleanNom(r.nom) && pol)) return;
-      if (isWait && !rawPod && !pol) return;
       if (src === 'prev'){
         const touch = dt.lastTouch || rawPod || pol;
         if (!touch || simDD(realToday, touch) > 14) return;
@@ -8362,7 +8356,7 @@ function gfCollectLoadShips(targetDate, realToday){
       const dispEta = validPlanDate(dt.rawPod || r.etaPod) || sheetFutureRakor;
       const sortKey = dispEta || ((rawPod && realToday && rawPod <= realToday) ? tglPlus(realToday, 3) : rawPod) || pol || '9999';
       (byUnit[unit] = byUnit[unit] || []).push({
-        row:r.row, nom:r.nom || 'TBN', sup:r.sup || '—', vol:vol, status:st, pol:pol, eta:dispEta, _sk:sortKey, src:src
+        row:r.row, nom:r.nom, sup:r.sup || '—', vol:vol, status:st, pol:pol, eta:dispEta, _sk:sortKey, src:src
       });
     });
   };
@@ -8372,7 +8366,7 @@ function gfCollectLoadShips(targetDate, realToday){
   Object.keys(byUnit).forEach(u => {
     byUnit[u].sort((a, b) => {
       const da = String(a._sk || a.eta || a.pol || '9999'), db = String(b._sk || b.eta || b.pol || '9999');
-      return da.localeCompare(db) || (rankSt(a.status) - rankSt(b.status));
+      return (rankSt(a.status) - rankSt(b.status)) || da.localeCompare(db);
     });
   });
   return byUnit;
@@ -11664,5 +11658,5 @@ function bindMissionUX(){
   setInterval(() => { if (SYNC.scriptToken) pullFromSheets(false); }, SYNC.refreshMinutes * 60000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4fed5acbe43fe1f',t:'MTc5MjkwNjI4Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4ff09815b17fe23',t:'MTc5MjkwODQwNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
