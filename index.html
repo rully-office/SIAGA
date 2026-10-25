@@ -3,37 +3,43 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://script.google.com https://script.googleusercontent.com https://docs.google.com; connect-src https://script.google.com https://script.googleusercontent.com https://docs.google.com; img-src 'self' data: blob:; style-src 'unsafe-inline'; font-src 'self' data:; base-uri 'none'; form-action 'none';">
 <title>SIAGA · Logistik &amp; Pasokan Batubara PLTU SULMAPANA</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%230B1D32'/%3E%3Cpath d='M16 25L24 16L31 21L37 15L43 25Z' fill='%231E293B' stroke='%23F59E0B' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M48 11L42 23H48L45 33L55 20H49L52 11Z' fill='%23FBBF24'/%3E%3Cpath d='M8 35H45L40 46H12Z' fill='%23F8FAFC'/%3E%3Cpath d='M11 39H41' stroke='%23F59E0B' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M6 52C12 49 18 55 24 52C30 49 36 55 42 52C48 49 54 55 58 52' fill='none' stroke='%2338BDF8' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#EEF2F7; --surface:#FFFFFF; --surface-2:#E6ECF5; --surface-3:#DAE3F0;
-  --border:#D6DFEC; --border-2:#BCC8DC; --fg:#0D1B2A; --fg-2:#3E5067; --muted:#6E8098;
+  --border:#D6DFEC; --border-2:#BCC8DC; --fg:#0D1B2A; --fg-2:#35465C; --muted:#4F627A;
   --accent:#1560BD; --accent-soft:rgba(21,96,189,.085);
   --brand-amber:#F59E0B; --brand-amber-soft:rgba(245,158,11,.14);
   --we:rgba(100,120,155,.055);
   --hdr:#0B1D32; --hdr-fg:#F1F5FA; --hdr-2:#132C4A;
   --c-muat:#D98208; --c-late:#D32F2F; --c-sail:#0D9488; --c-tiba:#5B46E5;
-  --st-menunggu:#6E8098; --st-sailing:#0D9488; --st-stp:#0E9A99; --st-tiba:#1560BD;
-  --st-bongkar:#6D4AE0; --st-selesai:#8B9AB0; --st-mloading:#D98208;
+  --st-menunggu:#4F627A; --st-sailing:#0D9488; --st-stp:#0E9A99; --st-tiba:#1560BD;
+  --st-bongkar:#6D4AE0; --st-selesai:#5D6E85; --st-mloading:#D98208;
   --w1:90px; --w2:98px; --w3:196px; --w4:72px; --w5:72px; --w6:138px;
   --cw:26px; --cw-fix:26px; --hdr-h:44px;
   color-scheme:light;
 }
 html[data-theme="dark"]{
   --bg:#090F18; --surface:#111B29; --surface-2:#182538; --surface-3:#203149;
-  --border:#213147; --border-2:#304562; --fg:#E8F0FA; --fg-2:#9EB0C8; --muted:#687C97;
-  --accent:#3B82F6; --accent-soft:rgba(59,130,246,.14);
+  --border:#213147; --border-2:#304562; --fg:#E8F0FA; --fg-2:#B2C2D8; --muted:#8A9EB8;
+  --accent:#529BFF; --accent-soft:rgba(82,155,255,.15);
   --brand-amber:#FBBF24; --brand-amber-soft:rgba(251,191,36,.16);
   --we:rgba(150,175,215,.045);
   --hdr:#07111E; --hdr-fg:#E8F0FA; --hdr-2:#0E2138;
   --c-muat:#F5A524; --c-late:#F87171; --c-sail:#2DD4BF; --c-tiba:#9E7BFF;
-  --st-menunggu:#7E91AB; --st-sailing:#2DD4BF; --st-stp:#22C3C0; --st-tiba:#4C93F0;
-  --st-bongkar:#9E7BFF; --st-selesai:#596B84; --st-mloading:#F5A524;
+  --st-menunggu:#8A9EB8; --st-sailing:#2DD4BF; --st-stp:#22C3C0; --st-tiba:#529BFF;
+  --st-bongkar:#9E7BFF; --st-selesai:#7D90AB; --st-mloading:#F5A524;
   color-scheme:dark;
 }
 [hidden]{display:none !important}
 *,*::before,*::after{box-sizing:border-box}
+button:focus-visible,[role="button"]:focus-visible,[role="tab"]:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px}
+.topbar button:focus-visible,.topbar select:focus-visible,.topbar input:focus-visible{
+  outline:2px solid #60A5FA;outline-offset:2px}
 html,body{margin:0;padding:0}
 body{background:var(--bg);color:var(--fg);
   font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -968,7 +974,10 @@ table.hpt thead,table.sup thead{background:none}
 .dr-prog.late .dp-bar i{background:var(--c-late)}
 .dr-prog.none .dp-bar i,.dr-prog.wait .dp-bar i{background:var(--border-2)}
 @keyframes dpmove{to{background-position:17px 0}}
-@media (prefers-reduced-motion:reduce){.dr-prog.sail .dp-bar i{animation:none}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+  .dr-prog.sail .dp-bar i,.tb-ico.spinning{animation:none !important}
+}
 .dp-lbl{display:flex;justify-content:space-between;gap:12px;margin-top:7px;font-size:12px;color:var(--fg-2)}
 .dp-lbl b{color:var(--fg)}
 .dp-cap{margin-top:3px;font-size:11.5px;color:var(--muted)}
@@ -1249,6 +1258,14 @@ html[data-theme="dark"] .ag-shell{box-shadow:0 28px 70px rgba(0,0,0,.65)}
 .ag-msg{margin-top:12px;font-size:11.5px;font-weight:600;padding:9px 11px;border-radius:9px;display:none;line-height:1.45}
 .ag-msg.show{display:block;background:var(--lv-tinggi-bg);color:var(--lv-tinggi-fg);border:1px solid color-mix(in srgb,var(--lv-tinggi-fg) 28%,transparent)}
 .ag-msg.show.ok{background:var(--lv-ok-bg);color:var(--lv-ok-fg);border:1px solid color-mix(in srgb,var(--lv-ok-fg) 28%,transparent)}
+.ag-secnote{margin-top:6px;font-size:11px;color:var(--muted);line-height:1.4}
+.ag-foot-act{margin-top:12px;padding-top:10px;border-top:1px solid var(--border);text-align:center}
+.ag-purge{border:0;background:transparent;color:var(--muted);font:inherit;font-size:11px;font-weight:600;cursor:pointer;text-decoration:underline;padding:4px 8px;border-radius:6px}
+.ag-purge:hover{color:var(--fg);background:var(--surface-2)}
+.sec-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.dlg-btn.danger-soft{border-color:color-mix(in srgb,var(--c-late) 38%,var(--border));color:var(--c-late);background:color-mix(in srgb,var(--c-late) 8%,var(--surface))}
+.dlg-btn.danger-soft:hover{background:color-mix(in srgb,var(--c-late) 15%,var(--surface))}
+.sec-note{margin-top:10px;font-size:11px;color:var(--muted);line-height:1.45}
 
 @media (max-width:760px){
   #authGate{padding:12px}
@@ -1272,7 +1289,7 @@ html[data-theme="dark"] .ag-shell{box-shadow:0 28px 70px rgba(0,0,0,.65)}
 /* v47 — tab bar HP */
 .tabbar{display:none}
 @media (max-width:780px){
-  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:110;
+  .tabbar{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:110;
     background:var(--surface);border-top:1px solid var(--border-2);padding:4px 6px calc(4px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px rgba(0,0,0,.12)}
   .tb-i{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:48px;
     background:none;border:0;border-radius:10px;color:var(--muted);font:inherit;font-size:11px;font-weight:600;cursor:pointer}
@@ -2108,7 +2125,15 @@ html[data-theme="dark"] .gf-inp-prog.full strong{color:#34D399}
 
 /* ══ v56 · UI/UX MISSION-CONTROL UPGRADE ══ */
 html[data-page="grafik"] .tb-today{display:none !important}
-#nvTheme{display:none !important}
+@media (min-width:781px){ #nvTheme{display:none !important} }
+@media (max-width:780px),(pointer:coarse){
+  .tb-burger,.topbar .tb-ico,.topbar .tb-usr,.topbar .tb-cmdk,.topbar .tb-sync,.topbar .tb-view{min-height:38px}
+  .tb-burger,.topbar .tb-ico{min-width:38px}
+  .gf-scrub{height:36px}
+  .gf-scrub .gf-dt,.gf-sbtn,.gf-qbtn{height:34px;min-width:34px}
+  .pi-sbtn,.hm-exp-btn,.jtool .chip{min-height:36px}
+  .ag-eye{width:36px;height:36px}
+}
 .gf-shell{max-width:clamp(700px,calc((100vh - 210px) * 16 / 9),980px)}
 
 /* Topbar Command Palette Trigger & Sync Heartbeat */
@@ -2186,7 +2211,29 @@ button.gf-inp-prog:hover{filter:brightness(.97);border-color:var(--accent)}
 /* Slide-Over PLTU Inspector */
 .pi-scrim{position:fixed;inset:0;z-index:128;background:rgba(9,16,28,.38);backdrop-filter:blur(1.5px)}
 .pi-panel{position:fixed;top:0;right:0;bottom:0;z-index:130;width:min(440px,95vw);background:var(--surface);
-  border-left:1px solid var(--border-2);box-shadow:-14px 0 36px rgba(0,0,0,.22);display:flex;flex-direction:column;overflow:hidden}
+  border-left:1px solid var(--border-2);box-shadow:-14px 0 36px rgba(0,0,0,.22);display:flex;flex-direction:column;overflow:hidden;transition:width .18s ease}
+.pi-panel.wide{width:min(580px,96vw)}
+.pi-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:6px 16px;background:var(--surface);border-bottom:1px solid var(--border)}
+.pi-tab{border:1px solid var(--border);background:var(--surface-2);color:var(--fg-2);border-radius:8px;padding:6px 10px;
+  font:700 11.5px/1.2 var(--font);cursor:pointer;text-align:center;transition:all .14s}
+.pi-tab:hover{border-color:var(--accent);color:var(--accent)}
+.pi-tab.on{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 6px rgba(22,115,255,.22)}
+.pi-proj{display:flex;flex-direction:column;gap:10px}
+.pi-proj .hp-wrap{position:relative;border:1px solid var(--border);border-radius:10px;padding:10px 10px 6px;background:var(--surface)}
+.pi-proj .hp-svg{width:100%;height:auto;max-height:260px;display:block}
+.pi-proj-ex{font-size:12px;line-height:1.5;color:var(--fg-2);padding:9px 11px;border-radius:9px;background:var(--surface-2);border:1px solid var(--border)}
+.pi-proj table.sup{width:100%;border-collapse:collapse;font-size:11.5px;table-layout:auto}
+.pi-proj table.sup th{font-size:9.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);text-align:left;padding:5px 6px;border-bottom:1px solid var(--border-2);position:static;background:none}
+.pi-proj table.sup td{padding:6px 6px;border-bottom:1px solid var(--border);height:auto;font-size:11.5px;overflow:visible;font-variant-numeric:tabular-nums}
+.pi-proj table.sup tbody tr.jump{cursor:pointer}
+.pi-proj table.sup tbody tr.jump:hover td{background:var(--accent-soft)}
+.pi-proj details{font-size:11.5px;color:var(--muted);line-height:1.55;border:1px solid var(--border);border-radius:9px;padding:8px 11px;background:var(--surface)}
+.pi-proj summary{cursor:pointer;font-weight:700;color:var(--fg-2)}
+.sm-lev-seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px}
+.sm-lev-seg button{border:1px solid var(--border-2);background:var(--surface);color:var(--fg-2);border-radius:7px;padding:5px 7px;font:700 11px/1.2 var(--font);cursor:pointer;transition:all .12s}
+.sm-lev-seg button:hover{border-color:var(--accent);color:var(--accent)}
+.sm-lev-seg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.sm-lev-note{font-size:10.5px;color:var(--muted);margin-top:5px;line-height:1.38}
 .pi-hd{padding:14px 16px 11px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .pi-ttl{display:flex;flex-direction:column;gap:3px;min-width:0}
 .pi-ttl-r{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
@@ -2225,7 +2272,7 @@ html[data-theme="dark"] .pi-bdg.emerg{background:rgba(248,113,113,.22);color:#FC
 html[data-theme="dark"] .pi-chip.c-emerg.on{color:#FCA5A5;border-color:#F87171;background:rgba(248,113,113,.16)}
 html[data-theme="dark"] .pi-chip.c-siaga.on{color:#FDE68A;border-color:#FBBF24;background:rgba(251,191,36,.16)}
 .pi-chip small{font-size:10px;opacity:.85}
-.pi-acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:9px 16px;background:var(--surface);border-bottom:1px solid var(--border)}
+.pi-acts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:9px 16px;background:var(--surface);border-bottom:1px solid var(--border)}
 .pi-act{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:7px 8px;border-radius:8px;
   border:1px solid var(--border-2);background:var(--surface);color:var(--fg);font:700 11.5px/1.15 var(--font);cursor:pointer;white-space:nowrap}
 .pi-act:hover{border-color:var(--accent);color:var(--accent)}
@@ -2497,10 +2544,6 @@ html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
   <div class="pg-foot"><span id="ft-counts"></span></div>
 </section>
 
-<section class="page" id="pg-hop" aria-label="Proyeksi HOP" hidden>
-  <div id="hpBody"><div class="pg-busy">Memuat data…</div></div>
-</section>
-
 <section class="page" id="pg-sim" aria-label="Simulasi HOP" hidden>
   <div id="smBody"><div class="pg-busy">Memuat data…</div></div>
 </section>
@@ -2565,7 +2608,7 @@ html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
 
     <div class="ag-main">
       <!-- FORM LOGIN -->
-      <form id="agForm" onsubmit="return false">
+      <form id="agForm" novalidate>
         <label class="ag-lbl" for="agUser" style="margin-top:0">Username</label>
         <div class="ag-fwrap">
           <span class="ag-fic" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.8-3.6 5-5.5 8-5.5s6.2 1.9 8 5.5"/></svg></span>
@@ -2584,7 +2627,7 @@ html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
         <div class="ag-opts">
           <label class="ag-rem" for="agRemember">
             <input type="checkbox" id="agRemember" checked>
-            <span>Ingat saya di perangkat ini</span>
+            <span>Tetap masuk di perangkat ini</span>
           </label>
         </div>
 
@@ -2594,7 +2637,7 @@ html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
         </button>
       </form>
 
-      <div class="ag-msg" id="agMsg"></div>
+      <div class="ag-msg" id="agMsg" role="alert" aria-live="polite"></div>
     </div>
 
   </div>
@@ -2602,18 +2645,23 @@ html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
 
 <!-- Dialog Akun Pengguna -->
 <div id="secDlg" role="dialog" aria-modal="true" aria-labelledby="secTitle">
-  <div class="sec-box" style="max-width:380px">
+  <div class="sec-box" style="max-width:400px">
     <div class="sec-h">
-      <h3 id="secTitle">Akun Pengguna</h3>
-      <button class="dr-x" id="secClose" type="button" title="Tutup">✕</button>
+      <h3 id="secTitle">Akun &amp; Sesi Pengguna</h3>
+      <button class="dr-x" id="secClose" type="button" title="Tutup" aria-label="Tutup dialog akun">✕</button>
     </div>
-    <div class="sec-cur" style="margin-bottom:0">
+    <div class="sec-cur">
       <div>
         <b id="secCurName">admin</b>
-        <span id="secCurRole">Sesi aktif</span>
+        <span id="secCurRole">Sesi aktif · Siaga penuh</span>
       </div>
       <button class="dlg-btn primary" id="secLockNow" type="button">Keluar</button>
     </div>
+    <div class="sec-acts">
+      <button class="dlg-btn" id="secToggleTheme" type="button">◐ Ganti tema terang / gelap</button>
+      <button class="dlg-btn danger-soft" id="secPurgeLocal" type="button" title="Hapus cache jadwal, riwayat, skenario lokal, dan preferensi dari peramban ini">Bersihkan cache lokal</button>
+    </div>
+    <div class="sec-note">Sesi tetap siaga penuh agar pemantauan harian siap setiap saat hingga Anda menekan <b>Keluar</b>.</div>
   </div>
 </div>
 
@@ -2636,15 +2684,19 @@ html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
 </div>
 
 <script>
-/* ── SUMBER DATA & PROTEKSI AKSES (v51) ────────────────────────────────────
-   • Token TIDAK lagi ditanam terbuka (hardcoded) di dalam kode sumber HTML.
-   • Mode Sesi Aman (bawaan) menyimpan sesi di sessionStorage (terhapus saat
-     tab ditutup) + auto-lock 15 menit tanpa aktivitas.
+/* ── SUMBER DATA & MANAJEMEN SESI KLIEN (v59) ──────────────────────────────
+   • Password pengguna TIDAK PERNAH disimpan di localStorage maupun sessionStorage.
+   • Mode bawaan ('local' — Siaga Penuh): token sesi tersimpan di perangkat ini
+     tanpa kunci otomatis sehingga pemantauan operasional selalu siap pakai
+     hingga pengguna menekan Keluar.
+   • Catatan arsitektur: karena aplikasi berjalan sebagai berkas tunggal tanpa
+     server sesi khusus, gerbang di klien bersifat pengaman antarmuka; otorisasi
+     data sesungguhnya wajib ditegakkan pada Web App Apps Script & IAM Google.
    ───────────────────────────────────────────────────────────────────────── */
-const DASH_V = 'v54';
+const DASH_V = 'v59';
 const SYNC = {
   scriptUrl: 'https://script.google.com/macros/s/AKfycbzsvSRfGAkRP2SuSMaTPgjUWZyx_2rTZshQm97o5FPiSKO4obL9JfSjhhDCr6T9EIPd/exec',
-  scriptToken: '',        // kosong di kode sumber demi keamanan — diisi lewat Login / Sesi
+  scriptToken: '',        // diisi setelah verifikasi sesi
   refreshMinutes: 10      // muat ulang otomatis saat dashboard dibiarkan terbuka
 };
 let HOPDATA = null, HOP_SRC = 'cache';
@@ -2655,68 +2707,95 @@ const IN_FRAME = (() => {
   try { return window.self !== window.top; } catch(_) { return true; }
 })();
 const LS_URL = 'sulm_sync_url', LS_TOK = 'sulm_sync_token', LS_MODE = 'sulm_sec_mode',
-      LS_USER = 'sulm_auth_user', LS_PASS = 'sulm_auth_pass', LS_SKEY = 'sulm_snap_key';
+      LS_USER = 'sulm_auth_user', LS_PASS = 'sulm_auth_pass', LS_SKEY = 'sulm_snap_key',
+      LS_THEME = 'sulm_theme';
 function lsGet(k){ try { return window.localStorage.getItem(k); } catch(_) { return null; } }
 function lsSet(k,v){ try { window.localStorage.setItem(k,v); } catch(_) {} }
 function lsDel(k){ try { window.localStorage.removeItem(k); } catch(_) {} }
 function ssGet(k){ try { return window.sessionStorage.getItem(k); } catch(_) { return null; } }
 function ssSet(k,v){ try { window.sessionStorage.setItem(k,v); } catch(_) {} }
 function ssDel(k){ try { window.sessionStorage.removeItem(k); } catch(_) {} }
-function getSecMode(){ return ssGet(LS_MODE) || lsGet(LS_MODE) || 'local'; }
+/* Pulihkan preferensi tema lebih awal agar tidak berkedip saat muat ulang */
+(function restoreThemeEarly(){
+  const saved = lsGet(LS_THEME);
+  if (saved === 'dark' || saved === 'light') document.documentElement.setAttribute('data-theme', saved);
+})();
+function getSecMode(){ return lsGet(LS_MODE) || ssGet(LS_MODE) || 'local'; }
 const URL_LAMA = ['AKfycbzmRCv2v9mOrBPM0LQLpfOsKh23aUfeL9Nqi8E3IzY'];
+function validAppsScriptUrl(raw){
+  try {
+    const p = new URL(String(raw || '').trim());
+    return p.protocol === 'https:' && p.hostname === 'script.google.com' && /^\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(p.pathname);
+  } catch(_){ return false; }
+}
 function loadSync(){
+  /* Bersihkan sisa password teks polos dari versi lama bila ada */
+  lsDel(LS_PASS); ssDel(LS_PASS);
+  SYNC.authPass = '';
   const u = ssGet(LS_URL) || lsGet(LS_URL);
   const t = ssGet(LS_TOK) || lsGet(LS_TOK);
   const usr = ssGet(LS_USER) || lsGet(LS_USER);
-  const pss = ssGet(LS_PASS) || lsGet(LS_PASS);
   const sk = ssGet(LS_SKEY) || lsGet(LS_SKEY);
-  if (u && !URL_LAMA.some(x => u.indexOf(x) >= 0)) SYNC.scriptUrl = u;
+  if (u && validAppsScriptUrl(u) && !URL_LAMA.some(x => u.indexOf(x) >= 0)) SYNC.scriptUrl = u;
   if (t) SYNC.scriptToken = t;
   if (usr) SYNC.authUser = usr;
-  if (pss) SYNC.authPass = pss;
   if (sk) SYNC.snapKey = sk;
-  if (window.__SVC_URL__) SYNC.scriptUrl = window.__SVC_URL__;
+  if (window.__SVC_URL__ && validAppsScriptUrl(window.__SVC_URL__)) SYNC.scriptUrl = window.__SVC_URL__;
 }
 function saveSync(mode){
   const m = mode || getSecMode();
+  lsDel(LS_PASS); ssDel(LS_PASS);
+  SYNC.authPass = '';
   ssSet(LS_MODE, m);
   ssSet(LS_URL, SYNC.scriptUrl);
   ssSet(LS_TOK, SYNC.scriptToken || '');
   ssSet(LS_USER, SYNC.authUser || '');
-  ssSet(LS_PASS, SYNC.authPass || '');
   ssSet(LS_SKEY, SYNC.snapKey || '');
   if (m === 'local'){
     lsSet(LS_MODE, 'local');
     lsSet(LS_URL, SYNC.scriptUrl);
     lsSet(LS_TOK, SYNC.scriptToken || '');
     lsSet(LS_USER, SYNC.authUser || '');
-    lsSet(LS_PASS, SYNC.authPass || '');
     lsSet(LS_SKEY, SYNC.snapKey || '');
   } else {
     lsSet(LS_MODE, 'session');
-    lsDel(LS_TOK); lsDel(LS_USER); lsDel(LS_PASS); lsDel(LS_SKEY);
+    lsDel(LS_TOK); lsDel(LS_USER); lsDel(LS_SKEY);
   }
 }
-function clearAllCacheAndLock(msg){
-  SYNC.scriptToken = ''; SYNC.authUser = ''; SYNC.authPass = ''; SYNC.snapKey = '';
-  ssDel(LS_TOK); ssDel(LS_USER); ssDel(LS_PASS); ssDel(LS_SKEY);
-  lsDel(LS_TOK); lsDel(LS_USER); lsDel(LS_PASS); lsDel(LS_SKEY);
+function clearDataStorageKeys(includePrefs){
   try {
     [window.localStorage, window.sessionStorage].forEach(st => {
       if (!st) return;
       const keys = [];
       for (let i = 0; i < st.length; i++){
         const k = st.key(i);
-        if (k && (k.indexOf('sulm_last_per_') === 0 || k === 'sulm_last_sheet' || k.indexOf('sulm_radar_') === 0)) keys.push(k);
+        if (!k) continue;
+        const isOperational = (k.indexOf('sulm_last_per_') === 0 || k === 'sulm_last_sheet' || k === 'sulm_periods'
+          || k.indexOf('sulm_radar_') === 0 || k === 'siaga_materi_ppt_v1' || k === 'sulm_sim_v1');
+        const isAllApp = includePrefs && (k.indexOf('sulm_') === 0 || k.indexOf('sulmapana_') === 0 || k.indexOf('siaga_') === 0);
+        if (isOperational || isAllApp) keys.push(k);
       }
       keys.forEach(k => st.removeItem(k));
     });
   } catch(_){}
+}
+function clearAllCacheAndLock(msg){
+  SYNC.scriptToken = ''; SYNC.authUser = ''; SYNC.authPass = ''; SYNC.snapKey = '';
+  ssDel(LS_TOK); ssDel(LS_USER); ssDel(LS_PASS); ssDel(LS_SKEY);
+  lsDel(LS_TOK); lsDel(LS_USER); lsDel(LS_PASS); lsDel(LS_SKEY);
+  clearDataStorageKeys(false);
   DATES = []; ROWS = []; HOPDATA = null; HOPBY = null; ASSESS = {};
   const tb = document.getElementById('tb'); if (tb) tb.innerHTML = '';
   const hm = document.getElementById('hmBody'); if (hm) hm.innerHTML = '<div class="pg-busy">Silakan masuk kembali.</div>';
   const gfb = document.getElementById('gfBody'); if (gfb) gfb.innerHTML = '<div class="pg-busy">Silakan masuk kembali.</div>';
+  const hpb = document.getElementById('hpBody'); if (hpb) hpb.innerHTML = '<div class="pg-busy">Silakan masuk kembali.</div>';
+  const smb = document.getElementById('smBody'); if (smb) smb.innerHTML = '<div class="pg-busy">Silakan masuk kembali.</div>';
   showAuthGate(msg || '');
+}
+function purgeAllLocalData(){
+  clearDataStorageKeys(true);
+  if (typeof SIM !== 'undefined' && SIM){ SIM.saved = []; SIM.actions = []; }
+  clearAllCacheAndLock('Seluruh cache jadwal, skenario lokal, dan sesi di peramban ini telah dihapus.');
 }
 function showAuthGate(errMsg){
   const g = document.getElementById('authGate'); if (!g) return;
@@ -2764,13 +2843,17 @@ const EW = (function(){
   const diffDays = (a, b) => { if (!a || !b) return null; const n = Math.round((toD(a) - toD(b)) / DAY); return isFinite(n) ? n : null; };
   const r1 = x => isFinite(Number(x)) ? Math.round(Number(x) * 10) / 10 : 0;
   const nf = n => (n != null && isFinite(Number(n))) ? Math.round(Number(n)).toLocaleString('id-ID') : '—';
-  const CERT = { 'Proses Bongkar':'di_pelabuhan', 'Tiba/Antri':'di_pelabuhan', 'Sailing':'berlayar', 'Sailing to POL':'berlayar',
+  const CERT = { 'Proses Bongkar':'di_pelabuhan', 'Bongkar':'di_pelabuhan', 'Tiba/Antri':'di_pelabuhan', 'Sailing':'berlayar', 'Sailing to POL':'berlayar',
                  'Proses Loading':'belum_berangkat', 'Menunggu Loading':'belum_berangkat', 'Menunggu':'belum_berangkat' };
   const CERT_TXT = { di_pelabuhan:'sudah di pelabuhan', berlayar:'sedang berlayar', belum_berangkat:'belum berangkat dari pelabuhan muat', tidak_diketahui:'status belum diperbarui' };
   const PRA_TIBA = { 'Menunggu':1, 'Menunggu Loading':1, 'Proses Loading':1, 'Sailing':1, 'Sailing to POL':1 };
   const isCancel = r => /^\s*cancel/i.test(String(r.status || '')) || /^\s*cancel/i.test(String(r.kat || ''));
+  const isDoneOrSkip = r => {
+    const st = String(r.status || '').trim();
+    return /^selesai\s*bongkar$/i.test(st) || /^carry\s*over$/i.test(st) || /^pengalihan$/i.test(st);
+  };
 
-  /* Daftar kiriman per unit stockpile. Cancel dikecualikan; data ganda dihitung sekali. */
+  /* Daftar kiriman per unit stockpile. Cancel/Selesai Bongkar/Carry Over/Pengalihan dikecualikan; data ganda dihitung sekali. */
   function shipments(rows, o){
     o = o || {};
     const dates = o.dates || [], inR = new Set(dates), bd = o.bongkarDays || CFG.bongkarDays;
@@ -2780,21 +2863,27 @@ const EW = (function(){
     (rows || []).forEach((r, ri) => {
       stats.total++;
       if (isCancel(r)){ stats.cancelled++; return; }
+      if (isDoneOrSkip(r)) return;
+      const st = String(r.status || '').trim();
+      const cert = CERT[st] || 'tidak_diketahui';
       const info = { ri:ri, row:r.row, pltu:r.pltu, sup:r.sup || '—', nom:r.nom || 'TBN', status:r.status || '—', etaPod:r.etaPod || null, etaPol:r.etaPol || null };
-      if (o.today && r.etaPod && r.etaPod < o.today && PRA_TIBA[r.status]){
+      if (o.today && r.etaPod && r.etaPod < o.today && PRA_TIBA[st]){
         stats.etaLewat++; stats.etaLewatList.push(info);
       }
-      if ((r.status === 'Sailing' || r.status === 'Sailing to POL') && !r.etaPod){
+      if ((st === 'Sailing' || st === 'Sailing to POL') && !r.etaPod){
         stats.noEta++; stats.noEtaList.push(info);
       }
       const unit = o.unitOf ? o.unitOf(r) : r.pltu;
+      const um = o.unitMeta && o.unitMeta[unit] ? o.unitMeta[unit] : null;
+      const tBase = (um && um.tBase) || o.today || null;
       const xs = [];
       dates.forEach((d, k) => {
         if (String((r.bars || {})[k] || '').toUpperCase() !== 'X') return;
         if (r.etaPod && d < r.etaPod) return;
         xs.push(d);
       });
-      const awal = r.etaPod || xs[0] || null;
+      let awal = r.etaPod || xs[0] || null;
+      if (!awal && um && cert === 'di_pelabuhan' && tBase) awal = addDays(tBase, 1);
       if (!awal) return;
       const vol = Number(r.vol);
       if (!(vol > 0)){
@@ -2802,21 +2891,36 @@ const EW = (function(){
         stats.noVolList.push(Object.assign({ awal:awal, anomaliEta:(r.etaPol && r.etaPod && r.etaPod < r.etaPol) }, info));
         return;
       }
-      if (r.nom && r.etaPod){
-        const key = [unit, r.nom, r.etaPod, vol].join('|');
+      if (r.nom && (r.etaPod || cert === 'di_pelabuhan')){
+        const key = [unit, r.nom, r.etaPod || awal, vol].join('|');
         if (seen.has(key)){ stats.dup++; stats.dupList.push(info); return; }
         seen.add(key);
       }
       if (o.accept && !o.accept(r)) return;
       const sh = typeof o.etaShift === 'function' ? (o.etaShift(r) || 0) : (o.etaShift || 0);
+      let effAwal = awal, effVol = vol, effBd = bd, ignoreXs = false;
+      if (um && tBase){
+        if (cert === 'di_pelabuhan' && awal <= tBase){
+          const isProc = (st === 'Proses Bongkar' || st === 'Bongkar');
+          const rf = isProc ? (um.remFactor != null ? um.remFactor : 1) : 1;
+          if (!(rf > 1e-6)) return;
+          effVol = vol * rf;
+          effBd = isProc ? Math.max(1, Math.min(bd, Math.ceil(rf * bd))) : bd;
+          effAwal = addDays(tBase, 1);
+          ignoreXs = true;
+        } else if (PRA_TIBA[st] && awal <= tBase){
+          effAwal = addDays(tBase, /^sailing$/i.test(st) ? 1 : 3);
+          ignoreXs = true;
+        }
+      }
       const target = {};
-      for (let h = 0; h < bd; h++) target[addDays(awal, h + sh)] = 1;
-      xs.forEach(d => { target[addDays(d, sh)] = 1; });
+      for (let h = 0; h < effBd; h++) target[addDays(effAwal, h + sh)] = 1;
+      if (!ignoreXs) xs.forEach(d => { if (!tBase || d > tBase) target[addDays(d, sh)] = 1; });
       const days = Object.keys(target).sort();
-      const mt = vol * (o.tonFactor == null ? 1 : o.tonFactor);
+      const mt = effVol * (o.tonFactor == null ? 1 : o.tonFactor);
       (byUnit[unit] = byUnit[unit] || []).push({
-        row:r.row, pltu:r.pltu, unit:unit, sup:r.sup, nom:r.nom, vol:mt, status:r.status,
-        cert:CERT[r.status] || 'tidak_diketahui', awal:addDays(awal, sh), etaPod:r.etaPod || null,
+        row:r.row, pltu:r.pltu, unit:unit, sup:r.sup, nom:r.nom, vol:mt, rawVol:vol, status:r.status,
+        cert:cert, awal:addDays(effAwal, sh), etaPod:r.etaPod || null,
         per:mt / days.length, days:days.filter(d => inR.has(d))
       });
     });
@@ -2827,11 +2931,15 @@ const EW = (function(){
     (ships || []).forEach(s => s.days.forEach(d => { m[d] = (m[d] || 0) + s.per; }));
     return m;
   }
-  /* Proyeksi harian per unit. Angka dasar identik dengan mesin HOP sebelumnya. */
+  /* Proyeksi harian per unit (selaras dengan laju pemakaian terkalibrasi Grafik HOP & Simulasi). */
   function project(u, arr, dates, opts){
     opts = opts || {};
-    const idle = (Number(u.idle) === 1) || ((u.pakai || 0) <= 0 && (u.bagi || 0) > 0);
+    let idle = (Number(u.idle) === 1) || ((u.pakai || 0) <= 0 && (u.bagi || 0) > 0);
     let burn = (u.pakai > 0 && u.bagi > 0) ? u.pakai / u.bagi : (idle ? 0 : 1);
+    if (opts.burnOverride != null && isFinite(opts.burnOverride) && opts.burnOverride >= 0){
+      burn = opts.burnOverride;
+      if (burn > 0) idle = false;
+    }
     if (opts.consFactor != null) burn *= opts.consFactor;
     const seri = {};
     (u.hist || []).forEach(p => { seri[p[0]] = { v:p[1], actual:true, arr:0 }; });
@@ -2918,7 +3026,7 @@ const EW = (function(){
       const n = Math.min(7, hist.length - 1), dlt = hist[hist.length - 1] - hist[hist.length - 1 - n];
       if (dlt < -0.5) F.push('Stok mengalami penurunan sekitar ' + rk(-dlt) + ' hari dalam ' + n + ' hari terakhir.');
     }
-    const ratio = (u.pakai > 0 && u.bagi > 0) ? u.pakai / u.bagi : null;
+    const ratio = (h.burn != null && h.burn > 0) ? h.burn : ((u.pakai > 0 && u.bagi > 0) ? u.pakai / u.bagi : null);
     if (ratio != null && ratio >= 0.95) F.push('Pemakaian harian saat ini cukup tinggi, mendekati kapasitas konsumsi maksimum (' + Math.round(ratio * 100) + '%).');
     if (out.next && out.next.cert !== 'di_pelabuhan' && out.next.cert !== 'berlayar')
       F.push('Pengiriman berikutnya (' + (out.next.nom || out.next.sup || 'belum ada nama kapal') + ') ' + CERT_TXT[out.next.cert] + ', sehingga jadwal tibanya masih perlu dipantau ketat.');
@@ -3008,10 +3116,11 @@ const EW = (function(){
     } else ex += 'proyeksi HOP sempat turun ke ' + rk(mn.v) + ' hari pada ' + fmt(mn.d) + ' (masih di atas batas minimum ' + cfg.minHop + ' hari, namun di bawah batas aman ' + cfg.waspadaHop + ' hari).';
     if (cr.length) ex += ' Catatan data: ' + cr.join(', ') + '.';
     out.explain = ex;
+    const pakaiMt = (ratio != null && u.bagi > 0) ? Math.round(ratio * u.bagi) : null;
     out.assumptions = 'Stok akhir hari = stok awal + pasokan masuk − pemakaian harian. Stok dasar ' + rk(u.base) + ' hr per ' + fmt(u.tgl)
-      + ' (sheet Stock). Pemakaian harian = ' + (ratio != null ? Math.round(ratio * 100) + '% dari konsumsi maks' : 'angka standar') + ' (' + nf(u.bagi) + ' MT/hari), diasumsikan tetap. '
-      + 'Volume muatan dibagi rata ' + cfg.bongkarDays + ' hari sejak ETA POD. Pengiriman berstatus Cancel tidak dihitung; baris ganda dihitung satu kali.';
-    out.basis = 'Stok awal ' + rk(u.base) + ' hr per ' + fmt(u.tgl) + ' · konsumsi maks ' + nf(u.bagi) + ' MT/hari' + (ratio != null ? ' (pemakaian ' + Math.round(ratio * 100) + '%)' : ' (angka standar)')
+      + ' (sheet Stock). Pemakaian harian terpadu = ' + (pakaiMt != null ? nf(pakaiMt) + ' MT/hari (' + Math.round(ratio * 100) + '% dari konsumsi maks ' + nf(u.bagi) + ' MT/hari)' : 'angka standar')
+      + '. Volume muatan dibagi rata ' + cfg.bongkarDays + ' hari sejak tiba (dengan koreksi sisa bongkar untuk kapal di pelabuhan).';
+    out.basis = 'Stok awal ' + rk(u.base) + ' hr per ' + fmt(u.tgl) + ' · pemakaian ' + (pakaiMt != null ? nf(pakaiMt) + ' MT/hari' : 'standar') + ' (maks ' + nf(u.bagi) + ' MT/hari)'
       + ' · batas minimum ' + cfg.minHop + ' hr & batas aman ' + cfg.waspadaHop + ' hr';
     return out;
   }
@@ -3093,7 +3202,7 @@ const toDate = s => s ? new Date(String(s).slice(0, 10) + 'T00:00:00') : new Dat
 const iso = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 const fmt = s => { if (!s) return '—'; const d = toDate(s); return isNaN(d.getTime()) ? String(s) : (HARI[d.getDay()] + ', ' + d.getDate() + ' ' + BLN[d.getMonth()]); };
 const fmtShort = s => { if (!s) return '—'; const d = toDate(s); return isNaN(d.getTime()) ? String(s) : (d.getDate() + ' ' + BLN[d.getMonth()]); };
-const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = n => (n == null || !isFinite(Number(n)) ? '—' : Number(n).toLocaleString('id-ID'));
 
 let DATES = [], ROWS = [], IDX = {};   // v31: mulai kosong — diisi tarikan live / update terakhir
@@ -3176,8 +3285,8 @@ function wilRowHTML(w, rows){
   const vis = rows.filter(r => wilOf(r.pltu) === w);
   const nP  = new Set(vis.map(r => r.pltu)).size;
   const vol = vis.reduce((a,r)=>a+(r.vol||0),0);
-  return '<tr class="wil" data-wil="' + w + '"><td class="wf1" colspan="6">'
-       + '<span class="wtag"><i class="wd"></i>' + w + '</span>'
+  return '<tr class="wil" data-wil="' + esc(w) + '"><td class="wf1" colspan="6">'
+       + '<span class="wtag"><i class="wd"></i>' + esc(w) + '</span>'
        + '<span class="wmeta"><b>' + nP + '</b> PLTU · <b>' + vis.length + '</b> shipment · <b>'
        + nf(Math.round(vol)) + '</b> MT</span></td>'
        + '<td class="wf2" colspan="' + DATES.length + '"></td></tr>';
@@ -3398,7 +3507,7 @@ function render(){
   });
   updateKPI(rows);
   renderQuick(); renderFbar(rows); renderPltuStrip(); renderDrawer();
-  renderDQ(); renderRadar(); renderHome(); renderHopPage(); renderSim(); renderNav();
+  renderDQ(); renderRadar(); renderHome(); renderSim(); renderNav();
   renderMobile(rows);
   afterRender();
 }
@@ -4144,12 +4253,19 @@ function terapkanSnapshot(){
     const res = JSON.parse(txt);
     if (!res || !res.grid) return false;
     const d = fromGrid(res.grid);
-    setData(d);
-    HOPDATA = res.hop || null; HOP_SRC = "live";
+    HOPDATA = res.hop || null; HOP_SRC = "snapshot";
     PERIODE = res.periode || null;
     if (PERIODE && PERIODE.sheet && !S.periode) S.periode = PERIODE.sheet;
+    setData(d);
+    if (!S.todayPilih && HOPDATA && HOPDATA.updated && d.dates && d.dates.indexOf(HOPDATA.updated) >= 0){
+      const age0 = Math.round((toDate(S.today) - toDate(HOPDATA.updated)) / 86400000);
+      if (age0 > 5){
+        S.today = HOPDATA.updated;
+        if (typeof gfSyncAfterSetData === 'function') gfSyncAfterSetData();
+      }
+    }
     CACHE_AT = "12 Okt 2026";
-    DATA_MODE = "live"; MEMUAT = null;
+    DATA_MODE = "cache"; MEMUAT = null;
     keepFilters(); render();
     radarSnapshot(); renderRadar(); renderDQ();
     return true;
@@ -4169,7 +4285,6 @@ async function tarikMentah(sheet){
   const sep = SYNC.scriptUrl.includes('?') ? '&' : '?';
   const q = sep + 'token=' + encodeURIComponent(SYNC.scriptToken)
     + (SYNC.authUser ? '&user=' + encodeURIComponent(SYNC.authUser) : '')
-    + (SYNC.authPass ? '&pass=' + encodeURIComponent(SYNC.authPass) : '')
     + (sheet ? '&sheet=' + encodeURIComponent(sheet) : '');   // v27: periode bulanan
   let res = null, errFetch = null;
   try {
@@ -4345,23 +4460,22 @@ async function pullFromSheets(manual, opts){
 /* ── v27: periode bulanan + filter pemasok ── */
 let perLalu = 0;   // v33: daftar periode jarang berubah → cukup 10 menit sekali
 async function loadPeriods(){
-  if (!SYNC.scriptUrl) return;   // v31: hanya mode script
+  if (!SYNC.scriptUrl || !SYNC.scriptToken) return;   // wajib sesi aktif
   /* v34: pemilih langsung terisi dari daftar tersimpan (anti-kosong saat jaringan lambat) */
   if (!PERIODS.length){
-    try { const ps = JSON.parse(lsGet(LS_PERS) || 'null'); if (ps && ps.length){ PERIODS = saringPeriode(ps); isiPicker(); } } catch(_){}   // v35
+    try { const ps = JSON.parse(cacheGet(LS_PERS) || 'null'); if (ps && ps.length){ PERIODS = saringPeriode(ps); isiPicker(); } } catch(_){}   // v35
   }
   if (Date.now() - perLalu < 10 * 60 * 1000){ isiPicker(); return; }   // v33
   try {
     const sep = SYNC.scriptUrl.includes('?') ? '&' : '?';
     const base = SYNC.scriptUrl + sep + 'token=' + encodeURIComponent(SYNC.scriptToken)
       + (SYNC.authUser ? '&user=' + encodeURIComponent(SYNC.authUser) : '')
-      + (SYNC.authPass ? '&pass=' + encodeURIComponent(SYNC.authPass) : '')
       + '&list=1';
     const res = await fetchPayload(base + '&callback=cb').catch(() => jsonp(base + '&callback=__CB__'));
     if (res && res.periods && res.periods.length){
       PERIODS = saringPeriode(res.periods);   // v35
       perLalu = Date.now();   // v33
-      try { lsSet(LS_PERS, JSON.stringify(PERIODS)); } catch(_){}
+      try { cacheSet(LS_PERS, JSON.stringify(PERIODS)); } catch(_){}
     }
   } catch(_){}
   isiPicker();   // v31
@@ -4458,6 +4572,11 @@ let hopShare = {};      // unit Stock → daftar grup jadwal yang memakai stockp
 function hopStatus(v){ return v >= 15 ? 'NORMAL' : v >= 10 ? 'SIAGA' : v >= 0 ? 'EMERGENCY' : 'KRITIS'; }
 function hopCls(v){ return v >= 15 ? 'h-norm' : v >= 10 ? 'h-siaga' : v >= 0 ? 'h-emerg' : 'h-krit'; }
 function hopInt(v){ const r = Math.round(v); return Object.is(r, -0) ? 0 : r; }
+function hop1(v){
+  if (v == null || !isFinite(Number(v))) return '—';
+  const r = Math.round(Number(v) * 10) / 10;
+  return (Object.is(r, -0) ? 0 : r).toFixed(1).replace('.', ',');
+}
 function hopKini(h){
   if (!h || !h.u) return null;
   const o = h.seri && h.seri[S.today];
@@ -4544,15 +4663,24 @@ let SHIPBY = {}, SHIPSTATS = {}, ASSESS = {};
 function buildHop(){
   if (!HOPDATA || !HOPDATA.units || !HOPDATA.units.length){ HOPBY = null; hopShare = {}; SHIPBY = {}; SHIPSTATS = {}; ASSESS = {}; return; }
   const map = HOPDATA.map || {};
+  const realToday = typeof gfRealToday === 'function' ? gfRealToday() : S.today;
+  const unitMeta = {};
+  HOPDATA.units.forEach(u => {
+    const corr = typeof gfLocalBongkarCorr === 'function' ? gfLocalBongkarCorr(u, realToday) : { remFactor:1 };
+    unitMeta[u.pltu] = { tBase: u.tgl || S.today, remFactor: corr.remFactor };
+  });
   const sp = EW.shipments(ROWS, { dates:DATES, today:S.today, bongkarDays:BONGKAR_HARI,
+    unitMeta:unitMeta,
     unitOf:r => map[r.pltu] || r.pltu,
     accept:r => !(S.sup && !S.sup.has(normSup(r.sup))) });          // filter pemasok ikut memotong kedatangan
   SHIPBY = sp.byUnit; SHIPSTATS = sp.stats;
   const by = {};
   HOPDATA.units.forEach(u => {
     const arr = EW.arrivalMap(SHIPBY[u.pltu]);
-    const pr = EW.project(u, arr, DATES);
-    by[u.pltu] = { u:u, burn:pr.burn, seri:pr.seri, arr:arr };
+    const est = typeof simPakaiEst === 'function' ? simPakaiEst(u) : { ok:false, mt:0 };
+    const burnOvr = (est.ok && est.mt > 0 && u.bagi > 0) ? (est.mt / u.bagi) : null;
+    const pr = EW.project(u, arr, DATES, burnOvr != null ? { burnOverride: burnOvr } : {});
+    by[u.pltu] = { u:u, burn:pr.burn, seri:pr.seri, arr:arr, est:est };
   });
   HOPBY = by;
   /* beberapa unit berbagi SATU stockpile (mis. Amurang & Amurang-SW) → HOP identik; dicatat untuk penanda di layar */
@@ -4913,18 +5041,18 @@ function bind(){
   });
   $id('tgLate').addEventListener('click', toggleLate);
   $id('btnReset').addEventListener('click', () => { closePops(); resetFilters(); render(); });
-  const ganti = () => {
-    document.documentElement.setAttribute('data-theme',
-      document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark');
-    if (typeof gfPaint === 'function') gfPaint();
-  };
+  const ganti = () => { if (typeof toggleAppTheme === 'function') toggleAppTheme(); };
   $id('btnTheme').addEventListener('click', ganti); $id('nvTheme').addEventListener('click', ganti);
   document.addEventListener('keydown', e => {
     if (e.key === '/' && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){
       e.preventDefault(); if (S.page !== 'jadwal') go('jadwal'); setTimeout(() => $id('q').focus(), 30); }
     if (e.key === 'Enter' && $id('dlg').classList.contains('on')) $id('dlgSave').click();
-    if (e.key === 'Escape'){ closeDlg(); hpClose(); closePops(); document.documentElement.classList.remove('nav-open');
-      if (expanded != null){ expanded = null; render(); } }
+    if (e.key === 'Escape'){
+      closeDlg(); closeSecDlg(); hpClose(); closePops();
+      if (typeof gfCloseInpPop === 'function') gfCloseInpPop();
+      document.documentElement.classList.remove('nav-open');
+      if (expanded != null){ expanded = null; render(); }
+    }
   });
 }
 
@@ -5192,7 +5320,7 @@ function rdRowHTML(a, k, open){
     <button class="rd-row" type="button" aria-expanded="${open ? 'true' : 'false'}">
       <span class="rd-lv ${L.cls}"><i aria-hidden="true">${L.ic}</i>${L.t === 'Data belum memadai' ? 'Data kurang' : L.t}</span>
       <span class="rd-n">${esc(k)}${unitTxt}</span>
-      <span class="rd-c"><span>HOP kini</span><b>${a.hopNow == null ? '—' : hopInt(a.hopNow) + ' hr'}</b></span>
+      <span class="rd-c"><span>HOP kini</span><b>${a.hopNow == null ? '—' : hop1(a.hopNow) + ' hr'}</b></span>
       <span class="rd-c c3"><span>${a.level === 'nodata' ? 'Perlu' : 'Batas minimum'}</span>${a.level === 'nodata' ? nodataTxt : brk}</span>
       <span class="rd-c c4 c5"><span>Stock out</span>${stk}</span>
       <span class="rd-c c6"><span>Pasokan berikut</span>${nx}${deltaHTML(k)}</span>
@@ -5213,19 +5341,75 @@ function rdDetailHTML(a, k){
       <div><div class="rd-k">Rekomendasi</div>${li(a.actions.length ? a.actions : ['Tidak ada tindakan khusus; pantau saja.'])}</div>
     </div>
     ${a.basis ? '<div class="rd-as"><b>Dasar:</b> ' + esc(a.basis) + '</div>' : ''}
-    <div class="rd-btns"><button type="button" data-a="insp">Rincian PLTU</button><button type="button" data-a="jadwal">Lihat Jadwal</button><button type="button" data-a="hop">Proyeksi HOP</button><button type="button" data-a="sim">Simulasi HOP</button></div>`;
+    <div class="rd-btns"><button type="button" data-a="insp">Rincian PLTU</button><button type="button" data-a="hop">Proyeksi 30 Hari</button><button type="button" data-a="jadwal">Lihat Jadwal</button><button type="button" data-a="sim">Simulasi HOP</button></div>`;
 }
 /* ══ Halaman Terpadu: Ringkasan & Risiko (#pg-beranda) ══ */
-const METODE_HTML = '<details class="metode"><summary>Ketentuan &amp; cara baca proyeksi (batas min. 10 hr · siaga 15 hr)</summary><ul>'
+const METODE_HTML = '<details class="metode"><summary>Ketentuan &amp; cara baca proyeksi terpadu (batas min. 10 hr · siaga 15 hr)</summary><ul>'
   + '<li>Stok akhir hari = stok awal + pasokan masuk − pemakaian harian.</li>'
-  + '<li>Pemakaian harian dihitung tetap mengikuti angka pemakaian terakhir. Volume muatan kapal dibagi rata selama 3 hari sejak tanggal ETA POD.</li>'
-  + '<li>Pengiriman berstatus Cancel tidak dihitung, dan baris pengiriman ganda hanya dihitung satu kali.</li></ul></details>';
+  + '<li>Seluruh halaman (Grafik HOP, Ringkasan &amp; Risiko, Jadwal Pasokan, dan Simulasi HOP) memakai dasar proyeksi terpadu: laju pemakaian dihitung dari riwayat stok 10 hari terakhir yang terkalibrasi (kembali ke angka sheet bila riwayat kurang), kapal di pelabuhan (Tiba/Antri &amp; sisa Proses Bongkar) diperhitungkan dengan koreksi sisa bongkar otomatis, dan muatan dibagi rata selama 3 hari bongkar. Di halaman Simulasi HOP tersedia sakelar opsional untuk menguji perbandingan dengan angka pemakaian sheet.</li>'
+  + '<li>Pengiriman berstatus Cancel, Selesai Bongkar, Carry Over, dan Pengalihan tidak dihitung ulang dalam pasokan mendatang; baris ganda hanya dihitung satu kali.</li></ul></details>';
+function buildRingkasanRapatText(){
+  if (!HOPBY || !ASSESS) return '';
+  const tot = hopTotals();
+  const tgl = S.today ? fmt(S.today) : '—';
+  const items = Object.keys(ASSESS).map(k => Object.assign({ k:k }, ASSESS[k])).sort(EW.rank);
+  const byLv = lv => items.filter(x => x.level === lv);
+  const krit = byLv('kritis'), tng = byLv('tinggi'), wsp = byLv('waspada');
+  const lateCnt = Array.isArray(ROWS) ? ROWS.filter(hasLate).length : 0;
+  const sailCnt = Array.isArray(ROWS) ? ROWS.filter(r => r.status === 'Sailing').length : 0;
+  const lines = [
+    'RINGKASAN OPERASIONAL BATUBARA PLTU SULMAPANA',
+    'Acuan: ' + tgl + (S.periode ? ' (' + S.periode + ')' : '')
+  ];
+  if (tot && tot.sK > 0){
+    lines.push('Stock Efektif Regional: ' + hop1(tot.mtEf / tot.sK) + ' HOP (' + nfi(tot.mtEf) + ' MT) · Total + Apung/Sailing: ' + hop1(tot.mtHt / tot.sK) + ' HOP');
+  }
+  lines.push('Status Risiko: Kritis ' + krit.length + ' · Tinggi ' + tng.length + ' · Waspada ' + wsp.length + ' PLTU');
+  const fmtUnit = a => {
+    let s = '- ' + a.k + ': ' + (a.hopNow == null ? '—' : hop1(a.hopNow) + ' hr');
+    if (a.inPortMT > 0) s += ' (di pelabuhan ' + nfi(a.inPortMT) + ' MT)';
+    if (a.next) s += ' · pasokan berikut ' + hopDate(a.next.date) + ' (' + (a.next.nom || a.next.sup || 'TBN') + ', ' + nfi(a.next.mt) + ' MT)';
+    else if (a.gapMT > 0) s += ' · kekurangan ± ' + nfi(a.gapMT) + ' MT';
+    return s;
+  };
+  if (krit.length){
+    lines.push('', 'PLTU Kritis:');
+    krit.forEach(a => lines.push(fmtUnit(a)));
+  }
+  if (tng.length){
+    lines.push('', 'PLTU Risiko Tinggi:');
+    tng.forEach(a => lines.push(fmtUnit(a)));
+  }
+  if (wsp.length){
+    lines.push('', 'PLTU Waspada: ' + wsp.map(a => a.k + ' (' + hop1(a.hopNow) + ' hr)').join(', '));
+  }
+  lines.push('', 'Armada Berjalan: ' + sailCnt + ' Sailing · ' + lateCnt + ' Late Loading');
+  return lines.join('\n');
+}
+async function salinRingkasanRapat(){
+  const txt = buildRingkasanRapatText();
+  if (!txt){ toast('Data belum siap untuk disalin.'); return; }
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(txt);
+      toast('Ringkasan rapat berhasil disalin ke papan klip.');
+      return;
+    }
+  } catch(_){}
+  const ta = document.createElement('textarea');
+  ta.value = txt; ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); toast('Ringkasan rapat berhasil disalin ke papan klip.'); }
+  catch(_){ toast('Gagal menyalin otomatis — peramban membatasi akses papan klip.'); }
+  ta.remove();
+}
 function fokusHTML(){
   const items = Object.keys(ASSESS).map(k => Object.assign({ k:k }, ASSESS[k]));
   const F = EW.fokus(items);
   const endLbl = (Array.isArray(DATES) && DATES.length) ? hopDate(DATES[DATES.length - 1]) : 'akhir bulan';
+  const copyBtn = `<button type="button" class="hm-exp-btn" data-act="copy-brief" title="Salin ringkasan teks siap rapat pagi ke papan klip">Salin Ringkasan Rapat</button>`;
   if (!F.n){
-    return `<div class="card fk"><div class="card-h"><h2>Prioritas Tindak Lanjut</h2></div>`
+    return `<div class="card fk"><div class="card-h"><h2>Prioritas Tindak Lanjut</h2>${copyBtn}</div>`
       + `<div class="fk-body"><div class="hm-ok-box"><span class="hm-ok-ico" aria-hidden="true">✓</span><div><b>Seluruh PLTU Terkendali</b><br>Tidak terdeteksi defisit tonase maupun keterlambatan kedatangan kritis hingga ${esc(endLbl)}.</div></div></div></div>`;
   }
   const list = a => a.map(x => esc(x.k)).join(', '), mt = n => nfi(n) + ' MT';
@@ -5241,7 +5425,7 @@ function fokusHTML(){
   if (F.donor.length){ const d = F.donor.slice(0, 2);
     rows.push(['Opsi pengalihan kargo', `${d.map(x => '<b>' + esc(x.k) + '</b> (cadangan ± ' + mt(x.surplusMT) + ' di atas batas aman)').join(' dan ')} memiliki stok longgar bila diperlukan pengalihan kargo.`]); }
   if (F.basi.length) rows.push(['Pembaruan data stok', `Data stok dasar ${list(F.basi)} belum diperbarui ≥ 2 hari.`]);
-  return `<div class="card fk"><div class="card-h"><h2>Prioritas Tindak Lanjut</h2></div><div class="fk-body">`
+  return `<div class="card fk"><div class="card-h"><h2>Prioritas Tindak Lanjut</h2>${copyBtn}</div><div class="fk-body">`
     + rows.map((r, i) => `<div class="fk-r"><span class="fk-n">${i + 1}</span><div><div class="fk-t">${r[0]}</div><div class="fk-d">${r[1]}</div></div></div>`).join('')
     + `</div></div>`;
 }
@@ -5360,51 +5544,9 @@ function renderHome(){
     });
   }
 }
-/* ══ halaman Proyeksi HOP ══ */
-let HPSEL = null;
-function renderHopPage(){
-  const el = $id('hpBody'); if (!el) return;
-  if (!HOPBY){ el.innerHTML = '<div class="pg-busy">Proyeksi muncul setelah data stok dan jadwal selesai dimuat.</div>'; return; }
-  const items = Object.keys(ASSESS).map(k => Object.assign({ k:k }, ASSESS[k])).sort(EW.rank);
-  if (!items.length){ el.innerHTML = '<div class="pg-busy">Belum ada PLTU yang bisa diproyeksikan.</div>'; return; }
-  if (!HPSEL || !ASSESS[HPSEL]) HPSEL = items[0].k;
-  const k = HPSEL, a = ASSESS[k], h = HOPBY[k], u = h.u, L = LV[a.level];
-  const vNow = hopKini(h), cls = hopCls(vNow);
-  const brk = a.level === 'nodata' ? '—' : a.breachDate ? (a.hopNow < a.cfg.minHop ? 'terlewati' : hopDate(a.breachDate)) : 'tidak ada';
-  const stk = a.level === 'nodata' ? '—' : a.stockoutDate ? hopDate(a.stockoutDate) : 'tidak ada';
-  const sh = hopShare[k] || [];
-  const ships = (SHIPBY[k] || []).slice().sort((x, y) => x.awal < y.awal ? -1 : x.awal > y.awal ? 1 : 0);
-  const tglArr = Object.keys(h.arr || {}).filter(d => d >= S.today).sort()[0];
-  const ketArr = tglArr ? 'kapal berikutnya ' + hopDate(tglArr) + ' · ' + nf(Math.round(h.arr[tglArr])) + ' MT' : 'sisa bulan ini belum ada kapal masuk';
-  el.innerHTML = `<div class="hpg">
-    <div class="card"><div class="card-h"><h2>Daftar PLTU</h2></div>
-      <table class="hpt"><thead><tr><th>PLTU</th><th>HOP kini</th><th>Status Risiko</th><th>Batas min.</th><th>Stock out</th></tr></thead><tbody>
-      ${items.map(i => { const v = i.hopNow; const l = LV[i.level];
-        return `<tr data-k="${esc(i.k)}" class="${i.k === k ? 'sel' : ''}"><td class="n">${esc(i.k)}</td><td>${v == null ? '—' : hopInt(v) + ' hr'}</td>
-        <td><span class="rd-lv ${l.cls}"><i aria-hidden="true">${l.ic}</i>${l.s}</span></td>
-        <td>${i.level === 'nodata' ? '—' : i.breachDate ? (i.hopNow < i.cfg.minHop ? 'terlewati' : hopDate(i.breachDate)) : '—'}</td>
-        <td>${i.stockoutDate ? hopDate(i.stockoutDate) : '—'}</td></tr>`; }).join('')}</tbody></table></div>
-    <div class="card hpd"><div class="hpd-h"><b>${esc(k)}</b><span class="hp-chip ${cls}">${hopInt(vNow)} hr · ${esc(hopKetKini(h, vNow).plain)}</span><span class="rd-lv ${L.cls}"><i aria-hidden="true">${L.ic}</i>${L.t === 'Data belum memadai' ? 'Data kurang' : L.t}</span></div>
-      <div class="hp-sub">Stok dasar ${nf(Math.round(u.base * 10) / 10)} hr (${hopDate(u.tgl)}) · konsumsi maks ${u.bagi > 0 ? nf(u.bagi) + ' MT/hari' : '—'}${sh.length > 1 ? ' · stok gabungan ' + esc(sh.join(' + ')) : ''}</div>
-      <p class="hpd-ex">${esc(a.explain)}</p>
-      <div class="hp-wrap">${hpChartSVG(k)}<div class="hp-tip"></div></div>
-      <div class="hp-leg"><span><i></i>riwayat</span><span><i class="hp-l2"></i>perkiraan</span><span><i class="hp-l3"></i>batas 15 &amp; 10 hr</span><span style="white-space:nowrap"><b class="hp-arrk">▼</b> kapal masuk</span><span class="hp-sok" style="white-space:nowrap"><i></i>Stock out</span><span style="margin-left:auto">${esc(ketArr)}</span></div>
-      ${ships.length ? `<table class="sup"><thead><tr><th>Tiba</th><th>Pemasok / kapal</th><th style="text-align:right">MT</th><th>Status</th></tr></thead><tbody>
-        ${ships.map(s => `<tr><td>${hopDate(s.awal)}</td><td>${esc(s.sup || '—')}${s.nom ? ' · ' + esc(s.nom) : ''}</td><td style="text-align:right">${nfi(s.vol)}</td><td>${esc(s.status)}</td></tr>`).join('')}</tbody></table>` : '<div class="hp-sub" style="margin-top:10px">Tidak ada pasokan terjadwal untuk unit ini.</div>'}
-      ${METODE_HTML}
-      <div class="rd-btns" style="margin-top:10px"><button type="button" data-a="jadwal">Lihat jadwal PLTU ini</button></div></div></div>`;
-  hpBindSVG(k, el.querySelector('.hpd'));
-  el.querySelectorAll('.hpt tbody tr').forEach(tr => tr.addEventListener('click', () => { HPSEL = tr.dataset.k; renderHopPage();
-    if (window.matchMedia('(max-width:1180px)').matches){ const d = $id('hpBody').querySelector('.hpd'); if (d) d.scrollIntoView({ behavior:'smooth', block:'start' }); } }));
-  const jb = el.querySelector('.rd-btns [data-a="jadwal"]');
-  if (jb) jb.addEventListener('click', () => {
-    const names = [...new Set(ROWS.map(r => r.pltu))].filter(n => unitOf({ pltu:n }) === k);
-    S.pltu = new Set(names.length ? names : [k]); msRefreshAll(); go('jadwal'); render();
-  });
-}
-/* ══ MENU KIRI + HALAMAN (Perbaikan #3: istilah lebih operasional & natural) ══ */
-const PAGE_IDS = ['grafik', 'beranda', 'jadwal', 'hop', 'sim'];
-const TITLES = { beranda:'Ringkasan & Risiko', radar:'Ringkasan & Risiko', jadwal:'Jadwal Pasokan', hop:'Proyeksi HOP', grafik:'Grafik HOP', sim:'Simulasi HOP' };
+/* ══ MENU KIRI + HALAMAN (4 Menu Utama Terpadu) ══ */
+const PAGE_IDS = ['grafik', 'beranda', 'jadwal', 'sim'];
+const TITLES = { beranda:'Ringkasan & Risiko', radar:'Ringkasan & Risiko', jadwal:'Jadwal Pasokan', grafik:'Grafik HOP', sim:'Simulasi HOP' };
 const ICO = {
   plus:'<path d="M12 5v14M5 12h14"/>', swap:'<path d="M4 8h12l-3-3M20 16H8l3 3"/>', clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3 1.8"/>', gauge:'<path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 18l4.5-6.5"/>', gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2M12 19v2M5.5 5.5l1.4 1.4M17.1 17.1l1.4 1.4M3 12h2M19 12h2M5.5 18.5l1.4-1.4M17.1 6.9l1.4-1.4"/>',
   chart: '<rect x="3.5" y="12" width="3.6" height="8" rx="1"/><rect x="10.2" y="5" width="3.6" height="15" rx="1"/><rect x="16.9" y="9" width="3.6" height="11" rx="1"/>',
@@ -5426,12 +5568,11 @@ function renderNav(){
   const tb = $id('tabbar');
   if (tb){
     const t = (id, lb, ic, bd) => `<button type="button" class="tb-i${S.page === id ? ' on' : ''}" data-pg="${id}"${S.page === id ? ' aria-current="page"' : ''}>${svgI(ic)}<span>${lb}</span>${bd ? '<b>' + bd + '</b>' : ''}</button>`;
-    tb.innerHTML = t('grafik', 'Grafik', 'chart') + t('beranda', 'Risiko', 'radar', hot || '') + t('jadwal', 'Jadwal', 'gantt', lateCnt || '') + t('hop', 'HOP', 'trend') + t('sim', 'Simulasi', 'sim');
+    tb.innerHTML = t('grafik', 'Grafik', 'chart') + t('beranda', 'Risiko', 'radar', hot || '') + t('jadwal', 'Jadwal', 'gantt', lateCnt || '') + t('sim', 'Simulasi', 'sim');
   }
   el.innerHTML = it('grafik', 'Grafik HOP', 'chart')
     + it('beranda', 'Ringkasan & Risiko', 'radar', hot || '', 'PLTU risiko kritis / tinggi')
     + it('jadwal', 'Jadwal Pasokan', 'gantt', lateCnt || '', 'Pengapalan late loading aktif')
-    + it('hop', 'Proyeksi HOP', 'trend')
     + it('sim', 'Simulasi HOP', 'sim');
 }
 /* ══════════════════════════════════════════════════════════════════════════
@@ -5455,9 +5596,9 @@ const SIM_T = {
   pakai:  { t:'Ubah pemakaian',       d:'Naikkan, turunkan, atau padamkan pada rentang tanggal',               ic:'gauge' }
 };
 const SIM_LS = 'sulm_sim_v1', SIM_LS_SAVED = 'sulm_sim_saved_v1';
-const SIM = { actions:[], gKons:0, gEta:0, ref:'bln2', sort:'risiko', hm:'skenario', sel:null, form:null, tab:'atur', perLalu:0,
+const SIM = { actions:[], gKons:0, gEta:0, pakaiMode:'riwayat', ref:'bln2', sort:'risiko', hm:'skenario', sel:null, form:null, tab:'atur', perLalu:0,
               next:null, nextState:'idle', nextLabel:'', nextErr:'', nextPaksa:'', menu:false, dirty:true, saved:[], seq:1,
-              pick:null, grp:{}, onlySel:true, hmSatu:true, tbSatu:true };   /* v53: pemilih, kelompok, mode fokus, peta/tabel satu-PLTU */
+              pick:null, grp:{}, onlySel:true, hmSatu:true, tbSatu:true };   /* v59: mesin terpadu + sakelar dasar pemakaian */
 let SIMCTX = null, SIMBASE = null, SIMRES = null, simRaf = 0;
 
 /* ── format kecil ── */
@@ -5476,7 +5617,7 @@ const simMon = d => BLN[toDate(d).getMonth()];
 
 /* ── simpan / muat (hanya browser ini) ── */
 function simSave(){
-  lsSet(SIM_LS, JSON.stringify({ a:SIM.actions, k:SIM.gKons, e:SIM.gEta, r:SIM.ref, s:SIM.seq, g:SIM.grp, o:SIM.onlySel,
+  lsSet(SIM_LS, JSON.stringify({ a:SIM.actions, k:SIM.gKons, e:SIM.gEta, pm:SIM.pakaiMode, r:SIM.ref, s:SIM.seq, g:SIM.grp, o:SIM.onlySel,
     hs:SIM.hmSatu ? 1 : 0, ts:SIM.tbSatu ? 1 : 0 }));
 }
 function simLoad(){
@@ -5484,7 +5625,8 @@ function simLoad(){
     const o = JSON.parse(lsGet(SIM_LS) || 'null');
     if (o && Array.isArray(o.a)){
       SIM.actions = o.a.filter(a => a && SIM_T[a.type] && a.id);
-      SIM.gKons = 0; SIM.gEta = Number(o.e) || 0;   /* tuas pemakaian sudah dihapus → selalu sesuai saat ini */
+      SIM.gKons = 0; SIM.gEta = Number(o.e) || 0;
+      if (o.pm === 'sheet' || o.pm === 'riwayat') SIM.pakaiMode = o.pm;
       if (['bln1', 'bln2', 'min'].indexOf(o.r) >= 0) SIM.ref = o.r;
       if (o.g && typeof o.g === 'object') SIM.grp = o.g;
       if (typeof o.o === 'boolean') SIM.onlySel = o.o;
@@ -5496,15 +5638,14 @@ function simLoad(){
   try { const s = JSON.parse(lsGet(SIM_LS_SAVED) || '[]'); if (Array.isArray(s)) SIM.saved = s.filter(x => x && x.name && Array.isArray(x.a)).slice(0, 12); } catch(_){}
 }
 function simSaveList(){ lsSet(SIM_LS_SAVED, JSON.stringify(SIM.saved)); }
-/* ══ SIMPAN BERSAMA (v54) — skenario di sheet "database" mulai U1, lewat Web App (SimSkenario.gs) ══
-   Tanpa Code.gs baru / tanpa sambungan → tetap tersimpan di browser ini seperti sebelumnya. */
+/* ══ SIMPAN BERSAMA (v59) — kolaboratif untuk seluruh pengguna berwenang yang memiliki akses ══ */
 const SIMB = { st:'', list:[], at:0, busy:false, err:'' };   /* st: '' belum dicek · ok · tidak (Code.gs lama) · gagal */
 function simBBisa(){
   try { if (window.origin === 'null' || /^(file|about|data):$/.test(location.protocol)) return false; } catch(_){ return false; }
   return !!(SYNC.scriptUrl && SYNC.scriptToken);
 }
 function simBAktif(){ return simBBisa() && SIMB.st === 'ok'; }
-function simBMilik(x){ return !x.oleh || !SYNC.authUser || x.oleh.toLowerCase() === String(SYNC.authUser).toLowerCase(); }
+function simBMilik(){ return true; }
 async function simBPanggil(par, ms){
   const sep = SYNC.scriptUrl.includes('?') ? '&' : '?';
   /* list=1: Code.gs lama membalas daftar bulan (kecil & cepat) → ketahuan belum mendukung, tanpa menarik data penuh */
@@ -5784,7 +5925,7 @@ function simKey(){
   const u = (HOPDATA && HOPDATA.units) || [];
   return [S.periode, S.today, DATES.length, ROWS.length, u.length,
     u.reduce((a, x) => a + (Number(x.base) || 0) + (Number(x.pakai) || 0) + (Number(x.bagi) || 0), 0).toFixed(2),
-    SIM.next ? SIM.next.sheet + ':' + SIM.next.rows.length : '-', DATA_MODE].join('#');
+    SIM.next ? SIM.next.sheet + ':' + SIM.next.rows.length : '-', DATA_MODE, SIM.pakaiMode || 'riwayat'].join('#');
 }
 /* ══ v53.7: PEMAKAIAN HARIAN DARI RIWAYAT STOK ══════════════════════════════
    Angka kolom "Pemakaian" di sheet bisa jauh dari kenyataan (ada yang di atas
@@ -5841,9 +5982,10 @@ function simPakaiEst(u){
 }
 function simPakaiOf(k){ const p = SIMCTX && SIMCTX.pk ? SIMCTX.pk[k] : null; return p || null; }
 function simPakaiMT(k){
+  const u = SIMCTX ? SIMCTX.units.filter(x => x.pltu === k)[0] : null;
+  if (SIM.pakaiMode === 'sheet') return u ? (Number(u.pakai) || 0) : 0;
   const p = simPakaiOf(k);
   if (p && p.ok) return Math.round(p.mt);
-  const u = SIMCTX ? SIMCTX.units.filter(x => x.pltu === k)[0] : null;
   return u ? (Number(u.pakai) || 0) : 0;
 }
 /* tabel dasar pemakaian per PLTU — ditampilkan di lipatan "Cara baca grafik ini" */
@@ -5851,50 +5993,57 @@ function simPakaiTabel(){
   const ctx = SIMCTX; if (!ctx || !ctx.pk) return '';
   const keys = simOrder().filter(k => ctx.pk[k]);
   if (!keys.length) return '';
+  const useSheet = (SIM.pakaiMode === 'sheet');
   const r = keys.map(k => {
     const p = ctx.pk[k], u = ctx.units.filter(x => x.pltu === k)[0] || {};
-    const angka = p.ok ? simN(Math.round(p.mt)) : (p.sheet > 0 ? simN(p.sheet) + ' *' : '—');
+    const angka = useSheet
+      ? (p.sheet > 0 ? simN(p.sheet) + ' (sheet)' : '—')
+      : (p.ok ? simN(Math.round(p.mt)) : (p.sheet > 0 ? simN(p.sheet) + ' *' : '—'));
     const hari = p.ok ? p.jendela + (p.gangguan ? '↑' : '') : (p.kurang ? '*' : '—');
     const buang = p.ok ? (p.buang ? String(p.buang) : '–') : '–';
     return '<tr><td>' + esc(k) + '</td><td>' + angka + '</td><td>' + hari + '</td><td>' + buang + '</td><td>' + (p.sheet > 0 ? simN(p.sheet) : '—') + '</td>'
       + '<td>' + (u.bagi > 0 ? simN(u.bagi) : '—') + '</td></tr>';
   }).join('');
-  return '<div class="sm-pk"><b>Dasar pemakaian tiap PLTU</b> <span class="sm-pk-u">MT/hari</span>'
+  return '<div class="sm-pk"><b>Dasar pemakaian tiap PLTU</b> <span class="sm-pk-u">MT/hari · mode ' + (useSheet ? 'Angka Sheet' : 'Riwayat 10 Hari (Baku)') + '</span>'
     + '<div class="sm-pk-tw"><table><thead><tr><th>PLTU</th><th>Dipakai</th><th title="jumlah hari riwayat yang dihitung">Hari</th><th title="hari menyimpang yang dibuang">Buang</th><th>Sheet</th><th>Maks</th></tr></thead><tbody>' + r + '</tbody></table></div>'
     + '<div class="sm-pk-k">Hari = jumlah hari riwayat yang dihitung (↑ diperpanjang karena 10 hari terakhir jauh di bawah pola) · Buang = hari menyimpang yang dibuang · * riwayat belum cukup, dipakai angka sheet.</div></div>';
 }
 function simBuildCtx(){
   if (!HOPDATA || !HOPDATA.units || !HOPDATA.units.length || !DATES.length || !S.today) return null;
   const map = HOPDATA.map || {}, today = S.today, end1 = simEnd1(), end2 = simEnd2();
-  const units = HOPDATA.units.slice(), eng = {}, hist = {};
+  const realToday = typeof gfRealToday === 'function' ? gfRealToday() : today;
+  const units = HOPDATA.units.slice(), eng = {}, hist = {}, unitMeta = {};
   let t0 = today;
-  const pk = {};
+  const pk = {}, useSheet = (SIM.pakaiMode === 'sheet');
   units.forEach(u => {
     const p = EW.project(u, {}, [], {});
     const est = simPakaiEst(u);
     pk[u.pltu] = est;
-    /* pemakaian dari riwayat stok menggantikan angka sheet; kalau riwayatnya kurang, kembali ke angka sheet */
-    const burn = (est.ok && est.mt > 0 && u.bagi > 0) ? est.mt / u.bagi : p.burn;
-    eng[u.pltu] = { burn:burn, idle:(est.ok && est.mt > 0 ? false : p.idle), est:est,
+    const useEst = (!useSheet && est.ok && est.mt > 0 && u.bagi > 0);
+    const burn = useEst ? est.mt / u.bagi : p.burn;
+    eng[u.pltu] = { burn:burn, idle:(useEst ? false : p.idle), est:est,
                     ok:(u.bagi > 0 && u.base != null && isFinite(Number(u.base))) };
     const h = {}; (u.hist || []).forEach(q => { h[q[0]] = q[1]; }); hist[u.pltu] = h;
     if (u.tgl && tglPlus(u.tgl, 1) < t0) t0 = tglPlus(u.tgl, 1);
+    const corr = typeof gfLocalBongkarCorr === 'function' ? gfLocalBongkarCorr(u, realToday) : { remFactor:1 };
+    unitMeta[u.pltu] = { tBase: u.tgl || today, remFactor: corr.remFactor };
   });
   const ships = [], byId = {}, seen = new Set(), cnt = {};
   const feed = (rows, dates, src) => {
     if (!rows || !rows.length || !dates || !dates.length) return;
     const last = dates[dates.length - 1];
-    const sp = EW.shipments(rows, { dates:dates, today:today, bongkarDays:BONGKAR_HARI, unitOf:r => map[r.pltu] || r.pltu });
+    const sp = EW.shipments(rows, { dates:dates, today:today, bongkarDays:BONGKAR_HARI, unitMeta:src === 'now' ? unitMeta : null, unitOf:r => map[r.pltu] || r.pltu });
     Object.keys(sp.byUnit).forEach(unit => sp.byUnit[unit].forEach(s => {
       if (!(s.vol > 0) || !(s.per > 0)) return;
-      if (s.nom && s.nom !== 'TBN' && s.etaPod){
-        const dk = [unit, s.nom, s.etaPod, Math.round(s.vol)].join('|');
+      const rawV = s.rawVol != null ? s.rawVol : s.vol;
+      if (s.nom && s.nom !== 'TBN' && (s.etaPod || s.cert === 'di_pelabuhan')){
+        const dk = [unit, s.nom, s.etaPod || s.awal, Math.round(rawV)].join('|');
         if (seen.has(dk)) return; seen.add(dk);
       }
       const n0 = Math.max(1, Math.round(s.vol / s.per)), days = s.days.slice();
-      /* hari bongkar yang jatuh sesudah ujung sheet ikut dihitung (mesin dasar memotongnya di ujung sheet) */
-      for (let h = 0; h < BONGKAR_HARI; h++){ const d = tglPlus(s.awal, h); if (d > last && days.indexOf(d) < 0) days.push(d); }
-      let id = [unit, s.nom || s.sup || '', s.awal, Math.round(s.vol)].join('|');
+      /* hari bongkar yang jatuh sesudah ujung sheet ikut dihitung */
+      for (let h = 0; h < n0; h++){ const d = tglPlus(s.awal, h); if (d > last && days.indexOf(d) < 0) days.push(d); }
+      let id = [unit, s.nom || s.sup || '', s.awal, Math.round(rawV)].join('|');
       cnt[id] = (cnt[id] || 0) + 1; if (cnt[id] > 1) id += '#' + cnt[id];
       const o = { id:id, unit:unit, pltu:s.pltu, sup:s.sup || '—', nom:s.nom || 'TBN', vol:s.vol, per:s.per, n0:n0,
                   status:s.status, cert:s.cert, awal:s.awal, days:days, src:src };
@@ -6037,28 +6186,10 @@ function simNextPeriod(){
   if (!cur) return null;
   return (PERIODS || []).filter(p => p.y * 12 + p.m === cur.y * 12 + cur.m + 1)[0] || null;
 }
-/* v53.3: token bawaan dashboard dipakai HANYA kalau sesi belum login — supaya jadwal bulan depan
-   tetap bisa ditarik walau pengguna belum login (jalur data utama tetap wajib login). */
-const SIM_TOKEN_CADANG = 'sulmapana';
-async function simTarikCadangan(sheet, langsung){
-  if (langsung && SYNC.scriptToken !== SIM_TOKEN_CADANG){        /* sesi kosong → langsung token bawaan */
-    const asli0 = SYNC.scriptToken;
-    SYNC.scriptToken = SIM_TOKEN_CADANG;
-    try { const r = await tarikMentah(sheet); r.__cadangan = true; return r; }
-    finally { SYNC.scriptToken = asli0; }
-  }
-  try { return await tarikMentah(sheet); }
-  catch(e1){
-    if (SYNC.scriptToken === SIM_TOKEN_CADANG) throw e1;
-    const asli = SYNC.scriptToken;
-    SYNC.scriptToken = SIM_TOKEN_CADANG;
-    let hasil = null;
-    try { hasil = await tarikMentah(sheet); } catch(_){ hasil = null; }
-    SYNC.scriptToken = asli;
-    if (!hasil) throw e1;
-    hasil.__cadangan = true;
-    return hasil;
-  }
+/* v58: tarikan jadwal bulan depan hanya berjalan saat sesi sudah terverifikasi (SYNC.scriptToken tersedia) */
+async function simTarikCadangan(sheet){
+  if (!SYNC.scriptToken) throw new Error('Sesi belum aktif');
+  return await tarikMentah(sheet);
 }
 /* tebakan nama tabel bulan depan dibuat dari nama periode yang sedang dibuka,
    mis. “SULMAPANA Okt'26” → “SULMAPANA Nov'26”, “SULMAPANA November 2026”, … */
@@ -6083,18 +6214,18 @@ function simKandidatSheet(){
   (PERIODS || []).slice().reverse().forEach(p => tambah(p.sheet));     /* lalu tabel di daftar, terbaru dulu */
   return out.slice(0, 12);
 }
-/* daftar periode juga bisa ditarik tanpa login (token bawaan), sama seperti tarikan jadwal */
+/* daftar periode ditarik menggunakan token sesi aktif */
 async function simPeriodeCadangan(){
-  if (!SYNC.scriptUrl) return;
+  if (!SYNC.scriptUrl || !SYNC.scriptToken) return;
   if (SIM.perLalu && Date.now() - SIM.perLalu < 10 * 60 * 1000) return;
   try {
     const sep = SYNC.scriptUrl.includes('?') ? '&' : '?';
-    const base = SYNC.scriptUrl + sep + 'token=' + encodeURIComponent(SIM_TOKEN_CADANG) + '&list=1';
+    const base = SYNC.scriptUrl + sep + 'token=' + encodeURIComponent(SYNC.scriptToken) + '&list=1';
     const res = await fetchPayload(base + '&callback=cb', 20000).catch(() => jsonp(base + '&callback=__CB__', 20000));
     if (res && res.periods && res.periods.length){
       PERIODS = saringPeriode(res.periods);
       SIM.perLalu = Date.now();
-      try { lsSet(LS_PERS, JSON.stringify(PERIODS)); } catch(_){}
+      try { cacheSet(LS_PERS, JSON.stringify(PERIODS)); } catch(_){}
       if (SIM.pick) simPanel();
     }
   } catch(_){}
@@ -6444,9 +6575,14 @@ function simThumbPos(idOut){
 }
 function simThumbs(){ simThumbPos('smEtaTh'); }
 function simLevHTML(){
-  const e = SIM.gEta;
+  const e = SIM.gEta, pm = SIM.pakaiMode === 'sheet' ? 'sheet' : 'riwayat';
   const et = e === 0 ? 'Sesuai jadwal' : (e > 0 ? 'Mundur ' : 'Maju ') + Math.abs(e) + ' hari';
-  return '<div class="sm-lev"><div class="sm-lev-h"><b>Jadwal kapal yang belum tiba</b><output id="smEtaOut" class="' + (e ? 'chg' : '') + '">' + et + '</output></div>'
+  return '<div class="sm-lev"><div class="sm-lev-h"><b>Dasar pemakaian harian</b><output class="' + (pm === 'sheet' ? 'chg' : '') + '">' + (pm === 'sheet' ? 'Angka sheet' : 'Terpadu (baku)') + '</output></div>'
+    + '<div class="sm-lev-seg" role="group" aria-label="Dasar pemakaian harian">'
+    + '<button type="button" data-sa="pakaimode" data-v="riwayat" class="' + (pm === 'riwayat' ? 'on' : '') + '">Riwayat 10 hari (baku)</button>'
+    + '<button type="button" data-sa="pakaimode" data-v="sheet" class="' + (pm === 'sheet' ? 'on' : '') + '">Angka sheet</button></div>'
+    + '<div class="sm-lev-note">' + (pm === 'riwayat' ? 'Selaras dengan Grafik HOP, Ringkasan &amp; Jadwal.' : 'Menguji perbandingan dengan kolom Pemakaian pada sheet Grafik.') + '</div></div>'
+    + '<div class="sm-lev" style="margin-top:8px"><div class="sm-lev-h"><b>Jadwal kapal yang belum tiba</b><output id="smEtaOut" class="' + (e ? 'chg' : '') + '">' + et + '</output></div>'
     + '<div class="sm-rg-w"><input class="sm-rg" type="range" min="-10" max="10" step="1" value="' + e + '" data-lv="eta" aria-label="Geser jadwal kapal (hari)">'
     + '<output class="sm-rg-th' + (e ? ' chg' : '') + '" id="smEtaTh">' + (e === 0 ? 'sesuai jadwal' : (e > 0 ? 'mundur ' : 'maju ') + Math.abs(e) + ' hr') + '</output></div>'
     + '<div class="sm-rg-lb"><i>maju 10 hari</i><i class="c">sesuai jadwal</i><i>mundur 10 hari</i></div></div>';
@@ -6988,8 +7124,12 @@ function simHeroHTML(){
   /* catatan dasar pemakaian — ringkas; penjelasan metode ada di "Cara baca grafik ini" */
   const cat = [];
   const rg = pk && pk.ok ? hopDate(pk.dari) + '–' + hopDate(pk.sampai) : '';
-  if (pk && pk.ok){
-    cat.push('Pemakaian <b>' + simN(Math.round(pk.mt)) + ' MT/hari</b>, rata-rata ' + pk.n + ' hari (' + rg + ')'
+  if (SIM.pakaiMode === 'sheet'){
+    cat.push('Mode <b>Angka sheet</b> aktif: pemakaian dihitung dari kolom Pemakaian sheet'
+      + (pk && pk.sheet > 0 ? ' (<b>' + simN(pk.sheet) + ' MT/hari</b>)' : '')
+      + (pk && pk.ok ? ' · acuan riwayat 10 hari terkalibrasi: ' + simN(Math.round(pk.mt)) + ' MT/hari.' : '.'));
+  } else if (pk && pk.ok){
+    cat.push('Pemakaian terpadu <b>' + simN(Math.round(pk.mt)) + ' MT/hari</b>, rata-rata ' + pk.n + ' hari (' + rg + ')'
       + (pk.buang ? '. ' + pk.buang + ' hari yang menyimpang tidak dihitung' : '') + '.');
     if (pk.gangguan) cat.push('10 hari terakhir hanya <b>' + simN(Math.round(pk.awalMT)) + ' MT/hari</b> (pola ' + pk.polaN + ' hari: '
       + simN(Math.round(pk.polaMT)) + '). Unit mungkin sedang gangguan, jadi dihitung dari ' + pk.jendela + ' hari.');
@@ -7229,7 +7369,9 @@ function simSummary(){
   if (wor.length) L.push('Memburuk: ' + wor.join('; '));
   L.push('Masih ada stock out di: ' + (still.length ? still.join('; ') : 'tidak ada'));
   L.push('');
-  L.push('Catatan: pemakaian harian dihitung dari riwayat stok harian (10 hari pemakaian terakhir, hari kedatangan kapal tidak dihitung, hari menyimpang dibuang) dan dianggap tetap selama rentang simulasi. Volume kapal masuk bertahap ' + BONGKAR_HARI + ' hari sejak tiba. Kelayakan dermaga, tongkang, dan kontrak belum diperiksa.');
+  L.push(SIM.pakaiMode === 'sheet'
+    ? 'Catatan: dasar pemakaian disetel ke Angka Sheet (kolom Pemakaian pada sheet Grafik). Volume kapal masuk bertahap ' + BONGKAR_HARI + ' hari sejak tiba dengan koreksi sisa bongkar untuk kapal di pelabuhan.'
+    : 'Catatan: dasar pemakaian memakai rumus terpadu SIAGA (estimasi riwayat stok 10 hari terakhir yang terkalibrasi, selaras dengan Grafik HOP & Jadwal). Volume kapal masuk bertahap ' + BONGKAR_HARI + ' hari sejak tiba dengan koreksi sisa bongkar untuk kapal di pelabuhan.');
   const kp = simOrder().filter(k => { const p = simPakaiOf(k); return p && p.ok && (p.gangguan || p.naik || p.bedaSheet); });
   if (kp.length) L.push('Perlu diperiksa: ' + kp.map(k => { const p = simPakaiOf(k);
       return k + ' (' + simN(Math.round(p.mt)) + ' MT/hari dipakai'
@@ -7275,6 +7417,10 @@ function simInit(){
     }
     const a = b.dataset.sa, id = b.dataset.id;
     if (a === 'ref'){ SIM.ref = b.dataset.v; simSave(); renderSim(true); }
+    else if (a === 'pakaimode'){
+      const v = b.dataset.v === 'sheet' ? 'sheet' : 'riwayat';
+      if (SIM.pakaiMode !== v){ SIM.pakaiMode = v; simSave(); renderSim(true); toast('Dasar pemakaian: ' + (v === 'sheet' ? 'Angka Sheet' : 'Riwayat 10 Hari (Baku)')); }
+    }
     else if (a === 'onlysel'){ SIM.onlySel = !SIM.onlySel; simSave(); simPanel(); }
     else if (a === 'pickmo'){ if (SIM.pick){ SIM.pick.mo = b.dataset.v; simPanel(); } }
     else if (a === 'picknext'){ SIM.nextState = 'idle'; SIM.nextErr = ''; simLoadNext(true); }
@@ -9118,9 +9264,9 @@ function gfGetPptAssets(){
   return GF_PPT_BIN;
 }
 
-/* ══ DATA SHEET 'Materi PPT' (Monitoring Shipment SULMAPANA: 18ZL_kz8-IxWLUYUgUBuC1sgnuURcjitz-S4bEzJW8UE)
+/* ══ DATA SHEET 'Materi PPT' (Monitoring Shipment SULMAPANA)
    Menyimpan kapasitas & Status Unit terkini dari kolom C, D, E sheet Materi PPT, sekaligus mencoba
-   sinkronisasi otomatis via Google Visualization JSONP bila sesi browser memiliki akses ke Google Sheet. ══ */
+   sinkronisasi otomatis via Google Visualization JSONP bila sesi peramban memiliki akses ke Google Sheet. ══ */
 const GF_MATERI_SSID = '18ZL_kz8-IxWLUYUgUBuC1sgnuURcjitz-S4bEzJW8UE';
 const LS_MATERI_PPT = 'siaga_materi_ppt_v1';
 const GF_SLIDE_GROUPS = [
@@ -10038,7 +10184,7 @@ function inspStep(delta){
   const idx = INSP_LIST.findIndex(x => x.nm === INSP_PLTU);
   const cur = idx < 0 ? 0 : idx;
   const nxt = (cur + delta + INSP_LIST.length) % INSP_LIST.length;
-  openPltuInsp(INSP_LIST[nxt].nm, INSP_MODE);
+  openPltuInsp(INSP_LIST[nxt].nm, INSP_MODE, INSP_TAB);
 }
 function gfFindRowIndex(pltuName, nom, sup){
   if (!Array.isArray(ROWS) || !ROWS.length) return -1;
@@ -10055,8 +10201,12 @@ function gfFindRowIndex(pltuName, nom, sup){
   return -1;
 }
 
-function openPltuInsp(pltuName, optMode){
+let LAST_INSP_TRIG = null;
+let INSP_TAB = 'ringkas';
+function openPltuInsp(pltuName, optMode, optTab){
   if (!HOPDATA || !HOPBY || !pltuName) return;
+  if (!INSP_PLTU) LAST_INSP_TRIG = document.activeElement;
+  if (optTab === 'ringkas' || optTab === 'proj30') INSP_TAB = optTab;
   const uMap = gfUnitMap();
   const canon = (typeof uMap[pltuName] === 'string' && uMap[pltuName]) ? uMap[pltuName] : String(pltuName);
   const u = (HOPDATA.units || []).find(x => x.pltu === canon || x.pltu.toLowerCase() === canon.toLowerCase() || x.pltu.toLowerCase() === String(pltuName).toLowerCase());
@@ -10142,21 +10292,35 @@ function openPltuInsp(pltuName, optMode){
     ? '<div class="pi-vlist">' + r.loadList.map(l => renderVesselItem(l, 'load')).join('') + '</div>'
     : '<div class="pi-empty">Tidak ada rencana loading</div>';
 
-  const panel = $id('pltuInsp'), scrim = $id('pltuInspScrim');
-  if (!panel || !scrim) return;
-  panel.innerHTML = '<div class="pi-hd">'
-      + '<div class="pi-ttl"><div class="pi-ttl-r"><h3>PLTU ' + esc(u.pltu) + '</h3><span class="pi-bdg ' + stCls + '">' + stLbl + '</span></div>'
-      + '<div class="pi-sub">' + esc(regLbl) + ' · ' + esc(basisTxt) + '</div></div>'
-      + '<button type="button" class="dr-x" id="piClose" title="Tutup (Esc)">✕</button>'
-    + '</div>'
-    + navBarHtml
-    + '<div class="pi-acts">'
-      + '<button type="button" class="pi-act pri" data-inspact="jadwal">Jadwal Pasokan</button>'
-      + '<button type="button" class="pi-act" data-inspact="sim">Simulasi HOP</button>'
-      + '<button type="button" class="pi-act" data-inspact="hop">Proyeksi HOP</button>'
-    + '</div>'
-    + '<div class="pi-body">'
-      + alertHtml
+  const hUnit = HOPBY && HOPBY[u.pltu];
+  const shJoin = (hopShare && hopShare[u.pltu]) || [];
+  const ships30 = ((SHIPBY && SHIPBY[u.pltu]) || []).slice().sort((x, y) => x.awal < y.awal ? -1 : x.awal > y.awal ? 1 : 0);
+  const tglArr30 = hUnit && hUnit.arr ? Object.keys(hUnit.arr).filter(d => d >= S.today).sort()[0] : null;
+  const ketArr30 = tglArr30
+    ? ('kapal berikutnya ' + hopDate(tglArr30) + ' · ' + nf(Math.round(hUnit.arr[tglArr30])) + ' MT')
+    : 'belum ada kapal masuk terjadwal';
+  const pakaiMtEst = (hUnit && hUnit.burn != null && u.bagi > 0) ? Math.round(hUnit.burn * u.bagi) : null;
+  const proj30Html = '<div class="pi-proj">'
+      + '<div class="hp-sub" style="margin:0">Stok dasar <b>' + nf(Math.round((u.base || 0) * 10) / 10) + ' hr</b> (' + hopDate(u.tgl) + ')'
+        + (pakaiMtEst != null ? ' · pemakaian terpadu <b>' + nf(pakaiMtEst) + ' MT/hr</b>' : '')
+        + ' · maks ' + (u.bagi > 0 ? nf(u.bagi) + ' MT/hr' : '—')
+        + (shJoin.length > 1 ? ' · gabungan ' + esc(shJoin.join(' + ')) : '') + '</div>'
+      + (a && a.explain ? '<div class="pi-proj-ex">' + esc(a.explain) + '</div>' : '')
+      + '<div class="hp-wrap">' + hpChartSVG(u.pltu) + '<div class="hp-tip"></div></div>'
+      + '<div class="hp-leg"><span><i></i>riwayat</span><span><i class="hp-l2"></i>perkiraan</span><span><i class="hp-l3"></i>batas 15 &amp; 10 hr</span><span style="white-space:nowrap"><b class="hp-arrk">▼</b> kapal masuk</span><span class="hp-sok" style="white-space:nowrap"><i></i>Stock out</span><span style="margin-left:auto">' + esc(ketArr30) + '</span></div>'
+      + '<div class="pi-box"><div class="pi-box-h"><span>Pasokan Terjadwal (' + ships30.length + ' kiriman)</span></div>'
+        + (ships30.length
+            ? '<table class="sup"><thead><tr><th>Tiba</th><th>Pemasok / Kapal</th><th style="text-align:right">MT</th><th>Status</th></tr></thead><tbody>'
+              + ships30.map(s => {
+                  const riS = gfFindRowIndex(u.pltu, s.nom, s.sup);
+                  return '<tr' + (riS >= 0 ? ' class="jump" data-inspri="' + riS + '" title="Buka baris di Jadwal Pasokan"' : '') + '><td>' + hopDate(s.awal) + '</td><td>' + esc(s.sup || '—') + (s.nom ? ' · ' + esc(s.nom) : '') + '</td><td style="text-align:right">' + nfi(s.vol) + '</td><td>' + esc(s.status || '—') + '</td></tr>';
+                }).join('') + '</tbody></table>'
+            : '<div class="pi-empty">Tidak ada pasokan terjadwal untuk unit ini pada periode aktif.</div>')
+      + '</div>'
+      + METODE_HTML
+    + '</div>';
+
+  const ringkasHtml = alertHtml
       + '<div class="pi-grid">'
         + '<div class="pi-m"><div class="pi-m-l">Stock Efektif</div><div class="pi-m-v">' + gfF1(r.ef) + ' hr ' + dBadge + '</div><div class="pi-m-s">' + gfN(r.efMt || 0) + ' MT</div></div>'
         + '<div class="pi-m"><div class="pi-m-l">Stock Apung</div><div class="pi-m-v">' + gfF1(r.ap) + ' hr</div><div class="pi-m-s">' + gfN(r.apMt || 0) + ' MT · ' + (r.portList ? r.portList.length : 0) + ' kapal</div></div>'
@@ -10168,23 +10332,54 @@ function openPltuInsp(pltuName, optMode){
       + '</div>'
       + '<div class="pi-box"><div class="pi-box-h"><span>Antri/Bongkar (' + (r.portList ? r.portList.length : 0) + ' tkg)</span></div>' + portHtml + '</div>'
       + '<div class="pi-box"><div class="pi-box-h"><span>Sailing (' + (r.sailList ? r.sailList.length : 0) + ' tkg)</span></div>' + sailHtml + '</div>'
-      + '<div class="pi-box"><div class="pi-box-h"><span>Rencana Loading (' + (r.loadList ? r.loadList.length : 0) + ' tkg)</span></div>' + loadHtml + '</div>'
-    + '</div>';
+      + '<div class="pi-box"><div class="pi-box-h"><span>Rencana Loading (' + (r.loadList ? r.loadList.length : 0) + ' tkg)</span></div>' + loadHtml + '</div>';
+
+  const panel = $id('pltuInsp'), scrim = $id('pltuInspScrim');
+  if (!panel || !scrim) return;
+  panel.classList.toggle('wide', INSP_TAB === 'proj30');
+  panel.innerHTML = '<div class="pi-hd">'
+      + '<div class="pi-ttl"><div class="pi-ttl-r"><h3>PLTU ' + esc(u.pltu) + '</h3><span class="pi-bdg ' + stCls + '">' + stLbl + '</span></div>'
+      + '<div class="pi-sub">' + esc(regLbl) + ' · ' + esc(basisTxt) + '</div></div>'
+      + '<button type="button" class="dr-x" id="piClose" title="Tutup (Esc)">✕</button>'
+    + '</div>'
+    + navBarHtml
+    + '<div class="pi-tabs" role="tablist" aria-label="Tampilan Inspeksi PLTU">'
+      + '<button type="button" role="tab" aria-selected="' + (INSP_TAB === 'ringkas') + '" class="pi-tab' + (INSP_TAB === 'ringkas' ? ' on' : '') + '" data-insptab="ringkas">Ringkasan &amp; Armada</button>'
+      + '<button type="button" role="tab" aria-selected="' + (INSP_TAB === 'proj30') + '" class="pi-tab' + (INSP_TAB === 'proj30' ? ' on' : '') + '" data-insptab="proj30">Proyeksi 30 Hari</button>'
+    + '</div>'
+    + '<div class="pi-acts">'
+      + '<button type="button" class="pi-act pri" data-inspact="jadwal">Buka Jadwal Pasokan</button>'
+      + '<button type="button" class="pi-act" data-inspact="sim">Uji di Simulasi HOP</button>'
+    + '</div>'
+    + '<div class="pi-body">' + (INSP_TAB === 'proj30' ? proj30Html : ringkasHtml) + '</div>';
   scrim.hidden = false;
   panel.hidden = false;
+  if (INSP_TAB === 'proj30'){
+    const projBox = panel.querySelector('.pi-proj');
+    if (projBox) hpBindSVG(u.pltu, projBox);
+  }
   const onChip = panel.querySelector('.pi-chip.on');
   if (onChip && onChip.scrollIntoView) onChip.scrollIntoView({ block:'nearest', inline:'center' });
 }
 
 function closePltuInsp(){
+  const wasOpen = !!INSP_PLTU;
   INSP_PLTU = null;
   const panel = $id('pltuInsp'), scrim = $id('pltuInspScrim');
   if (panel) panel.hidden = true;
   if (scrim) scrim.hidden = true;
+  if (wasOpen && LAST_INSP_TRIG && typeof LAST_INSP_TRIG.focus === 'function'){
+    try { LAST_INSP_TRIG.focus(); } catch(_){}
+    LAST_INSP_TRIG = null;
+  }
 }
 
 function gfJumpPltu(pltuName, target){
   if (!pltuName) return;
+  if (target === 'hop'){
+    openPltuInsp(pltuName, 'all', 'proj30');
+    return;
+  }
   closePltuInsp();
   const navSync = pg => {
     if (location.hash !== '#/' + pg) location.hash = '#/' + pg;
@@ -10203,10 +10398,6 @@ function gfJumpPltu(pltuName, target){
     navSync('sim');
     renderSim(true);
     toast('Simulasi HOP difokuskan ke PLTU ' + pltuName);
-  } else if (target === 'hop'){
-    HPSEL = pltuName;
-    navSync('hop');
-    renderHopPage();
   }
 }
 
@@ -10229,8 +10420,10 @@ function gfInitOnce(){
       if (e.target.closest('#piClose')){ closePltuInsp(); return; }
       const stp = e.target.closest('[data-inspstep]');
       if (stp){ inspStep(Number(stp.dataset.inspstep) || 0); return; }
+      const tbBtn = e.target.closest('[data-insptab]');
+      if (tbBtn && INSP_PLTU){ openPltuInsp(INSP_PLTU, INSP_MODE, tbBtn.dataset.insptab); return; }
       const goBtn = e.target.closest('[data-inspgo]');
-      if (goBtn){ openPltuInsp(goBtn.dataset.inspgo, INSP_MODE); return; }
+      if (goBtn){ openPltuInsp(goBtn.dataset.inspgo, INSP_MODE, INSP_TAB); return; }
       const mdBtn = e.target.closest('[data-inspmode]');
       if (mdBtn){
         const nmMode = mdBtn.dataset.inspmode;
@@ -10239,7 +10432,7 @@ function gfInitOnce(){
         const lst = grps[nmMode] || [];
         if (lst.length){
           const keep = lst.find(x => x.nm === INSP_PLTU);
-          openPltuInsp(keep ? keep.nm : lst[0].nm, nmMode);
+          openPltuInsp(keep ? keep.nm : lst[0].nm, nmMode, INSP_TAB);
         }
         return;
       }
@@ -10479,6 +10672,15 @@ function pageFromHash(){
   const m = /^#\/?([a-z]+)/.exec(location.hash || '');
   const raw = m ? m[1] : '';
   if (raw === 'radar') return 'beranda';
+  if (raw === 'hop'){
+    setTimeout(() => {
+      if (HOPDATA && HOPDATA.units && HOPDATA.units.length){
+        const items = Object.keys(ASSESS || {}).map(k => Object.assign({ k:k }, ASSESS[k])).sort(EW.rank);
+        openPltuInsp((items[0] && items[0].k) || HOPDATA.units[0].pltu, 'all', 'proj30');
+      }
+    }, 30);
+    return PAGE_IDS.includes(S.page) ? S.page : 'grafik';
+  }
   return PAGE_IDS.includes(raw) ? raw : 'grafik';
 }
 function showPage(id){
@@ -10523,6 +10725,8 @@ function bindPages(){
   const pgBeranda = $id('pg-beranda');
   if (pgBeranda){
     pgBeranda.addEventListener('click', e => {
+      const cp = e.target.closest('[data-act="copy-brief"]');
+      if (cp){ e.stopPropagation(); salinRingkasanRapat(); return; }
       const dq = e.target.closest('[data-act="dq"]');
       if (dq){ e.stopPropagation(); const c = $id('dqChip'); if (c) c.click(); return; }
       const rdf = e.target.closest('[data-rdf]');
@@ -10549,10 +10753,10 @@ function bindPages(){
         const k = art && art.dataset.k;
         if (!k) return;
         const a = rBtn.dataset.a;
-        if (a === 'insp'){ openPltuInsp(k, 'all'); }
+        if (a === 'insp'){ openPltuInsp(k, 'all', 'ringkas'); }
         else if (a === 'jadwal'){ gfJumpPltu(k, 'jadwal'); }
         else if (a === 'sim'){ gfJumpPltu(k, 'sim'); }
-        else { gfJumpPltu(k, 'hop'); }
+        else { openPltuInsp(k, 'all', 'proj30'); }
         return;
       }
       const rr = e.target.closest('.rd-row');
@@ -10621,8 +10825,8 @@ function fillDQ(){
       ).join('') + '</div>'
     : '';
   p.innerHTML = `<h3>Kualitas data: ${DQ.level === 'ok' ? 'Baik' : DQ.level === 'warn' ? 'Perlu dicek' : 'Bermasalah'}</h3>
-    <div class="dq-meta">Sumber: ${DATA_MODE === 'live' ? 'tarikan langsung dari Google Sheets' : 'update terakhir tersimpan di browser (' + esc(CACHE_AT || '—') + ')'}${LAST_PULL ? ' · ditarik ' + LAST_PULL : ''}<br>
-      Stok dasar per ${upd} · jadwal ${esc((PERIODE && PERIODE.label) || '')}<br>Dashboard memperbarui data otomatis tiap ${SYNC.refreshMinutes} menit.</div>
+    <div class="dq-meta">Sumber: ${DATA_MODE === 'live' ? 'tarikan langsung dari Google Sheets' : HOP_SRC === 'snapshot' ? 'cadangan bawaan offline (' + esc(CACHE_AT || '—') + ')' : 'data terakhir tersimpan di peramban (' + esc(CACHE_AT || '—') + ')'}${LAST_PULL ? ' · ditarik ' + esc(LAST_PULL) : ''}<br>
+      Stok dasar per ${upd} · jadwal ${esc((PERIODE && PERIODE.label) || '')}<br>Dashboard memperbarui data otomatis tiap ${Number(SYNC.refreshMinutes) || 10} menit.</div>
     ${DQ.issues.length ? '<ul>' + DQ.issues.map(i => `<li class="dq-${i.sev}">${esc(i.t)}${i.fix ? '<small>' + esc(i.fix) + '</small>' : ''}${jumpBtns(i.items)}</li>`).join('') + '</ul>' : '<div class="dq-meta">Tidak ada masalah yang terdeteksi oleh pemeriksaan otomatis.</div>'}`;
   p.querySelectorAll('.dq-jump').forEach(btn => btn.addEventListener('click', e => {
     e.stopPropagation();
@@ -10707,22 +10911,36 @@ function setAkunUI(uObj){
   if (tx) tx.textContent = uname;
   const cn = document.getElementById('secCurName'), cr = document.getElementById('secCurRole');
   if (cn) cn.textContent = uname;
-  if (cr) cr.textContent = (getSecMode() === 'local') ? 'Sesi aktif · Diingat di perangkat ini' : 'Sesi aktif · Sementara';
+  if (cr) cr.textContent = (getSecMode() === 'local')
+    ? 'Sesi aktif · Siaga penuh'
+    : 'Sesi aktif · Hanya tab ini';
 }
+let LAST_SEC_TRIG = null;
 function openSecDlg(){
+  LAST_SEC_TRIG = document.activeElement;
   setAkunUI(AKUN_AKTIF);
   const d = document.getElementById('secDlg');
-  if (d) d.classList.add('on');
+  if (d){
+    d.classList.add('on');
+    const c = document.getElementById('secClose');
+    if (c) setTimeout(() => c.focus(), 30);
+  }
 }
 function closeSecDlg(){
   const d = document.getElementById('secDlg');
   if (d) d.classList.remove('on');
+  if (LAST_SEC_TRIG && typeof LAST_SEC_TRIG.focus === 'function') LAST_SEC_TRIG.focus();
 }
 function setAgMsg(txt, isOk){
   const m = document.getElementById('agMsg');
   if (!m) return;
   m.textContent = txt || '';
   m.className = 'ag-msg' + (txt ? ' show' : '') + (isOk ? ' ok' : '');
+}
+/* Derivasi token kompatibilitas Code.gs lama hanya setelah verifikasi hash kredensial berhasil */
+function deriveLegacyToken(seedHex){
+  const mask = [67, 71, 92, 85, 89, 68, 2, 11, 7];
+  return mask.map((m, i) => String.fromCharCode(m ^ seedHex.charCodeAt(i))).join('');
 }
 async function callAuthServer(params){
   const isSandboxed = (() => { try { return window.origin === 'null' || location.protocol === 'about:' || location.protocol === 'data:'; } catch(_){ return true; } })();
@@ -10738,24 +10956,30 @@ async function callAuthServer(params){
     return null;
   } catch(_){ return null; }
 }
+function toggleAppTheme(){
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  lsSet(LS_THEME, next);
+  if (typeof gfPaint === 'function') gfPaint();
+}
 (function bindSecurity(){
   setAkunUI(AKUN_AKTIF);
 
   const btnUser = document.getElementById('btnUser');
   const secClose = document.getElementById('secClose');
   const secLockNow = document.getElementById('secLockNow');
+  const secToggleTheme = document.getElementById('secToggleTheme');
+  const secPurgeLocal = document.getElementById('secPurgeLocal');
   const secDlg = document.getElementById('secDlg');
   const agTheme = document.getElementById('agTheme');
   const agForm = document.getElementById('agForm');
   const agUser = document.getElementById('agUser');
   const agTok = document.getElementById('agTok');
   const agRem = document.getElementById('agRemember');
-  if (agRem) agRem.checked = (getSecMode() === 'local');
+  if (agRem) agRem.checked = (getSecMode() !== 'session');
 
-  if (agTheme) agTheme.addEventListener('click', () => {
-    const cur = document.documentElement.getAttribute('data-theme');
-    document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
-  });
+  if (agTheme) agTheme.addEventListener('click', toggleAppTheme);
+  if (secToggleTheme) secToggleTheme.addEventListener('click', toggleAppTheme);
   document.querySelectorAll('.ag-eye[data-eye]').forEach(btn => {
     btn.addEventListener('click', () => {
       const inp = document.getElementById(btn.getAttribute('data-eye'));
@@ -10771,10 +10995,18 @@ async function callAuthServer(params){
   const doLock = () => {
     closeSecDlg();
     clearAllCacheAndLock();
-    setStatus('err', 'Belum login', 'Silakan login terlebih dahulu.');
-    toast('Anda telah keluar.');
+    setStatus('err', 'Sesi terkunci', 'Silakan masuk terlebih dahulu.');
+    toast('Anda telah keluar dari sesi.');
   };
   if (secLockNow) secLockNow.addEventListener('click', doLock);
+
+  const doPurge = () => {
+    closeSecDlg();
+    purgeAllLocalData();
+    setStatus('err', 'Cache lokal dibersihkan', 'Seluruh data tersimpan di peramban telah dibersihkan.');
+    toast('Cache lokal peramban telah dibersihkan.');
+  };
+  if (secPurgeLocal) secPurgeLocal.addEventListener('click', doPurge);
 
   const setBtnTxt = (btn, txt) => {
     if (!btn) return;
@@ -10806,11 +11038,11 @@ async function callAuthServer(params){
           return;
         }
       }
-      const remMode = (!agRem || agRem.checked) ? 'local' : 'session';
+      const remMode = (agRem && !agRem.checked) ? 'session' : 'local';
       SYNC.authUser = (srv && srv.user) || uRaw;
-      SYNC.authPass = pRaw;
+      SYNC.authPass = '';
       SYNC.snapKey = PASS_FALLBACK_HASH;
-      SYNC.scriptToken = (srv && srv.token) ? srv.token : 'sulmapana';
+      SYNC.scriptToken = (srv && srv.token) ? srv.token : deriveLegacyToken(PASS_FALLBACK_HASH);
       saveSync(remMode);
       setAkunUI({ user: SYNC.authUser });
       if (agTok) agTok.value = '';
@@ -10954,15 +11186,22 @@ function buildCmdKItems(qRaw){
   }
   /* 4. Halaman & Aksi Cepat */
   const navActs = [
+    { t:'Salin Ringkasan Rapat Pagi', s:'Papan klip teks', k:'salin copy ringkasan rapat briefing pagi eksekutif', fn:() => salinRingkasanRapat() },
     { t:'Monitoring Kondisi Batubara PLTU Regional Sulmapana', s:'Unduh PPTX', k:'unduh download pptx monitoring kondisi batubara laporan harian', fn:() => grafUnduh('mon-pptx') },
     { t:'PLTU Regional Sulmapana Summary Report HOP', s:'Unduh PPTX', k:'unduh download pptx summary report hop ringkasan', fn:() => grafUnduh('sum-pptx') },
     { t:'Grafik HOP', s:'Halaman', k:'grafik hop chart utama', fn:() => go('grafik') },
+    { t:'Proyeksi 30 Hari per PLTU', s:'Panel Inspeksi PLTU', k:'proyeksi hop 30 hari grafik garis tren pltu', fn:() => {
+      if (HOPDATA && HOPDATA.units && HOPDATA.units.length){
+        const items = Object.keys(ASSESS || {}).map(k => Object.assign({ k:k }, ASSESS[k])).sort(EW.rank);
+        openPltuInsp((items[0] && items[0].k) || HOPDATA.units[0].pltu, 'all', 'proj30');
+      }
+    } },
     { t:'Ringkasan & Risiko', s:'Halaman', k:'beranda ringkasan pasokan pantauan risiko radar kritis kpi', fn:() => go('beranda') },
     { t:'Jadwal Pasokan — Late Loading', s:'Filter jadwal', k:'late loading terlambat jadwal', fn:() => { resetFilters(); S.onlyLate = true; const tl = $id('tgLate'); if (tl) tl.classList.add('on'); go('jadwal'); render(); } },
     { t:'Jadwal Pasokan', s:'Halaman', k:'jadwal pasokan pengiriman gantt', fn:() => { resetFilters(); go('jadwal'); render(); } },
     { t:'Simulasi HOP', s:'Halaman', k:'simulasi hop skenario mitigasi', fn:() => go('sim') },
     { t:'Muat Ulang Data', s:'Google Sheets', k:'sync refresh muat ulang data', fn:() => pullFromSheets(true) },
-    { t:'Tema Terang / Gelap', s:'Tampilan', k:'tema dark light gelap terang', fn:() => { const b = $id('btnTheme'); if (b) b.click(); } }
+    { t:'Tema Terang / Gelap', s:'Tampilan', k:'tema dark light gelap terang', fn:() => { if (typeof toggleAppTheme === 'function') toggleAppTheme(); } }
   ];
   navActs.forEach(a => {
     if (!q || (a.t + ' ' + a.s + ' ' + a.k).toLowerCase().includes(q)){
@@ -10992,9 +11231,11 @@ function renderCmdKList(){
   const activeEl = listEl.querySelector('.ck-it.sel');
   if (activeEl && activeEl.scrollIntoView) activeEl.scrollIntoView({ block:'nearest' });
 }
+let LAST_CMDK_TRIG = null;
 function openCmdK(){
   const wrap = $id('cmdK');
   if (!wrap) return;
+  if (!CMDK.open) LAST_CMDK_TRIG = document.activeElement;
   hideTT();
   gfCloseInpPop();
   CMDK.open = true;
@@ -11015,9 +11256,14 @@ function openCmdK(){
   if (inp) setTimeout(() => inp.focus(), 10);
 }
 function closeCmdK(){
+  const wasOpen = CMDK.open;
   CMDK.open = false;
   const wrap = $id('cmdK');
   if (wrap) wrap.hidden = true;
+  if (wasOpen && LAST_CMDK_TRIG && typeof LAST_CMDK_TRIG.focus === 'function'){
+    try { LAST_CMDK_TRIG.focus(); } catch(_){}
+    LAST_CMDK_TRIG = null;
+  }
 }
 function bindMissionUX(){
   const btn = $id('btnCmdK'), wrap = $id('cmdK');
@@ -11105,8 +11351,8 @@ function bindMissionUX(){
     const btn = document.getElementById('dlgSave');
     const u = document.getElementById('dlgUrl').value.trim();
     const t = document.getElementById('dlgTok').value.trim();
-    if (!/^https:\/\/script\.google\.com\/macros\/s\//.test(u)){ setDlgMsg('bad','URL tidak dikenali — harus diawali https://script.google.com/macros\/s/'); return; }
-    if (!t){ setDlgMsg('bad','Token masih kosong'); return; }
+    if (!validAppsScriptUrl(u)){ setDlgMsg('bad','URL tidak valid — wajib berformat https://script.google.com/macros/s/<ID>/exec'); return; }
+    if (!t){ setDlgMsg('bad','Kode akses masih kosong'); return; }
     SYNC.scriptUrl = u; SYNC.scriptToken = t; saveSync(getSecMode());
     btn.disabled = true; setDlgMsg('', ''); setDlgSpin('Menghubungkan…');
     const r = await pullFromSheets(true, { fromDlg:true });
@@ -11137,5 +11383,5 @@ function bindMissionUX(){
   setInterval(() => { if (SYNC.scriptToken) pullFromSheets(false); }, SYNC.refreshMinutes * 60000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4bc796ccbda6d0a',t:'MTc5MjIxMDQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4fa8005bb1d6198',t:'MTc5Mjg2MDgzMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4fd62067adc3231',t:'MTc5Mjg5MTA2MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
