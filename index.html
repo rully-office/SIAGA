@@ -2208,6 +2208,77 @@ button.gf-inp-prog:hover{filter:brightness(.97);border-color:var(--accent)}
 .gf-ip-item.est{border-color:rgba(217,119,6,.32);background:rgba(217,119,6,.06)}
 .gf-ip-item.ok{border-color:rgba(16,185,129,.28);background:rgba(16,185,129,.06)}
 
+/* Tombol & Modal Input Cepat Realisasi Bongkar Tongkang */
+.gf-bk-btn{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px;border-radius:7px;
+  border:1px solid var(--border-2);background:var(--surface);color:var(--fg);font:700 11px/1 var(--font);
+  cursor:pointer;white-space:nowrap;transition:all .14s}
+.gf-bk-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.gf-bk-btn.active{border-color:rgba(22,115,255,.45);background:rgba(22,115,255,.09);color:var(--accent)}
+.gf-bk-cnt{display:inline-flex;align-items:center;justify-content:center;padding:1.5px 5.5px;border-radius:999px;
+  font-size:10px;font-weight:800;background:var(--surface-3);color:var(--fg-2);font-variant-numeric:tabular-nums}
+.gf-bk-btn.active .gf-bk-cnt{background:var(--accent);color:#fff}
+.pi-bk-btn{border:1px solid rgba(22,115,255,.36);background:rgba(22,115,255,.08);color:var(--accent);
+  border-radius:6px;padding:2px 7px;font:700 10.5px/1.25 var(--font);cursor:pointer;text-transform:none;letter-spacing:0;transition:all .12s}
+.pi-bk-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.bk-scrim{position:fixed;inset:0;z-index:142;background:rgba(9,16,28,.46);backdrop-filter:blur(2px)}
+.bk-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:144;
+  width:min(900px,96vw);max-height:min(88vh,760px);background:var(--surface);border:1px solid var(--border-2);
+  border-radius:14px;box-shadow:0 24px 56px rgba(0,0,0,.32);display:flex;flex-direction:column;overflow:hidden}
+.bk-modal[hidden],.bk-scrim[hidden]{display:none!important}
+.bk-hd{padding:14px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:var(--surface)}
+.bk-hd h3{margin:0;font-size:15.5px;font-weight:800;color:var(--fg);letter-spacing:-.01em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.bk-sub{margin-top:3px;font-size:11.5px;color:var(--fg-2);line-height:1.45}
+.bk-sync{display:inline-flex;align-items:center;gap:5px;padding:2.5px 8px;border-radius:999px;font-size:10.5px;font-weight:700;
+  border:1px solid var(--border);background:var(--surface-2);color:var(--fg-2);white-space:nowrap}
+.bk-sync.ok{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.1);color:#059669}
+.bk-sync.busy{border-color:rgba(217,119,6,.35);background:rgba(217,119,6,.1);color:#D97706}
+html[data-theme="dark"] .bk-sync.ok{color:#6EE7B7}
+html[data-theme="dark"] .bk-sync.busy{color:#FCD34D}
+.bk-body{padding:0;overflow-y:auto;flex:1;background:var(--surface)}
+.bk-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.bk-tbl th{position:sticky;top:0;z-index:2;background:var(--surface-2);border-bottom:1px solid var(--border-2);
+  padding:8px 10px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);white-space:nowrap}
+.bk-tbl th.num,.bk-tbl td.num{text-align:right}
+.bk-tbl td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.bk-tbl tr.bk-reg td{padding:6px 12px;background:var(--surface-3);font-size:10.5px;font-weight:800;letter-spacing:.06em;color:var(--fg-2);text-transform:uppercase}
+.bk-tbl tr.bk-row:hover td{background:var(--surface-2)}
+.bk-tbl tr.bk-row.focus-hi td{background:var(--accent-soft)}
+.bk-pltu{font-weight:800;color:var(--fg);font-size:12.5px;white-space:nowrap}
+.bk-burn{display:block;font-size:10.5px;font-weight:500;color:var(--muted);margin-top:1px;font-variant-numeric:tabular-nums}
+.bk-ship{font-weight:700;color:var(--fg);font-size:12px;line-height:1.3}
+.bk-ship-sub{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.3}
+.bk-iw{display:inline-flex;align-items:center;border:1px solid var(--border-2);border-radius:7px;background:var(--surface);
+  overflow:hidden;height:30px;transition:border-color .12s,box-shadow .12s}
+.bk-iw:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px rgba(22,115,255,.15)}
+.bk-inp{border:0;background:transparent;color:var(--fg);font:700 12px/1 var(--font);font-variant-numeric:tabular-nums;
+  padding:0 7px;height:28px;text-align:right;outline:none;width:72px}
+.bk-inp.w-bl{width:78px}
+.bk-inp.w-pct{width:58px}
+.bk-inp.w-mt{width:76px}
+.bk-inp::placeholder{color:var(--muted);font-weight:500;opacity:.72}
+.bk-u{font-size:10px;font-weight:700;color:var(--muted);padding-right:6px;user-select:none}
+.bk-res{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bk-sisa{font-size:11.5px;font-weight:700;color:var(--fg)}
+.bk-sisa.utuh{color:var(--muted);font-weight:600}
+.bk-apung{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;padding:1.5px 6.5px;
+  border-radius:999px;background:rgba(22,115,255,.1);color:var(--accent)}
+.bk-clr{border:1px solid var(--border);background:var(--surface-2);color:var(--muted);width:26px;height:26px;
+  border-radius:6px;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;transition:all .12s}
+.bk-clr:hover{border-color:#DC2626;color:#DC2626;background:rgba(220,38,38,.08)}
+.bk-ft{padding:11px 18px;border-top:1px solid var(--border);background:var(--surface-2);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.bk-ft-note{font-size:11px;color:var(--muted);line-height:1.4}
+.bk-ft-btns{display:inline-flex;align-items:center;gap:8px;margin-left:auto}
+.bk-btn{height:32px;padding:0 13px;border-radius:8px;border:1px solid var(--border-2);background:var(--surface);
+  color:var(--fg-2);font:700 12px/1 var(--font);cursor:pointer;transition:all .14s;white-space:nowrap}
+.bk-btn:hover{border-color:var(--fg-2);color:var(--fg)}
+.bk-btn.danger:hover{border-color:#DC2626;color:#DC2626;background:rgba(220,38,38,.06)}
+.bk-btn.pri{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(22,115,255,.25)}
+.bk-btn.pri:hover{filter:brightness(1.06)}
+@media (max-width:720px){
+  .bk-tbl th:nth-child(3),.bk-tbl td:nth-child(3){display:none}
+  .bk-inp.w-pct{width:50px}.bk-inp.w-mt{width:64px}
+}
+
 /* Slide-Over PLTU Inspector */
 .pi-scrim{position:fixed;inset:0;z-index:128;background:rgba(9,16,28,.38);backdrop-filter:blur(1.5px)}
 .pi-panel{position:fixed;top:0;right:0;bottom:0;z-index:130;width:min(440px,95vw);background:var(--surface);
@@ -2559,6 +2630,8 @@ html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
 <div id="tt"></div>
 <div class="pi-scrim" id="pltuInspScrim" hidden></div>
 <aside class="pi-panel" id="pltuInsp" role="dialog" aria-modal="false" aria-label="Panel Inspeksi PLTU" hidden></aside>
+<div class="bk-scrim" id="bongkarScrim" hidden></div>
+<div class="bk-modal" id="bongkarModal" role="dialog" aria-modal="true" aria-label="Input Realisasi Bongkar Tongkang" hidden></div>
 <div class="ck-scrim" id="cmdK" role="dialog" aria-modal="true" aria-label="Pencarian cepat" hidden></div>
 
 <!-- Halaman Login -->
@@ -2917,14 +2990,20 @@ const EW = (function(){
       }
       if (o.accept && !o.accept(r)) return;
       const sh = typeof o.etaShift === 'function' ? (o.etaShift(r) || 0) : (o.etaShift || 0);
-      let effAwal = awal, effVol = vol, effBd = bd, ignoreXs = !!um;
+      let effAwal = awal, effVol = vol, effBd = bd, ignoreXs = !!um, rawBlVol = vol, bkPct = 0, bkMt = 0;
       if (um && tBase){
         const isProc = (st === 'Proses Bongkar' || st === 'Bongkar');
         if (isProc && awal <= (holdUntil || tBase)){
-          const rf = um.remFactor != null ? um.remFactor : 1;
-          if (!(rf > 1e-6)) return;
-          effVol = vol * rf;
-          effBd = Math.max(1, Math.min(bd, Math.ceil(rf * bd)));
+          const stBk = (typeof gfShipBongkarState === 'function')
+            ? gfShipBongkarState(unit, r.nom, r.sup, vol, r.etaPod || awal, um.realToday || tBase)
+            : null;
+          rawBlVol = stBk ? stBk.blMt : vol;
+          effVol = stBk ? stBk.remMt : (vol * (um.remFactor != null ? um.remFactor : 1));
+          bkPct = (stBk && stBk.hasInput) ? stBk.pct : 0;
+          bkMt = (stBk && stBk.hasInput) ? stBk.unloadedMt : 0;
+          if (!(effVol > 0.05)) return;
+          const rfDays = rawBlVol > 0 ? Math.min(1, effVol / rawBlVol) : 1;
+          effBd = Math.max(1, Math.min(bd, Math.ceil(rfDays * bd)));
           effAwal = addDays(tBase, 1);
           ignoreXs = true;
         } else if (cert === 'di_pelabuhan'){
@@ -2943,7 +3022,8 @@ const EW = (function(){
       const days = Object.keys(target).sort();
       const mt = effVol * (o.tonFactor == null ? 1 : o.tonFactor);
       (byUnit[unit] = byUnit[unit] || []).push({
-        row:r.row, pltu:r.pltu, unit:unit, sup:r.sup, kat:r.kat || '', nom:r.nom, vol:mt, rawVol:vol, status:r.status,
+        row:r.row, pltu:r.pltu, unit:unit, sup:r.sup, kat:r.kat || '', nom:r.nom, vol:mt, rawVol:rawBlVol,
+        bongkarPct:bkPct, bongkarMt:bkMt, status:r.status,
         cert:cert, awal:addDays(effAwal, sh), etaPol:r.etaPol || null, tdPol:r.tdPol || null, etaPod:r.etaPod || null,
         per:mt / days.length, days:days.filter(d => inR.has(d))
       });
@@ -4459,6 +4539,7 @@ async function pullFromSheets(manual, opts){
       if (typeof gfLoadPrev === 'function'){
         if (GF.prevFor !== S.periode || !GF.prev || manual){ GF.prevFor = S.periode; gfLoadPrev(!!manual); }
       }
+      if (typeof bongkarLoadCloud === 'function') bongkarLoadCloud(!!manual);
       if (manual) toast((PERIODE ? PERIODE.label : 'Data') + ' tampil ✓ · ' + d.rows.length + ' baris');   // v29
       const jam = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
       setStatus('live', 'Terhubung · ' + jam,
@@ -5783,6 +5864,7 @@ async function simBMuat(paksa){
   SIMB.busy = true; simBSegarkan();
   try {
     const r = await simBPanggil({ action:'simList' });
+    if (typeof bongkarApplyCloudList === 'function') bongkarApplyCloudList(r.items, true);
     SIMB.list = (Array.isArray(r.items) ? r.items : []).map(simBRapikan).filter(Boolean);
     SIMB.st = 'ok'; SIMB.err = '';
   } catch(e){ SIMB.st = e.tidak ? 'tidak' : 'gagal'; SIMB.err = e.message; }
@@ -6035,7 +6117,8 @@ function simKey(){
   const u = (HOPDATA && HOPDATA.units) || [];
   return [S.periode, S.today, DATES.length, ROWS.length, u.length,
     u.reduce((a, x) => a + (Number(x.base) || 0) + (Number(x.pakai) || 0) + (Number(x.bagi) || 0), 0).toFixed(2),
-    SIM.next ? SIM.next.sheet + ':' + SIM.next.rows.length : '-', DATA_MODE, SIM.pakaiMode || 'riwayat'].join('#');
+    SIM.next ? SIM.next.sheet + ':' + SIM.next.rows.length : '-', DATA_MODE, SIM.pakaiMode || 'riwayat',
+    typeof BONGKAR !== 'undefined' ? BONGKAR.rev : 0].join('#');
 }
 /* ══ v53.7: PEMAKAIAN HARIAN DARI RIWAYAT STOK ══════════════════════════════
    Angka kolom "Pemakaian" di sheet bisa jauh dari kenyataan (ada yang di atas
@@ -8372,278 +8455,260 @@ function gfCollectLoadShips(targetDate, realToday){
   return byUnit;
 }
 
-/* ══ FORMULASI MANDIRI SISA BONGKAR (OTOMATIS TANPA INPUT MANUAL u.apung) ══
-   1. Menghitung sisa muatan kapal 'Proses Bongkar' secara mandiri 100% dari data Stock Efektif
-      harian unit (u.hist, u.bagi, u.pakai) + jadwal kapal lintas bulan (N-1, N, N+1), tanpa
-      bergantung pada input/koreksi manual kolom Stock Apung pada sheet Grafik (u.apung).
-   2. Kapal 'Tiba/Antri' di pelabuhan tetap utuh 100% hingga kapal mulai bongkar.
-   3. Menyaring laju bakar murni lokal (cLoc & batas bawah 1-unit cFloor) dari kontaminasi hari
-      bongkar parsial (< 0,55x P75) dan lonjakan koreksi opname (> 2,5x median), mendeteksi
-      gelombang aliran masuk kotor (gross coal inflow) termasuk saat bongkar lambat atau kenaikan
-      beban 2-unit (cRamp), mempertahankan akumulasi selama jeda cuaca/alat 1-2 hari, serta
-      memisahkan porsi kapal 'Selesai Bongkar' terbaru berbasis port queue lag. */
+/* ══ INPUT CEPAT REALISASI BONGKAR TONGKANG (% / MT · SINKRON CLOUD & LOKAL) ══
+   1. Kapal 'Proses Bongkar' yang belum diisi realisasi % / MT bongkarnya tetap utuh 100% B/L
+      sebagai Stock Apung sampai status pada Google Sheets berubah menjadi 'Selesai Bongkar'
+      (sesuai aturan operasional PLTU yang tidak melaporkan % bongkar harian, mis. PLTU Barru).
+   2. Kapal 'Proses Bongkar' yang diisi % bongkar (mis. Timor 25,06%, Sulut 1 41,66%, Amurang 45%)
+      atau MT terbongkar (beserta opsional penyesuaian B/L aktual) langsung mengurangi Stock Apung
+      dan proyeksi sisa bongkar secara presisi per tongkang di seluruh modul & unduhan PPTX/PNG.
+   3. Otomatis kedaluwarsa saat status kapal berubah menjadi 'Selesai Bongkar' atau berganti voyage,
+      serta tersinkron antar-pengguna lewat Web App (simList/simSave id 'siaga_bongkar_v1') tanpa
+      mengubah rumus Google Sheets maupun Code.gs. */
+const LS_BONGKAR = 'siaga_bongkar_v1';
+const BONGKAR_CLOUD_ID = 'siaga_bongkar_v1';
+const BONGKAR = {
+  items: {},
+  rev: 1,
+  loaded: false,
+  busy: false,
+  saving: false,
+  syncSt: 'local',
+  syncAt: '',
+  cloudLoadedAt: 0,
+  open: false,
+  focusUnit: ''
+};
+
+function gfParseBongkarNum(raw, isPct){
+  if (raw == null) return null;
+  let s = String(raw).trim().replace(/\s+/g, '').replace(/%/g, '').replace(/mt$/i, '');
+  if (!s) return null;
+  if (isPct){
+    s = s.replace(/,/g, '.');
+    const v = Number(s);
+    if (!isFinite(v) || v < 0) return null;
+    return Math.min(100, Math.max(0, v));
+  }
+  const hasComma = s.indexOf(',') >= 0, hasDot = s.indexOf('.') >= 0;
+  if (hasComma && hasDot){
+    if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g, '').replace(',', '.');
+    else s = s.replace(/,/g, '');
+  } else if (hasDot){
+    if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+  } else if (hasComma){
+    if (/^[1-9]\d{0,2},\d{3}$/.test(s) && /00$/.test(s) && Number(s.replace(',', '.')) < 15) s = s.replace(/,/g, '');
+    else s = s.replace(',', '.');
+  }
+  const v = Number(s);
+  if (!isFinite(v) || v < 0) return null;
+  return v;
+}
+
+function gfFmtDecId(n, maxDec){
+  if (n == null || !isFinite(Number(n))) return '';
+  const d = maxDec == null ? 2 : maxDec;
+  const p = Math.pow(10, d);
+  const r = Math.round(Number(n) * p) / p;
+  return String(r).replace('.', ',');
+}
+
+function gfBongkarKey(unit, nom, sup){
+  const cn = gfCleanNom(nom).replace(/[^A-Z0-9]+/g, '').toLowerCase();
+  const cs = String((typeof normSup === 'function' ? normSup(sup) : sup) || '').replace(/[^a-zA-Z0-9]+/g, '').toLowerCase();
+  return String(unit || '').trim() + '|' + (cn || cs || 'tbn');
+}
+
+function bongkarPruneMap(obj){
+  const out = {}, now = Date.now(), maxAge = 45 * 86400000;
+  if (!obj || typeof obj !== 'object') return out;
+  Object.keys(obj).forEach(k => {
+    const it = obj[k];
+    if (!it || typeof it !== 'object') return;
+    if (it.at && now - Number(it.at) > maxAge) return;
+    out[k] = it;
+  });
+  return out;
+}
+
+function bongkarLoadLocal(){
+  if (BONGKAR.loaded) return;
+  BONGKAR.loaded = true;
+  try {
+    const raw = lsGet(LS_BONGKAR);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.items && typeof parsed.items === 'object'){
+      BONGKAR.items = bongkarPruneMap(parsed.items);
+      BONGKAR.syncAt = String(parsed.syncAt || '');
+      BONGKAR.rev++;
+    }
+  } catch(_){}
+}
+
+function bongkarSaveLocal(){
+  try {
+    BONGKAR.items = bongkarPruneMap(BONGKAR.items);
+    lsSet(LS_BONGKAR, JSON.stringify({ v:1, items:BONGKAR.items, syncAt:BONGKAR.syncAt || '' }));
+  } catch(_){}
+}
+
+function bongkarPropagate(){
+  BONGKAR.rev++;
+  if (typeof SIMCTX !== 'undefined'){ SIMCTX = null; SIMBASE = null; }
+  if (HOPDATA && typeof buildHop === 'function'){
+    buildHop();
+    if (typeof radarSnapshot === 'function') radarSnapshot();
+    if (typeof renderRadar === 'function') renderRadar();
+    if (typeof renderDQ === 'function') renderDQ();
+    if (S.page === 'beranda' && typeof renderHome === 'function') renderHome();
+    else if (S.page === 'jadwal' && typeof render === 'function') render();
+    else if (S.page === 'sim' && typeof renderSim === 'function') renderSim(true);
+  }
+  if (typeof gfPaint === 'function') gfPaint();
+  if (typeof INSP_PLTU !== 'undefined' && INSP_PLTU && typeof openPltuInsp === 'function') openPltuInsp(INSP_PLTU, INSP_MODE, INSP_TAB);
+}
+
+function bongkarApplyCloudList(list, silent){
+  bongkarLoadLocal();
+  if (!Array.isArray(list)) return false;
+  const rec = list.find(x => x && String(x.id) === BONGKAR_CLOUD_ID);
+  BONGKAR.syncSt = 'ok';
+  if (!rec || !rec.data) return false;
+  let d = null;
+  try { d = typeof rec.data === 'string' ? JSON.parse(rec.data) : rec.data; } catch(_){}
+  if (!d || !d.items || typeof d.items !== 'object') return false;
+  const incoming = bongkarPruneMap(d.items);
+  let changed = false;
+  Object.keys(incoming).forEach(k => {
+    const inc = incoming[k], cur = BONGKAR.items[k];
+    const incAt = Number(inc && inc.at) || 0, curAt = Number(cur && cur.at) || 0;
+    if (!cur || incAt > curAt){
+      if (JSON.stringify(cur || null) !== JSON.stringify(inc)){
+        BONGKAR.items[k] = inc;
+        changed = true;
+      }
+    }
+  });
+  if (rec.at) BONGKAR.syncAt = typeof simBWaktu === 'function' ? simBWaktu(rec.at) : String(rec.at);
+  if (changed){
+    bongkarSaveLocal();
+    bongkarPropagate();
+    if (BONGKAR.open && typeof renderBongkarModal === 'function') renderBongkarModal();
+    else if (!silent) toast('Realisasi bongkar tongkang disinkronkan dari Cloud');
+  } else if (BONGKAR.open && typeof bongkarUpdateSyncBadge === 'function'){
+    bongkarUpdateSyncBadge();
+  }
+  return changed;
+}
+
+async function bongkarLoadCloud(force){
+  bongkarLoadLocal();
+  if (typeof simBBisa !== 'function' || !simBBisa() || BONGKAR.busy) return;
+  if (!force && BONGKAR.cloudLoadedAt && Date.now() - BONGKAR.cloudLoadedAt < 25000) return;
+  BONGKAR.busy = true;
+  if (typeof bongkarUpdateSyncBadge === 'function') bongkarUpdateSyncBadge();
+  try {
+    const r = await simBPanggil({ action:'simList' }, 20000);
+    BONGKAR.cloudLoadedAt = Date.now();
+    BONGKAR.syncSt = 'ok';
+    bongkarApplyCloudList(r && r.items, true);
+    if (Array.isArray(r && r.items) && typeof simBRapikan === 'function'){
+      SIMB.list = r.items.map(simBRapikan).filter(Boolean);
+      SIMB.st = 'ok'; SIMB.err = ''; SIMB.at = Date.now();
+      if (typeof simBSegarkan === 'function') simBSegarkan();
+    }
+  } catch(_){
+    if (BONGKAR.syncSt !== 'ok') BONGKAR.syncSt = 'local';
+  } finally {
+    BONGKAR.busy = false;
+    if (typeof bongkarUpdateSyncBadge === 'function') bongkarUpdateSyncBadge();
+  }
+}
+
+async function bongkarSaveCloud(){
+  if (typeof simBBisa !== 'function' || !simBBisa()) return false;
+  BONGKAR.saving = true;
+  if (typeof bongkarUpdateSyncBadge === 'function') bongkarUpdateSyncBadge();
+  try {
+    const payload = JSON.stringify({ v:1, items:bongkarPruneMap(BONGKAR.items), updatedAt:new Date().toISOString() });
+    const parts = simBPotong(payload);
+    if (parts.length > 12) throw new Error('Data realisasi bongkar melebihi batas ukuran');
+    for (let i = 0; i < parts.length; i++){
+      await simBPanggil({
+        action:'simSave', id:BONGKAR_CLOUD_ID, nama:'__SIAGA_BONGKAR__',
+        per:S.periode || '', part:i + 1, of:parts.length, d:parts[i]
+      }, 25000);
+    }
+    BONGKAR.syncSt = 'ok';
+    BONGKAR.syncAt = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+    BONGKAR.cloudLoadedAt = Date.now();
+    bongkarSaveLocal();
+    return true;
+  } catch(_){
+    BONGKAR.syncSt = 'local';
+    return false;
+  } finally {
+    BONGKAR.saving = false;
+    if (typeof bongkarUpdateSyncBadge === 'function') bongkarUpdateSyncBadge();
+  }
+}
+
+function gfShipBongkarState(unit, nom, sup, sheetVol, podDate, optTargetDate){
+  bongkarLoadLocal();
+  const vSheet = Math.max(0, Number(sheetVol) || 0);
+  const key = gfBongkarKey(unit, nom, sup);
+  let it = BONGKAR.items[key] || null;
+  if (it && it.clr) it = null;
+  if (it && it.pod && podDate && /^\d{4}-\d{2}-\d{2}$/.test(String(it.pod)) && /^\d{4}-\d{2}-\d{2}$/.test(String(podDate))){
+    if (Math.abs(simDD(podDate, it.pod)) > 14) it = null;
+  }
+  const realToday = gfRealToday();
+  if (it && optTargetDate && realToday && optTargetDate < realToday && it.tgl && optTargetDate < it.tgl){
+    it = null;
+  }
+  if (!it){
+    return { hasInput:false, key:key, blMt:vSheet, unloadedMt:0, pct:0, remMt:vSheet, remFactor:1 };
+  }
+  const blMt = (it.bl != null && isFinite(Number(it.bl)) && Number(it.bl) > 0) ? Number(it.bl) : vSheet;
+  let unloadedMt = 0, pct = 0;
+  if (it.mode === 'mt' && it.mt != null && isFinite(Number(it.mt)) && Number(it.mt) >= 0){
+    unloadedMt = Math.min(blMt, Math.max(0, Number(it.mt)));
+    pct = blMt > 0 ? (unloadedMt / blMt) * 100 : 0;
+  } else if (it.pct != null && isFinite(Number(it.pct)) && Number(it.pct) >= 0){
+    pct = Math.min(100, Math.max(0, Number(it.pct)));
+    unloadedMt = blMt * (pct / 100);
+  }
+  const remMt = Math.max(0, blMt - unloadedMt);
+  const remFactor = vSheet > 0 ? (remMt / vSheet) : 1;
+  const hasVal = (pct > 0 || unloadedMt > 0 || (it.bl != null && Math.abs(blMt - vSheet) > 0.01));
+  return {
+    hasInput:hasVal, key:key, blMt:blMt, unloadedMt:unloadedMt, pct:pct,
+    remMt:remMt, remFactor:remFactor, mode:it.mode || 'pct', by:it.by || '', at:it.at || 0
+  };
+}
+
 function gfLocalBongkarCorr(u, targetDate){
   const bagi = Number(u && u.bagi) || 0;
   if (!(bagi > 0) || !u || !targetDate) return { inHop:0, grossHop:0, remFactor:1, cLast:0 };
   const realToday = gfRealToday();
-  const map = gfUnitMap();
-
-  const collectPort = (evalDate, ignoreSup) => {
-    const regPort = gfMakeShipRegistry(), regDone = gfMakeShipRegistry();
-    let taHop = 0, pbHop = 0, pbPodMin = null, taPodMin = null;
-    const sbList = [];
-    const pre = (rows, dates, src) => {
-      (rows || []).forEach(r => {
-        if (!r) return;
-        const vol = Number(r.vol) || 0; if (!(vol > 0)) return;
-        const st = String(r.status || '').trim();
-        if (gfIsCancel(r) || st === 'Selesai Bongkar' || /^pengalihan$/i.test(st)){
-          const unit = map[r.pltu] || r.pltu;
-          if (unit === u.pltu){
-            const dt = gfExtractRowDates(r, dates);
-            regPort.registerOnly(unit, r, dt.rawPod || r.etaRakor || null, vol, src);
-          }
-        }
-      });
-    };
-    pre(ROWS, DATES, 'cur');
-    if (typeof SIM !== 'undefined' && SIM.next && SIM.next.rows && SIM.next.dates) pre(SIM.next.rows, SIM.next.dates, 'next');
-
-    const scan = (rows, dates, src) => {
-      if (!rows || !rows.length) return;
-      rows.forEach(r => {
-        if (!r || gfIsCancel(r)) return;
-        if (!gfSupMatch(r, ignoreSup)) return;
-        const unit = map[r.pltu] || r.pltu;
-        if (unit !== u.pltu) return;
-        const vol = Number(r.vol) || 0; if (!(vol > 0)) return;
-        const st = String(r.status || '').trim();
-        if (/^carry\s*over$/i.test(st) || /^pengalihan$/i.test(st)) return;
-        const dt = gfExtractRowDates(r, dates);
-        if (src === 'prev'){
-          const touch = dt.lastTouch || dt.rawPod;
-          if (touch && simDD(evalDate, touch) > 14) return;
-        }
-        const lastX = dt.xs.length ? dt.xs[dt.xs.length - 1] : null;
-        if (st === 'Proses Bongkar' || st === 'Bongkar'){
-          const estPod = gfEstActualPod(r, dt, 'di_pelabuhan', evalDate);
-          if (evalDate < realToday && estPod && estPod > evalDate) return;
-          if (regPort.seenOrAdd(unit, r, estPod, vol, src)) return;
-          const podPb = r.etaPod || lastX || estPod || evalDate;
-          if (podPb <= evalDate || evalDate >= realToday){
-            pbHop += vol / bagi;
-            if (podPb && (!pbPodMin || podPb < pbPodMin)) pbPodMin = podPb;
-          }
-        } else if (st === 'Tiba/Antri'){
-          const estPod = gfEstActualPod(r, dt, 'di_pelabuhan', evalDate);
-          if (evalDate < realToday && estPod && estPod > evalDate) return;
-          if (regPort.seenOrAdd(unit, r, estPod, vol, src)) return;
-          taHop += vol / bagi;
-          const podTa = r.etaPod || lastX || estPod || evalDate;
-          if (podTa && (!taPodMin || podTa < taPodMin)) taPodMin = podTa;
-        } else if (st === 'Selesai Bongkar'){
-          const pKey = dt.rawPod || r.etaRakor || null;
-          if (regDone.seenOrAdd(unit, r, pKey, vol, src)) return;
-          const podSb = r.etaPod || lastX || (dt.xs.length ? dt.xs[0] : null);
-          if (podSb && podSb <= evalDate) sbList.push({ pod:podSb, hop:vol / bagi });
-        }
-      });
-    };
-    scan(ROWS, DATES, 'cur');
-    if (typeof SIM !== 'undefined' && SIM.next && SIM.next.rows && SIM.next.dates) scan(SIM.next.rows, SIM.next.dates, 'next');
-    if (GF.prev && GF.prev.rows && GF.prev.dates) scan(GF.prev.rows, GF.prev.dates, 'prev');
-    return { taHop:taHop, pbHop:pbHop, portHop:taHop + pbHop, pbPodMin:pbPodMin, taPodMin:taPodMin, sbList:sbList };
-  };
-
-  const cur = collectPort(targetDate, false);
-  if (!(cur.pbHop > 0)) return { inHop:0, grossHop:0, remFactor:1, cLast:0 };
-  const allAtTarget = (!S.sup || S.sup === 'ALL') ? cur : collectPort(targetDate, true);
-  if (!(allAtTarget.pbHop > 0)) return { inHop:0, grossHop:cur.pbHop, remFactor:1, cLast:0 };
-
-  const hist = ((u && u.hist) || [])
-    .filter(h => h && h[0] && h[0] <= targetDate && h[1] != null && isFinite(Number(h[1])))
-    .slice()
-    .sort((a, b) => String(a[0]).localeCompare(String(b[0])));
-  const cNom = ((Number(u.pakai) || 0) / bagi) || 0.85;
-  let unloadedAll = 0, cLoc = cNom;
-
-  if (hist.length >= 2){
-    const n = hist.length;
-    const effToday = hist[n - 1][0];
-    if (simDD(targetDate, effToday) <= 3){
-      /* 1. Estimasi laju bakar murni lokal (cLoc), batas bawah 1-unit (cFloor), & kapasitas penuh (cRamp) */
-      const cut14 = tglPlus(effToday, -14);
-      const recentNeg = [], allNeg = [];
-      for (let i = 1; i < n; i++){
-        const gap = Math.max(1, simDD(hist[i][0], hist[i - 1][0]));
-        if (gap > 3) continue;
-        const dv = (Number(hist[i][1]) - Number(hist[i - 1][1])) / gap;
-        if (isFinite(dv) && dv < -0.06 && dv > -2.5){
-          allNeg.push(-dv);
-          if (hist[i][0] >= cut14) recentNeg.push(-dv);
-        }
-      }
-      const cleanArr = (arr) => {
-        if (!arr.length) return [];
-        const s = arr.slice().sort((a, b) => a - b);
-        const med = s[Math.floor(s.length * 0.50)];
-        const noSpike = s.filter(x => x <= med * 2.5 + 1e-9);
-        const base = noSpike.length >= 2 ? noSpike : s;
-        const p75 = base[Math.min(base.length - 1, Math.floor((base.length - 1) * 0.75))];
-        const pure = base.filter(x => x >= 0.55 * p75 - 1e-9);
-        return pure.length ? pure : base;
-      };
-      const pureRec = recentNeg.length >= 2 ? cleanArr(recentNeg) : [];
-      const pureAll = allNeg.length ? cleanArr(allNeg) : [];
-      const cRec = pureRec.length ? pureRec[Math.min(pureRec.length - 1, Math.floor(pureRec.length * 0.55))] : null;
-      const cAll = pureAll.length ? pureAll[Math.min(pureAll.length - 1, Math.floor(pureAll.length * 0.55))] : null;
-      const p90All = pureAll.length >= 4 ? pureAll[Math.min(pureAll.length - 1, Math.floor((pureAll.length - 1) * 0.90))] : null;
-      if (cRec != null) cLoc = cRec;
-      else if (cAll != null) cLoc = cAll;
-      const cFloorRec = pureRec.length ? pureRec[0] : cLoc;
-      const cFloorAll = pureAll.length ? pureAll[Math.floor(pureAll.length * 0.15)] : cFloorRec;
-      const cFloor = Math.min(cLoc, cFloorRec);
-      const cCons = Math.min(cLoc, cNom);
-      const cRamp = Math.max(cLoc, Math.min(1.05, Math.max(cNom, p90All || 0)));
-      const pbPod = allAtTarget.pbPodMin || effToday;
-
-      /* 2. Estimasi waktu tunggu antrean pelabuhan (port queue lag) dari kapal Tiba/Antri & SB terbaru */
-      const taWait = allAtTarget.taPodMin ? Math.max(0, simDD(effToday, allAtTarget.taPodMin)) : 0;
-      const pbAge = Math.max(0, simDD(effToday, pbPod));
-      const estDischDays = Math.max(1, Math.ceil((allAtTarget.pbHop * bagi) / 4200));
-      const hasCoQueueSb = allAtTarget.sbList.some(s => s.pod >= tglPlus(pbPod, -2));
-      const hasNearSb = allAtTarget.sbList.some(s => s.pod >= tglPlus(pbPod, -4) && simDD(effToday, s.pod) <= 8);
-      const qLag = hasCoQueueSb
-        ? Math.min(8, Math.max(taWait > 0 ? 1 : 0, Math.min(taWait, pbAge - estDischDays)))
-        : (hasNearSb && taWait > 0 ? 1 : 0);
-
-      /* 3. Segmentasi gelombang bongkar pasca-POD berbasis aliran masuk kotor (gross coal inflow) */
-      const gainFloor = Math.max(0.20, 0.16 * cNom);
-      const pureBurnWall = -0.70 * cFloor;
-      const isInitDay = (idx) => {
-        const gap = Math.max(1, simDD(hist[idx][0], hist[idx - 1][0]));
-        if (gap > 3) return false;
-        const dvDay = (Number(hist[idx][1]) - Number(hist[idx - 1][1])) / gap;
-        if (!isFinite(dvDay)) return false;
-        if (dvDay > gainFloor) return true;
-        const qInDay = dvDay + cLoc;
-        return (dvDay >= 0 && Math.min(cFloor, cFloorAll) >= 0.45 && qInDay >= 0.55 && (qInDay * bagi) >= 800);
-      };
-      const isContDay = (idx) => {
-        const gap = Math.max(1, simDD(hist[idx][0], hist[idx - 1][0]));
-        if (gap > 3) return false;
-        const dvDay = (Number(hist[idx][1]) - Number(hist[idx - 1][1])) / gap;
-        if (!isFinite(dvDay) || !(dvDay > pureBurnWall)) return false;
-        if (dvDay >= 0.05) return true;
-        const cRef = dvDay < 0 ? cRamp : cLoc;
-        return ((dvDay + cRef) * bagi) >= 400;
-      };
-
-      let waveStart = -1, waveEnd = -1, inWave = false;
-      for (let i = 1; i < n; i++){
-        if (hist[i][0] < pbPod) continue;
-        if (hist[i][0] === pbPod){
-          if (isInitDay(i)){ waveStart = i - 1; waveEnd = i; inWave = true; }
-          continue;
-        }
-        if (!inWave){
-          if (isInitDay(i)){
-            let sIdx = i - 1;
-            while (sIdx >= 1 && hist[sIdx][0] > pbPod){
-              const gPrev = Math.max(1, simDD(hist[sIdx][0], hist[sIdx - 1][0]));
-              const dvPrev = gPrev <= 3 ? (Number(hist[sIdx][1]) - Number(hist[sIdx - 1][1])) / gPrev : -9;
-              if (dvPrev > 0.05) sIdx--;
-              else break;
-            }
-            waveStart = sIdx; waveEnd = i; inWave = true;
-          }
-        } else {
-          if (isContDay(i)) waveEnd = i;
-          else inWave = false;
-        }
-      }
-
-      let idx0 = -1, endIdx = -1, hasPureBurnTail = false;
-      if (waveStart >= 0 && waveEnd > waveStart){
-        const tailDays = simDD(effToday, hist[waveEnd][0]);
-        if (waveEnd === n - 1){
-          idx0 = waveStart; endIdx = n - 1; hasPureBurnTail = false;
-        } else if (tailDays >= 1 && tailDays <= 2){
-          let rawW = 0;
-          for (let i = waveStart + 1; i <= waveEnd; i++){
-            const g = Math.max(1, simDD(hist[i][0], hist[i - 1][0]));
-            rawW += Math.max(0, (Number(hist[i][1]) - Number(hist[i - 1][1])) + g * cLoc);
-          }
-          if (!(waveEnd - waveStart === 1 && allAtTarget.sbList.length === 0 && rawW > 0.95 * allAtTarget.pbHop)){
-            idx0 = waveStart; endIdx = waveEnd; hasPureBurnTail = true;
-          }
-        }
-      }
-
-      if (idx0 >= 0 && idx0 < endIdx){
-        /* 4. Hitung total batubara masuk ke stockpile selama gelombang aktif */
-        let grossWave = 0;
-        if (!hasPureBurnTail){
-          for (let i = idx0 + 1; i <= endIdx; i++){
-            const gap = Math.max(1, simDD(hist[i][0], hist[i - 1][0]));
-            const dv = Number(hist[i][1]) - Number(hist[i - 1][1]);
-            if (isFinite(dv) && gap <= 3){
-              const dvPerDay = dv / gap;
-              const cDay = (dvPerDay < 0 && i > idx0 + 1 && cLoc < 0.75 * cRamp) ? cRamp : cLoc;
-              grossWave += Math.max(0, dv + gap * cDay);
-            }
-          }
-        } else {
-          const span = Math.max(1, simDD(hist[n - 1][0], hist[idx0][0]));
-          grossWave = Math.max(0, (Number(hist[n - 1][1]) - Number(hist[idx0][1])) + span * cCons);
-        }
-
-        /* 5. Kurangi porsi kapal 'Selesai Bongkar' terbaru yang belum terserap sebelum idx0 */
-        let maxUnabsSb = 0;
-        const slacks = hasPureBurnTail ? [0, 4, 7] : (qLag >= 3 ? [0, 4, qLag + 1] : [0, 3]);
-        for (let si = 0; si < slacks.length; si++){
-          const slack = slacks[si];
-          const podCut = tglPlus(pbPod, -slack);
-          let sbSum = 0;
-          for (let j = 0; j < allAtTarget.sbList.length; j++){
-            if (allAtTarget.sbList[j].pod >= podCut) sbSum += allAtTarget.sbList[j].hop;
-          }
-          if (!(sbSum > 0)) continue;
-          const shift = slack > 0 ? qLag : 0;
-          const shiftedCut = tglPlus(podCut, shift);
-          const histCut = shiftedCut < pbPod ? shiftedCut : pbPod;
-          if (!hasPureBurnTail){
-            let absBefore = 0;
-            for (let i = 1; i <= idx0; i++){
-              if (hist[i][0] <= histCut) continue;
-              const gap = Math.max(1, simDD(hist[i][0], hist[i - 1][0]));
-              const dv = Number(hist[i][1]) - Number(hist[i - 1][1]);
-              if (isFinite(dv) && gap <= 3 && dv > -0.25 * cLoc * gap){
-                absBefore += Math.max(0, dv + gap * cLoc);
-              }
-            }
-            if (sbSum - absBefore > maxUnabsSb) maxUnabsSb = sbSum - absBefore;
-          } else {
-            let kAnchor = -1;
-            for (let i = 0; i <= idx0; i++){
-              if (hist[i][0] >= histCut){ kAnchor = i; break; }
-            }
-            if (kAnchor >= 0 && kAnchor <= idx0){
-              const spanBefore = Math.max(0, simDD(hist[idx0][0], hist[kAnchor][0]));
-              const absBefore = Math.max(0, (Number(hist[idx0][1]) - Number(hist[kAnchor][1])) + spanBefore * cCons);
-              if (sbSum - absBefore > maxUnabsSb) maxUnabsSb = sbSum - absBefore;
-            }
-          }
-        }
-
-        unloadedAll = Math.min(allAtTarget.pbHop * 0.85, Math.max(0, grossWave - maxUnabsSb));
-      }
+  const actMap = gfCollectActualShips(targetDate, realToday) || {};
+  const ships = actMap[u.pltu] || [];
+  let rawPbMt = 0, remPbMt = 0, blPbMt = 0;
+  ships.forEach(sh => {
+    if (sh.status === 'Proses Bongkar' || sh.status === 'Bongkar'){
+      const v = Math.max(0, Number(sh.vol) || 0);
+      const stBk = gfShipBongkarState(u.pltu, sh.nom, sh.sup, v, sh.etaPod || sh.awal, targetDate);
+      rawPbMt += v;
+      blPbMt += stBk.blMt;
+      remPbMt += stBk.remMt;
     }
-  }
-
-  const remFactor = allAtTarget.pbHop > 0 ? Math.max(0, Math.min(1, (allAtTarget.pbHop - unloadedAll) / allAtTarget.pbHop)) : 1;
-  const inHop = cur.pbHop * (1 - remFactor);
-  return { inHop:inHop, grossHop:cur.pbHop, remFactor:remFactor, cLast:cLoc };
+  });
+  if (!(rawPbMt > 0)) return { inHop:0, grossHop:0, remFactor:1, cLast:0 };
+  const remFactor = rawPbMt > 0 ? Math.max(0, remPbMt / rawPbMt) : 1;
+  const grossHop = blPbMt / bagi;
+  const inHop = Math.max(0, (blPbMt - remPbMt) / bagi);
+  return { inHop:inHop, grossHop:grossHop, remFactor:remFactor, cLast:0 };
 }
 
 /* cek apakah unit sudah memiliki input Stock Efektif aktual pada tanggal d */
@@ -8682,7 +8747,6 @@ function gfEvalProjOnDate(u, unitShips, D, realToday){
   if (h && h.seri && h.seri[realToday] && h.seri[realToday].actual && isFinite(h.seri[realToday].v)){
     tBase = realToday; v0 = Math.max(0, Number(h.seri[realToday].v));
   }
-  const corr = gfLocalBongkarCorr(u, realToday);
   const holdUntil = (realToday && realToday > tBase) ? realToday : tBase;
   const ships = unitShips || [];
   const addDay = {};
@@ -8695,10 +8759,12 @@ function gfEvalProjOnDate(u, unitShips, D, realToday){
     if (!(fullHop > 0)) return;
     const rawV = Math.round(Number(sh.vol) || 0);
     if ((sh.status === 'Proses Bongkar' || sh.status === 'Bongkar') && sh.pod <= holdUntil){
-      /* otomatis Koreksi Bongkar: lanjutkan hanya sisa bongkaran yang belum masuk ke Stock Efektif (v0) */
-      const remHop = fullHop * corr.remFactor;
+      /* Lanjutkan hanya sisa bongkaran per kapal (100% B/L bila belum diisi % / MT bongkar) */
+      const stBk = gfShipBongkarState(u.pltu, sh.nom, sh.sup, sh.vol, sh.rawPod || sh.pod, realToday);
+      const remHop = bagi > 0 ? (stBk.remMt / bagi) : 0;
       if (!(remHop > 1e-6)) return;
-      const remDays = Math.max(1, Math.min(nBongkar, Math.ceil(corr.remFactor * nBongkar)));
+      const rfDays = stBk.blMt > 0 ? Math.min(1, stBk.remMt / stBk.blMt) : 1;
+      const remDays = Math.max(1, Math.min(nBongkar, Math.ceil(rfDays * nBongkar)));
       const perDay = remHop / remDays;
       const startD = tglPlus(tBase, 1);
       let remOnD = 0;
@@ -8707,7 +8773,12 @@ function gfEvalProjOnDate(u, unitShips, D, realToday){
         addDay[dU] = (addDay[dU] || 0) + perDay;
         if (dU > D){ ap += perDay; remOnD += perDay; }
       }
-      if (remOnD > 0.02) portList.push({ nom:sh.nom || 'TBN', sup:sh.sup || '—', vol:Math.round(remOnD * bagi), rawVol:rawV, hop:remOnD, status:sh.status, src:sh.src || 'cur' });
+      if (remOnD > 0.02) portList.push({
+        nom:sh.nom || 'TBN', sup:sh.sup || '—',
+        vol:Math.round(remOnD * bagi), rawVol:Math.round(stBk.blMt),
+        hop:remOnD, status:sh.status, src:sh.src || 'cur',
+        bongkarPct:stBk.hasInput ? stBk.pct : 0, bongkarMt:stBk.hasInput ? Math.round(stBk.unloadedMt) : 0
+      });
     } else if (sh.diPelabuhan){
       /* Kapal Tiba/Antri di pelabuhan per hari ini belum mulai bongkar (masih mengantre sandar):
          volume tetap 100% utuh pada D <= holdUntil dengan status Tiba/Antri, dan baru dibongkar bertahap mulai holdUntil + 1 */
@@ -8841,16 +8912,21 @@ function gfBuildRegRows(reg, targetDate, realToday, shipMap, optProjMap){
           dTxt = gfF1(dv);
           if (dv > 0.05) dir = 'up'; else if (dv < -0.05) dir = 'down';
         }
-        const corr = gfLocalBongkarCorr(u, targetDate);
         let ap = 0;
         const portList = [];
         ships.forEach(sh => {
           const v = Number(sh.vol) || 0;
           const days = burn > 0 ? v / burn : 0;
           if (sh.status === 'Proses Bongkar' || sh.status === 'Bongkar'){
-            const hRem = days * corr.remFactor;
+            const stBk = gfShipBongkarState(u.pltu, sh.nom, sh.sup, v, sh.etaPod || sh.awal, targetDate);
+            const hRem = burn > 0 ? (stBk.remMt / burn) : 0;
             ap += hRem;
-            if (hRem > 0.02) portList.push({ nom:sh.nom || 'TBN', sup:sh.sup || '—', vol:Math.round(v * corr.remFactor), rawVol:Math.round(v), hop:hRem, status:sh.status, src:sh.src || 'cur' });
+            if (hRem > 0.02) portList.push({
+              nom:sh.nom || 'TBN', sup:sh.sup || '—',
+              vol:Math.round(stBk.remMt), rawVol:Math.round(stBk.blMt),
+              hop:hRem, status:sh.status, src:sh.src || 'cur',
+              bongkarPct:stBk.hasInput ? stBk.pct : 0, bongkarMt:stBk.hasInput ? Math.round(stBk.unloadedMt) : 0
+            });
           } else if (sh.cert === 'di_pelabuhan'){
             ap += days;
             if (days > 0.02) portList.push({ nom:sh.nom || 'TBN', sup:sh.sup || '—', vol:Math.round(v), rawVol:Math.round(v), hop:days, status:sh.status, src:sh.src || 'cur' });
@@ -10282,8 +10358,9 @@ function gfShowCanvasTT(cvs, e){
     html += '<div class="gf-tt-sec"><div class="gf-tt-shd">Antri/Bongkar (' + r.portList.length + ' tkg)</div>';
     r.portList.slice(0, 4).forEach(p => {
       const isPart = p.rawVol && Math.round(p.vol || 0) < Math.round(p.rawVol) - 1;
+      const pctTag = (p.bongkarPct && p.bongkarPct > 0.01) ? (' (-' + gfFmtDecId(p.bongkarPct, 2) + '%)') : '';
       const vLbl = isPart
-        ? ('Sisa ' + gfN(p.vol || 0) + ' / BL ' + gfN(p.rawVol) + ' MT · ' + gfF1(p.hop || 0) + ' hr')
+        ? ('Sisa ' + gfN(p.vol || 0) + ' / BL ' + gfN(p.rawVol) + ' MT' + pctTag + ' · ' + gfF1(p.hop || 0) + ' hr')
         : (gfN(p.vol || 0) + ' MT · ' + gfF1(p.hop || 0) + ' hr');
       const supTxt = esc(p.sup || '—') + (p.src === 'next' ? ' · ' + esc(nxLbl) : '');
       html += '<div class="gf-tt-sh"><span>• ' + esc(p.nom || 'TBN') + ' (' + supTxt + ')</span>'
@@ -10632,13 +10709,21 @@ function openPltuInsp(pltuName, optMode, optTab){
       ? (v.eta ? ('ETA ' + esc(fmtShort(v.eta)) + (v.nHari != null ? ' (' + v.nHari + ' hr)' : '')) : 'ETA belum tercatat')
       : (modeV === 'load'
         ? (esc(v.status || 'Rencana Loading') + (loadDates ? ' · ' + loadDates : ''))
-        : (esc(v.status || 'Antri/Bongkar') + (isPart ? ' · BL ' + gfN(v.rawVol) + ' MT' : '') + ' · ' + gfF1(v.hop || 0) + ' hr'));
+        : (esc(v.status || 'Antri/Bongkar')
+          + ((v.bongkarPct && v.bongkarPct > 0.01) ? ' · ' + gfFmtDecId(v.bongkarPct, 2) + '% bongkar' : '')
+          + (isPart ? ' · BL ' + gfN(v.rawVol) + ' MT' : '')
+          + ' · ' + gfF1(v.hop || 0) + ' hr'));
     const nextBdg = (v && v.src === 'next') ? '<span class="pi-src-bdg">' + esc(nxLbl) + '</span>' : '';
     return '<div' + jumpAttr + '>'
       + '<div class="pi-v-l"><b>' + esc(v.nom || 'TBN') + '</b><small>' + esc(v.sup || '—') + nextBdg + '</small></div>'
       + '<div class="pi-v-r">' + rightTop + '<small>' + rightSub + '</small></div>'
     + '</div>';
   };
+  const hasPbHere = ((gfCollectActualShips(realToday, realToday) || {})[u.pltu] || [])
+    .some(s => s && (s.status === 'Proses Bongkar' || s.status === 'Bongkar'));
+  const pbEditBtn = hasPbHere
+    ? '<button type="button" class="pi-bk-btn" data-openbongkar="' + esc(u.pltu) + '" title="Input realisasi % atau MT bongkar kapal di PLTU ' + esc(u.pltu) + '">✎ Input % / MT Bongkar</button>'
+    : '';
   const portHtml = (r.portList && r.portList.length)
     ? '<div class="pi-vlist">' + r.portList.map(p => renderVesselItem(p, 'port')).join('') + '</div>'
     : '<div class="pi-empty">Tidak ada kapal</div>';
@@ -10692,7 +10777,7 @@ function openPltuInsp(pltuName, optMode, optTab){
       + '<div class="pi-box"><div class="pi-box-h"><span>Lintasan Proyeksi HOP (21 Hari)</span><span style="font-weight:600;text-transform:none;color:var(--muted)">● kedatangan kargo</span></div>'
         + gfPltuSparkSVG(u, realToday, selDate)
       + '</div>'
-      + '<div class="pi-box"><div class="pi-box-h"><span>Antri/Bongkar (' + (r.portList ? r.portList.length : 0) + ' tkg)</span></div>' + portHtml + '</div>'
+      + '<div class="pi-box"><div class="pi-box-h"><span>Antri/Bongkar (' + (r.portList ? r.portList.length : 0) + ' tkg)</span>' + pbEditBtn + '</div>' + portHtml + '</div>'
       + '<div class="pi-box"><div class="pi-box-h"><span>Sailing (' + (r.sailList ? r.sailList.length : 0) + ' tkg)</span></div>' + sailHtml + '</div>'
       + '<div class="pi-box"><div class="pi-box-h"><span>Rencana Loading (' + (r.loadList ? r.loadList.length : 0) + ' tkg)</span>' + (loadMtSum > 0 ? '<span style="font-weight:600;text-transform:none;color:var(--muted)">' + gfN(Math.round(loadMtSum)) + ' MT</span>' : '') + '</div>' + loadHtml + '</div>';
 
@@ -10763,9 +10848,384 @@ function gfJumpPltu(pltuName, target){
   }
 }
 
+/* ══ PANEL INPUT CEPAT REALISASI BONGKAR TONGKANG (#bongkarModal) ══ */
+let LAST_BK_TRIG = null;
+
+function bongkarCollectActiveShips(){
+  if (!HOPDATA || !Array.isArray(HOPDATA.units)) return [];
+  const realToday = gfRealToday();
+  const actMap = gfCollectActualShips(realToday, realToday) || {};
+  const out = [];
+  ['SULAWESI', 'MAPANA'].forEach(reg => {
+    const w = (WILAYAH || []).filter(x => x.k === reg)[0];
+    const rank = k => {
+      const b = wilInduk(k).toLowerCase();
+      const l = w ? w.l : [];
+      const i = l.findIndex(x => x.toLowerCase() === b);
+      return i < 0 ? 999 : i;
+    };
+    const units = HOPDATA.units.filter(u => wilOf(u.pltu) === reg)
+      .slice().sort((a, b) => rank(a.pltu) - rank(b.pltu) || (a.pltu < b.pltu ? -1 : 1));
+    units.forEach(u => {
+      const burn = Number(u.bagi) || 0;
+      const list = actMap[u.pltu] || [];
+      const pbList = list.filter(s => s && (s.status === 'Proses Bongkar' || s.status === 'Bongkar'));
+      if (!pbList.length) return;
+      const taList = list.filter(s => s && s.status !== 'Proses Bongkar' && s.status !== 'Bongkar' && s.cert === 'di_pelabuhan');
+      const taMt = taList.reduce((acc, s) => acc + (Number(s.vol) || 0), 0);
+      pbList.forEach(sh => {
+        const pod = sh.etaPod || sh.awal || '';
+        const vSheet = Number(sh.vol) || 0;
+        const stBk = gfShipBongkarState(u.pltu, sh.nom, sh.sup, vSheet, pod, realToday);
+        out.push({
+          reg:reg, unit:u.pltu, burn:burn,
+          taCnt:taList.length, taMt:taMt,
+          key:stBk.key, nom:sh.nom || 'TBN', sup:sh.sup || '—',
+          pod:pod, src:sh.src || 'cur', sheetVol:vSheet,
+          stBk:stBk
+        });
+      });
+    });
+  });
+  return out;
+}
+
+function bongkarSummaryCounts(){
+  const list = bongkarCollectActiveShips();
+  let filled = 0;
+  list.forEach(x => { if (x.stBk && x.stBk.hasInput) filled++; });
+  return { total:list.length, filled:filled };
+}
+
+function bongkarSyncBadgeHTML(){
+  if (BONGKAR.saving) return '<span class="bk-sync busy" id="bkSyncBdg">⟳ Menyimpan ke Cloud…</span>';
+  if (BONGKAR.busy) return '<span class="bk-sync busy" id="bkSyncBdg">⟳ Memuat Cloud…</span>';
+  if (typeof simBBisa === 'function' && simBBisa() && BONGKAR.syncSt === 'ok'){
+    return '<span class="bk-sync ok" id="bkSyncBdg">☁ Sinkron Cloud' + (BONGKAR.syncAt ? ' · ' + esc(BONGKAR.syncAt) : '') + '</span>';
+  }
+  return '<span class="bk-sync" id="bkSyncBdg">💾 Tersimpan di Perangkat</span>';
+}
+
+function bongkarUpdateSyncBadge(){
+  const el = $id('bkSyncBdg');
+  if (!el) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = bongkarSyncBadgeHTML();
+  if (tmp.firstChild) el.replaceWith(tmp.firstChild);
+}
+
+function bongkarRecalcModalUnit(modalEl, unitName){
+  if (!modalEl) return;
+  const rows = Array.from(modalEl.querySelectorAll('tr.bk-row')).filter(tr => tr.dataset.unit === unitName);
+  if (!rows.length) return;
+  const burn = Number(rows[0].dataset.burn) || 0;
+  const taMt = Number(rows[0].dataset.tamt) || 0;
+  const taCnt = Number(rows[0].dataset.tacnt) || 0;
+  let sumRemPb = 0;
+  const perRow = rows.map(tr => {
+    const sheetVol = Number(tr.dataset.sheetvol) || 0;
+    const blInp = tr.querySelector('[data-bkf="bl"]');
+    const pctInp = tr.querySelector('[data-bkf="pct"]');
+    const mtInp = tr.querySelector('[data-bkf="mt"]');
+    const blParsed = blInp ? gfParseBongkarNum(blInp.value, false) : null;
+    const bl = (blParsed != null && blParsed > 0) ? blParsed : sheetVol;
+    const mode = tr.dataset.mode || 'pct';
+    let unlMt = 0, pct = 0, hasVal = false;
+    if (mode === 'mt'){
+      const mVal = mtInp ? gfParseBongkarNum(mtInp.value, false) : null;
+      if (mVal != null && mVal > 0){
+        unlMt = Math.min(bl, mVal);
+        pct = bl > 0 ? (unlMt / bl) * 100 : 0;
+        hasVal = true;
+      }
+    } else {
+      const pVal = pctInp ? gfParseBongkarNum(pctInp.value, true) : null;
+      if (pVal != null && pVal > 0){
+        pct = Math.min(100, pVal);
+        unlMt = bl * (pct / 100);
+        hasVal = true;
+      }
+    }
+    const remMt = Math.max(0, bl - unlMt);
+    sumRemPb += remMt;
+    return { tr:tr, bl:bl, unlMt:unlMt, pct:pct, remMt:remMt, hasVal:hasVal, blCustom:(blParsed != null && Math.abs(bl - sheetVol) > 0.01) };
+  });
+  const totApungHop = burn > 0 ? ((sumRemPb + taMt) / burn) : 0;
+  perRow.forEach(info => {
+    const sisaEl = info.tr.querySelector('.bk-sisa');
+    const apEl = info.tr.querySelector('.bk-apung');
+    if (sisaEl){
+      if (info.hasVal || info.blCustom){
+        sisaEl.className = 'bk-sisa';
+        sisaEl.textContent = 'Sisa ' + gfN(Math.round(info.remMt)) + ' MT (' + gfF1(burn > 0 ? info.remMt / burn : 0) + ' hr)';
+      } else {
+        sisaEl.className = 'bk-sisa utuh';
+        sisaEl.textContent = 'Utuh 100% B/L · ' + gfN(Math.round(info.remMt)) + ' MT';
+      }
+    }
+    if (apEl){
+      apEl.textContent = 'Apung ' + unitName + ': ' + gfF1(totApungHop) + ' hr' + (taCnt > 0 ? ' (+' + taCnt + ' antri)' : '');
+    }
+  });
+}
+
+function renderBongkarModal(){
+  const modal = $id('bongkarModal'), scrim = $id('bongkarScrim');
+  if (!modal || !scrim) return;
+  const list = bongkarCollectActiveShips();
+  const nxLbl = gfNextShortLbl();
+  let tblHtml = '';
+  if (!list.length){
+    tblHtml = '<div style="padding:32px 20px;text-align:center;color:var(--muted);font-size:13px">Saat ini tidak ada tongkang berstatus <b>Proses Bongkar</b> pada seluruh PLTU SULMAPANA.</div>';
+  } else {
+    let lastReg = '';
+    tblHtml = '<table class="bk-tbl"><thead><tr>'
+      + '<th>PLTU</th>'
+      + '<th>Tongkang (Proses Bongkar)</th>'
+      + '<th class="num">B/L Aktual (MT)</th>'
+      + '<th class="num">Sudah Bongkar (%)</th>'
+      + '<th class="num">Sudah Bongkar (MT)</th>'
+      + '<th class="num">Sisa Kapal &amp; Apung PLTU</th>'
+      + '<th style="width:34px"></th>'
+      + '</tr></thead><tbody>';
+    list.forEach(item => {
+      if (item.reg !== lastReg){
+        lastReg = item.reg;
+        tblHtml += '<tr class="bk-reg"><td colspan="7">Regional ' + esc(item.reg) + '</td></tr>';
+      }
+      const st = item.stBk;
+      const saved = BONGKAR.items[item.key];
+      const blVal = (saved && !saved.clr && saved.bl != null && Number(saved.bl) > 0) ? gfFmtDecId(saved.bl, 2) : '';
+      const pctVal = (st.hasInput && (st.pct > 0 || st.unloadedMt > 0)) ? gfFmtDecId(st.pct, 2) : '';
+      const mtVal = (st.hasInput && (st.pct > 0 || st.unloadedMt > 0)) ? gfFmtDecId(st.unloadedMt, 2) : '';
+      const rowMode = (saved && !saved.clr && saved.mode === 'mt') ? 'mt' : 'pct';
+      const podTxt = item.pod ? ('Tiba ' + fmtShort(item.pod)) : '';
+      const taTxt = item.taCnt > 0 ? (' · +' + item.taCnt + ' Tiba/Antri (' + gfN(Math.round(item.taMt)) + ' MT)') : '';
+      const srcTxt = item.src === 'next' ? (' · Sheet ' + nxLbl) : (item.src === 'prev' ? ' · Carry-over Bln-1' : '');
+      const isFoc = BONGKAR.focusUnit && BONGKAR.focusUnit.toLowerCase() === item.unit.toLowerCase();
+      tblHtml += '<tr class="bk-row' + (isFoc ? ' focus-hi' : '') + '" data-key="' + esc(item.key) + '" data-unit="' + esc(item.unit) + '"'
+        + ' data-nom="' + esc(item.nom) + '" data-sup="' + esc(item.sup) + '" data-pod="' + esc(item.pod) + '"'
+        + ' data-sheetvol="' + item.sheetVol + '" data-burn="' + item.burn + '" data-tamt="' + item.taMt + '" data-tacnt="' + item.taCnt + '"'
+        + ' data-mode="' + rowMode + '">'
+        + '<td><span class="bk-pltu">' + esc(item.unit) + '</span><span class="bk-burn">Pembagi ' + gfN(item.burn) + ' MT/hr</span></td>'
+        + '<td><div class="bk-ship">' + esc(item.nom) + '</div>'
+          + '<div class="bk-ship-sub">' + esc(item.sup) + (podTxt ? ' · ' + esc(podTxt) : '') + esc(srcTxt) + esc(taTxt) + '</div></td>'
+        + '<td class="num"><label class="bk-iw" title="Opsional: isi jika B/L aktual berbeda dari pembulatan sheet (' + gfFmtDecId(item.sheetVol, 2) + ' MT)">'
+          + '<input type="text" inputmode="decimal" class="bk-inp w-bl" data-bkf="bl" placeholder="' + esc(gfFmtDecId(item.sheetVol, 2)) + '" value="' + esc(blVal) + '" aria-label="B/L Aktual ' + esc(item.unit) + '">'
+          + '<span class="bk-u">MT</span></label></td>'
+        + '<td class="num"><label class="bk-iw" title="Persentase batubara yang sudah dibongkar (contoh: 25,06 atau 41,66)">'
+          + '<input type="text" inputmode="decimal" class="bk-inp w-pct" data-bkf="pct" placeholder="0" value="' + esc(pctVal) + '" aria-label="Persen bongkar ' + esc(item.unit) + '">'
+          + '<span class="bk-u">%</span></label></td>'
+        + '<td class="num"><label class="bk-iw" title="Tonase batubara yang sudah dibongkar dalam MT (contoh: 1880)">'
+          + '<input type="text" inputmode="decimal" class="bk-inp w-mt" data-bkf="mt" placeholder="0" value="' + esc(mtVal) + '" aria-label="Tonase bongkar ' + esc(item.unit) + '">'
+          + '<span class="bk-u">MT</span></label></td>'
+        + '<td class="num"><div class="bk-res"><span class="bk-sisa">—</span><span class="bk-apung">—</span></div></td>'
+        + '<td><button type="button" class="bk-clr" data-bkclr="1" title="Kembalikan ke 100% B/L utuh">↺</button></td>'
+      + '</tr>';
+    });
+    tblHtml += '</tbody></table>';
+  }
+  modal.innerHTML = '<div class="bk-hd">'
+      + '<div><h3><span>⚓ Input Cepat Realisasi Bongkar Tongkang</span>' + bongkarSyncBadgeHTML() + '</h3>'
+      + '<div class="bk-sub">Isi <b>%</b> atau <b>MT</b> yang sudah terbongkar khusus untuk PLTU yang melaporkan progres bongkar. '
+      + 'Baris yang dikosongkan otomatis dihitung <b>100% B/L utuh</b> di Stock Apung hingga status berubah menjadi <b>Selesai Bongkar</b>.</div></div>'
+      + '<button type="button" class="dr-x" id="bkClose" title="Tutup (Esc)">✕</button>'
+    + '</div>'
+    + '<div class="bk-body">' + tblHtml + '</div>'
+    + '<div class="bk-ft">'
+      + '<div class="bk-ft-note">Otomatis tidak berlaku lagi begitu status tongkang di Google Sheets menjadi <b>Selesai Bongkar</b>.</div>'
+      + '<div class="bk-ft-btns">'
+        + (list.length ? '<button type="button" class="bk-btn danger" id="bkResetAll" title="Kembalikan seluruh kapal Proses Bongkar ke 100% B/L utuh">Reset Semua (100% B/L)</button>' : '')
+        + '<button type="button" class="bk-btn" id="bkCancel">Batal</button>'
+        + (list.length ? '<button type="button" class="bk-btn pri" id="bkSave">Simpan &amp; Terapkan</button>' : '')
+      + '</div>'
+    + '</div>';
+  const unitsSeen = new Set();
+  Array.from(modal.querySelectorAll('tr.bk-row')).forEach(tr => {
+    const u = tr.dataset.unit;
+    if (u && !unitsSeen.has(u)){ unitsSeen.add(u); bongkarRecalcModalUnit(modal, u); }
+  });
+}
+
+function openBongkarModal(optFocusUnit){
+  bongkarLoadLocal();
+  if (!BONGKAR.open) LAST_BK_TRIG = document.activeElement;
+  BONGKAR.open = true;
+  BONGKAR.focusUnit = optFocusUnit ? String(optFocusUnit) : '';
+  hideTT();
+  gfCloseInpPop();
+  const modal = $id('bongkarModal'), scrim = $id('bongkarScrim');
+  if (!modal || !scrim) return;
+  renderBongkarModal();
+  scrim.hidden = false;
+  modal.hidden = false;
+  bongkarLoadCloud(false);
+  setTimeout(() => {
+    const focRow = BONGKAR.focusUnit
+      ? Array.from(modal.querySelectorAll('tr.bk-row')).find(tr => tr.dataset.unit.toLowerCase() === BONGKAR.focusUnit.toLowerCase())
+      : modal.querySelector('tr.bk-row');
+    if (focRow){
+      if (focRow.scrollIntoView) focRow.scrollIntoView({ block:'nearest' });
+      const inp = focRow.querySelector('[data-bkf="pct"]');
+      if (inp && typeof inp.focus === 'function'){ inp.focus(); if (inp.select) inp.select(); }
+    }
+  }, 20);
+}
+
+function closeBongkarModal(){
+  const wasOpen = BONGKAR.open;
+  BONGKAR.open = false;
+  BONGKAR.focusUnit = '';
+  const modal = $id('bongkarModal'), scrim = $id('bongkarScrim');
+  if (modal) modal.hidden = true;
+  if (scrim) scrim.hidden = true;
+  if (wasOpen && LAST_BK_TRIG && typeof LAST_BK_TRIG.focus === 'function'){
+    try { LAST_BK_TRIG.focus(); } catch(_){}
+    LAST_BK_TRIG = null;
+  }
+}
+
+async function bongkarSaveFromModal(){
+  const modal = $id('bongkarModal');
+  if (!modal) return;
+  const now = Date.now(), realToday = gfRealToday();
+  const byUser = (typeof SYNC !== 'undefined' && SYNC.authUser) ? String(SYNC.authUser) : '';
+  let filledCnt = 0;
+  Array.from(modal.querySelectorAll('tr.bk-row')).forEach(tr => {
+    const key = tr.dataset.key;
+    if (!key) return;
+    const sheetVol = Number(tr.dataset.sheetvol) || 0;
+    const blInp = tr.querySelector('[data-bkf="bl"]');
+    const pctInp = tr.querySelector('[data-bkf="pct"]');
+    const mtInp = tr.querySelector('[data-bkf="mt"]');
+    const blParsed = blInp ? gfParseBongkarNum(blInp.value, false) : null;
+    const bl = (blParsed != null && blParsed > 0) ? blParsed : sheetVol;
+    const blCustom = (blParsed != null && Math.abs(bl - sheetVol) > 0.01) ? Math.round(bl * 100) / 100 : null;
+    const mode = tr.dataset.mode || 'pct';
+    let pct = null, mt = null;
+    if (mode === 'mt'){
+      const mVal = mtInp ? gfParseBongkarNum(mtInp.value, false) : null;
+      if (mVal != null && mVal > 0){
+        mt = Math.round(Math.min(bl, mVal) * 100) / 100;
+        pct = bl > 0 ? Math.round((mt / bl) * 10000) / 100 : 0;
+      }
+    } else {
+      const pVal = pctInp ? gfParseBongkarNum(pctInp.value, true) : null;
+      if (pVal != null && pVal > 0){
+        pct = Math.round(Math.min(100, pVal) * 100) / 100;
+        mt = Math.round(bl * (pct / 100) * 100) / 100;
+      }
+    }
+    if (pct != null || mt != null || blCustom != null){
+      filledCnt++;
+      BONGKAR.items[key] = {
+        u:tr.dataset.unit || '', nom:tr.dataset.nom || '', sup:tr.dataset.sup || '',
+        pod:tr.dataset.pod || '', mode:mode, pct:pct || 0, mt:mt || 0, bl:blCustom,
+        tgl:realToday, by:byUser, at:now
+      };
+    } else if (BONGKAR.items[key] && !BONGKAR.items[key].clr){
+      BONGKAR.items[key] = { u:tr.dataset.unit || '', pod:tr.dataset.pod || '', clr:1, by:byUser, at:now };
+    }
+  });
+  bongkarSaveLocal();
+  bongkarPropagate();
+  closeBongkarModal();
+  const cloudOk = await bongkarSaveCloud();
+  if (S.page === 'grafik') gfPaint();
+  toast(filledCnt > 0
+    ? ('Realisasi bongkar ' + filledCnt + ' tongkang diterapkan' + (cloudOk ? ' & tersinkron ke Cloud ✓' : ' (tersimpan lokal)'))
+    : ('Seluruh kapal Proses Bongkar dikembalikan ke 100% B/L utuh' + (cloudOk ? ' & tersinkron ke Cloud ✓' : '')));
+}
+
+function bindBongkarModalOnce(){
+  const modal = $id('bongkarModal'), scrim = $id('bongkarScrim');
+  if (!modal || modal._bkBound) return;
+  modal._bkBound = true;
+  if (scrim) scrim.addEventListener('click', closeBongkarModal);
+  modal.addEventListener('click', e => {
+    if (e.target.closest('#bkClose') || e.target.closest('#bkCancel')){ closeBongkarModal(); return; }
+    if (e.target.closest('#bkSave')){ bongkarSaveFromModal(); return; }
+    if (e.target.closest('#bkResetAll')){
+      Array.from(modal.querySelectorAll('tr.bk-row')).forEach(tr => {
+        const blInp = tr.querySelector('[data-bkf="bl"]');
+        const pctInp = tr.querySelector('[data-bkf="pct"]');
+        const mtInp = tr.querySelector('[data-bkf="mt"]');
+        if (blInp) blInp.value = '';
+        if (pctInp) pctInp.value = '';
+        if (mtInp) mtInp.value = '';
+        tr.dataset.mode = 'pct';
+      });
+      const unitsSeen = new Set();
+      Array.from(modal.querySelectorAll('tr.bk-row')).forEach(tr => {
+        if (tr.dataset.unit && !unitsSeen.has(tr.dataset.unit)){
+          unitsSeen.add(tr.dataset.unit);
+          bongkarRecalcModalUnit(modal, tr.dataset.unit);
+        }
+      });
+      return;
+    }
+    const clrBtn = e.target.closest('[data-bkclr]');
+    if (clrBtn){
+      const tr = clrBtn.closest('tr.bk-row');
+      if (tr){
+        const blInp = tr.querySelector('[data-bkf="bl"]');
+        const pctInp = tr.querySelector('[data-bkf="pct"]');
+        const mtInp = tr.querySelector('[data-bkf="mt"]');
+        if (blInp) blInp.value = '';
+        if (pctInp) pctInp.value = '';
+        if (mtInp) mtInp.value = '';
+        tr.dataset.mode = 'pct';
+        bongkarRecalcModalUnit(modal, tr.dataset.unit);
+      }
+    }
+  });
+  modal.addEventListener('input', e => {
+    const inp = e.target;
+    if (!inp || !inp.dataset || !inp.dataset.bkf) return;
+    const tr = inp.closest('tr.bk-row');
+    if (!tr) return;
+    const fld = inp.dataset.bkf;
+    const sheetVol = Number(tr.dataset.sheetvol) || 0;
+    const blInp = tr.querySelector('[data-bkf="bl"]');
+    const pctInp = tr.querySelector('[data-bkf="pct"]');
+    const mtInp = tr.querySelector('[data-bkf="mt"]');
+    const blParsed = blInp ? gfParseBongkarNum(blInp.value, false) : null;
+    const bl = (blParsed != null && blParsed > 0) ? blParsed : sheetVol;
+    if (fld === 'pct'){
+      tr.dataset.mode = 'pct';
+      const pVal = gfParseBongkarNum(pctInp.value, true);
+      if (mtInp){
+        mtInp.value = (pVal != null && pVal > 0 && bl > 0) ? gfFmtDecId(bl * (Math.min(100, pVal) / 100), 2) : '';
+      }
+    } else if (fld === 'mt'){
+      tr.dataset.mode = 'mt';
+      const mVal = gfParseBongkarNum(mtInp.value, false);
+      if (pctInp){
+        pctInp.value = (mVal != null && mVal > 0 && bl > 0) ? gfFmtDecId((Math.min(bl, mVal) / bl) * 100, 2) : '';
+      }
+    } else if (fld === 'bl'){
+      if (tr.dataset.mode === 'mt'){
+        const mVal = mtInp ? gfParseBongkarNum(mtInp.value, false) : null;
+        if (pctInp && mVal != null && mVal > 0 && bl > 0) pctInp.value = gfFmtDecId((Math.min(bl, mVal) / bl) * 100, 2);
+      } else {
+        const pVal = pctInp ? gfParseBongkarNum(pctInp.value, true) : null;
+        if (mtInp && pVal != null && pVal > 0 && bl > 0) mtInp.value = gfFmtDecId(bl * (Math.min(100, pVal) / 100), 2);
+      }
+    }
+    bongkarRecalcModalUnit(modal, tr.dataset.unit);
+  });
+  modal.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.target && e.target.dataset && e.target.dataset.bkf){
+      e.preventDefault();
+      bongkarSaveFromModal();
+    }
+  });
+}
+
 function gfInitOnce(){
   if (GF.inited) return;
   GF.inited = true;
+  bindBongkarModalOnce();
   [['dan', GF_LOGO_DAN], ['pln', GF_LOGO_PLN], ['kapal', GF_LOGO_KAPAL]].forEach(p => {
     const im = new Image();
     im.onload = () => {
@@ -10798,6 +11258,8 @@ function gfInitOnce(){
         }
         return;
       }
+      const bkBtn = e.target.closest('[data-openbongkar]');
+      if (bkBtn){ e.stopPropagation(); openBongkarModal(bkBtn.dataset.openbongkar || INSP_PLTU || ''); return; }
       const act = e.target.closest('[data-inspact]');
       if (act && INSP_PLTU){ gfJumpPltu(INSP_PLTU, act.dataset.inspact); return; }
       const vRow = e.target.closest('[data-inspri]');
@@ -10827,6 +11289,8 @@ function gfInitOnce(){
     });
     el.addEventListener('mouseleave', () => { if (tt && tt.classList.contains('gf-tt')) hideTT(); });
     el.addEventListener('click', e => {
+      const bkOpen = e.target.closest('[data-gfbongkar]');
+      if (bkOpen){ e.stopPropagation(); openBongkarModal(''); return; }
       const openBtn = e.target.closest('[data-gfopenpltu]');
       if (openBtn){ e.stopPropagation(); openPltuInsp(openBtn.dataset.gfopenpltu, openBtn.dataset.gfinpmode || 'all'); return; }
       const inpBtn = e.target.closest('[data-gfinppop]');
@@ -10967,6 +11431,11 @@ function renderGrafik(force){
   const atMin = !!(bnd.min && tgl <= bnd.min), atMax = !!(bnd.max && tgl >= bnd.max);
   const vBtn = (v, lb, ttl) => '<button type="button" class="' + (GF.view === v ? 'on' : '') + '" data-gfview="' + v + '" title="' + ttl + '">' + lb + '</button>';
   const sBtn = (v, lb, ttl) => '<button type="button" class="' + (GF.sort === v ? 'on' : '') + '" data-gfsort="' + v + '" title="' + ttl + '">' + lb + '</button>';
+  const bkStat = bongkarSummaryCounts();
+  const bkBtnHtml = '<button type="button" class="gf-bk-btn' + (bkStat.filled > 0 ? ' active' : '') + '" data-gfbongkar="1" title="Input cepat % atau MT bongkar tongkang berstatus Proses Bongkar (tersinkron Cloud)">'
+    + '⚓ Input Bongkar'
+    + (bkStat.total > 0 ? ' <span class="gf-bk-cnt">' + (bkStat.filled > 0 ? (bkStat.filled + '/' + bkStat.total) : bkStat.total) + '</span>' : '')
+    + '</button>';
   const kpiHtml = gfKpiStripHTML(mAll, tgl, realToday);
   const ctrl = '<div class="gf-ctrl">'
     + '<div class="gf-ctrl-g">'
@@ -10982,6 +11451,7 @@ function renderGrafik(force){
         + ((!bnd.max || t7 <= bnd.max) ? '<button type="button" class="gf-qbtn' + (tgl === t7 ? ' on' : '') + '" data-gfpick="7" title="Proyeksi 7 hari ke depan">+7 hr</button>' : '')
       + '</div>'
       + modeHtml
+      + bkBtnHtml
       + (needAdjLoad ? '<span class="gf-bound">Memuat bulan berikutnya…</span>' : (maxLbl ? '<span class="gf-bound" title="Batas simulasi proyeksi lintas bulan">s.d. ' + esc(maxLbl) + '</span>' : ''))
     + '</div>'
     + '<div class="gf-ctrl-g">'
@@ -11548,6 +12018,7 @@ function buildCmdKItems(qRaw){
   }
   /* 4. Halaman & Aksi Cepat */
   const navActs = [
+    { t:'Input Cepat Realisasi Bongkar Tongkang (% / MT)', s:'Stock Apung · Sinkron Cloud', k:'input bongkar persen mt apung tongkang proses bongkar sisa', fn:() => { if (typeof bindBongkarModalOnce === 'function') bindBongkarModalOnce(); openBongkarModal(''); } },
     { t:'Salin Ringkasan Rapat Pagi', s:'Papan klip teks', k:'salin copy ringkasan rapat briefing pagi eksekutif', fn:() => salinRingkasanRapat() },
     { t:'Monitoring Kondisi Batubara PLTU Regional Sulmapana', s:'Unduh PPTX', k:'unduh download pptx monitoring kondisi batubara laporan harian', fn:() => grafUnduh('mon-pptx') },
     { t:'PLTU Regional Sulmapana Summary Report HOP', s:'Unduh PPTX', k:'unduh download pptx summary report hop ringkasan', fn:() => grafUnduh('sum-pptx') },
@@ -11670,6 +12141,7 @@ function bindMissionUX(){
       return;
     }
     if (e.key === 'Escape'){
+      if (BONGKAR && BONGKAR.open){ closeBongkarModal(); return; }
       if (INSP_PLTU){ closePltuInsp(); return; }
       if (GF.inpOpen){ gfCloseInpPop(); return; }
     }
@@ -11730,6 +12202,8 @@ function bindMissionUX(){
   });
   bindView();
   simInit();
+  if (typeof bongkarLoadLocal === 'function') bongkarLoadLocal();
+  if (typeof bindBongkarModalOnce === 'function') bindBongkarModalOnce();
   loadSync();
   const p0 = pageFromHash(); S.page = p0;
   msBuild(); msRefreshAll(); bind();
@@ -11745,5 +12219,5 @@ function bindMissionUX(){
   setInterval(() => { if (SYNC.scriptToken) pullFromSheets(false); }, SYNC.refreshMinutes * 60000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a507153b5a15d176',t:'MTc5Mjk5Mjc3Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a507ba1a6c82fe09',t:'MTc5Mjk5OTUyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
