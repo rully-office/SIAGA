@@ -8372,22 +8372,24 @@ function gfCollectLoadShips(targetDate, realToday){
   return byUnit;
 }
 
-/* ══ KOREKSI BONGKAR TERKALIBRASI (TOGGLE 'koreksi') ══
-   1. Hanya memotong kapal 'Proses Bongkar' (kapal 'Tiba/Antri' di pelabuhan tetap utuh 100%).
-   2. Jangkar presisi ke laporan sisa Stock Apung aktual unit pada HOPDATA (u.apung dari sheet Grafik)
-      saat tersedia: pada posisi terkini menghasilkan keselarasan eksak (mis. 22 Okt: Timor 4,9; Amurang 13,8;
-      Kendari 8,7; Gorontalo 5,9 utuh), serta mendistribusikan progres secara proporsional pada tanggal historis.
-   3. Dilengkapi formula gelombang bongkar terkalibrasi dari u.hist (memisahkan kenaikan stok milik kapal
-      'Selesai Bongkar' sebelumnya agar tidak memotong kapal mengapung saat ini) sebagai fallback mandiri. */
+/* ══ FORMULASI MANDIRI SISA BONGKAR (OTOMATIS TANPA INPUT MANUAL u.apung) ══
+   1. Menghitung sisa muatan kapal 'Proses Bongkar' secara mandiri 100% dari data Stock Efektif
+      harian unit (u.hist, u.bagi, u.pakai) + jadwal kapal lintas bulan (N-1, N, N+1), tanpa
+      bergantung pada input/koreksi manual kolom Stock Apung pada sheet Grafik (u.apung).
+   2. Kapal 'Tiba/Antri' di pelabuhan tetap utuh 100% hingga kapal mulai bongkar.
+   3. Mengukur laju bakar aktual terbaru (persentil murni penurunan stok 14 hari terakhir),
+      mendeteksi gelombang bongkar aktif sejak hari bakar murni terakhir pasca-POD, menghitung
+      konservasi massa saat jeda bongkar harian, dan memisahkan antrean kapal 'Selesai Bongkar'
+      terbaru dengan pergeseran waktu tunggu pelabuhan (port queue lag). */
 function gfLocalBongkarCorr(u, targetDate){
   const bagi = Number(u && u.bagi) || 0;
-  if (!(bagi > 0) || !u) return { inHop:0, grossHop:0, remFactor:1, cLast:0 };
+  if (!(bagi > 0) || !u || !targetDate) return { inHop:0, grossHop:0, remFactor:1, cLast:0 };
   const realToday = gfRealToday();
   const map = gfUnitMap();
 
   const collectPort = (evalDate, ignoreSup) => {
     const regPort = gfMakeShipRegistry(), regDone = gfMakeShipRegistry();
-    let taHop = 0, pbHop = 0, pbPodMin = null;
+    let taHop = 0, pbHop = 0, pbPodMin = null, taPodMin = null;
     const sbList = [];
     const pre = (rows, dates, src) => {
       (rows || []).forEach(r => {
@@ -8421,33 +8423,35 @@ function gfLocalBongkarCorr(u, targetDate){
           const touch = dt.lastTouch || dt.rawPod;
           if (touch && simDD(evalDate, touch) > 14) return;
         }
+        const lastX = dt.xs.length ? dt.xs[dt.xs.length - 1] : null;
         if (st === 'Proses Bongkar' || st === 'Bongkar'){
           const estPod = gfEstActualPod(r, dt, 'di_pelabuhan', evalDate);
-          if (src === 'next' && evalDate < realToday && estPod && estPod > evalDate) return;
+          if (evalDate < realToday && estPod && estPod > evalDate) return;
           if (regPort.seenOrAdd(unit, r, estPod, vol, src)) return;
-          const firstX = dt.xs.length ? dt.xs[0] : null;
-          const startD = (firstX && r.etaPod) ? (firstX < r.etaPod ? firstX : r.etaPod) : (firstX || r.etaPod || estPod || evalDate);
-          if (startD <= evalDate || evalDate >= realToday){
+          const podPb = r.etaPod || lastX || estPod || evalDate;
+          if (podPb <= evalDate || evalDate >= realToday){
             pbHop += vol / bagi;
-            if (startD && (!pbPodMin || startD < pbPodMin)) pbPodMin = startD;
+            if (podPb && (!pbPodMin || podPb < pbPodMin)) pbPodMin = podPb;
           }
         } else if (st === 'Tiba/Antri'){
           const estPod = gfEstActualPod(r, dt, 'di_pelabuhan', evalDate);
-          if (src === 'next' && evalDate < realToday && estPod && estPod > evalDate) return;
+          if (evalDate < realToday && estPod && estPod > evalDate) return;
           if (regPort.seenOrAdd(unit, r, estPod, vol, src)) return;
           taHop += vol / bagi;
+          const podTa = r.etaPod || lastX || estPod || evalDate;
+          if (podTa && (!taPodMin || podTa < taPodMin)) taPodMin = podTa;
         } else if (st === 'Selesai Bongkar'){
           const pKey = dt.rawPod || r.etaRakor || null;
           if (regDone.seenOrAdd(unit, r, pKey, vol, src)) return;
-          const podSb = r.etaPod || (dt.xs.length ? dt.xs[0] : null);
-          if (podSb) sbList.push({ pod:podSb, hop:vol / bagi });
+          const podSb = r.etaPod || lastX || (dt.xs.length ? dt.xs[0] : null);
+          if (podSb && podSb <= evalDate) sbList.push({ pod:podSb, hop:vol / bagi });
         }
       });
     };
     scan(ROWS, DATES, 'cur');
     if (typeof SIM !== 'undefined' && SIM.next && SIM.next.rows && SIM.next.dates) scan(SIM.next.rows, SIM.next.dates, 'next');
     if (GF.prev && GF.prev.rows && GF.prev.dates) scan(GF.prev.rows, GF.prev.dates, 'prev');
-    return { taHop:taHop, pbHop:pbHop, portHop:taHop + pbHop, pbPodMin:pbPodMin, sbList:sbList };
+    return { taHop:taHop, pbHop:pbHop, portHop:taHop + pbHop, pbPodMin:pbPodMin, taPodMin:taPodMin, sbList:sbList };
   };
 
   const cur = collectPort(targetDate, false);
@@ -8455,100 +8459,129 @@ function gfLocalBongkarCorr(u, targetDate){
   const allAtTarget = (!S.sup || S.sup === 'ALL') ? cur : collectPort(targetDate, true);
   if (!(allAtTarget.pbHop > 0)) return { inHop:0, grossHop:cur.pbHop, remFactor:1, cLast:0 };
 
-  const hist = (u && u.hist) || [];
-  const burnNom = (Number(u.pakai) || 0) / bagi;
-  const anchorDate = (u.tgl && /^\d{4}-\d{2}-\d{2}/.test(String(u.tgl))) ? String(u.tgl).slice(0, 10) : realToday;
-  const ancState = (anchorDate === targetDate) ? allAtTarget : collectPort(anchorDate, true);
-  const srvApung = (u.apung != null && isFinite(Number(u.apung))) ? Number(u.apung) : null;
-  const srvValid = srvApung != null && srvApung >= 0
-    && ((Number(u.efektif) > 0) || (Number(u.base) > 0) || srvApung > 0)
-    && !(srvApung === 0 && ancState.taHop > 0.05);
+  const hist = ((u && u.hist) || [])
+    .filter(h => h && h[0] && h[0] <= targetDate && h[1] != null && isFinite(Number(h[1])))
+    .slice()
+    .sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+  const cNom = ((Number(u.pakai) || 0) / bagi) || 0.85;
+  let unloadedAll = 0, cLoc = cNom;
 
-  let unloadedAll = 0, cLoc = burnNom;
-
-  if (srvValid && ancState.pbHop > 0){
-    const rawDiff = ancState.portHop - srvApung;
-    const anchorUnloaded = rawDiff >= 0.02 ? Math.min(ancState.pbHop, rawDiff) : 0;
-    if (targetDate >= anchorDate){
-      unloadedAll = Math.min(allAtTarget.pbHop, anchorUnloaded);
-    } else if (anchorUnloaded >= 0.02){
-      const startPod = allAtTarget.pbPodMin || ancState.pbPodMin || tglPlus(anchorDate, -5);
-      if (targetDate > startPod){
-        let wTot = 0, wCur = 0;
-        for (let i = 1; i < hist.length; i++){
-          const d1 = hist[i][0];
-          if (!d1 || d1 <= startPod || d1 > anchorDate) continue;
-          const dv = Number(hist[i][1]) - Number(hist[i - 1][1]);
-          if (isFinite(dv) && dv > 0.02){
-            const w = dv + burnNom;
-            wTot += w;
-            if (d1 <= targetDate) wCur += w;
-          }
-        }
-        if (wTot > 0){
-          unloadedAll = Math.min(allAtTarget.pbHop, anchorUnloaded * (wCur / wTot));
-        } else {
-          const span = Math.max(1, simDD(anchorDate, startPod));
-          const elap = Math.max(0, Math.min(span, simDD(targetDate, startPod)));
-          unloadedAll = Math.min(allAtTarget.pbHop, anchorUnloaded * (elap / span));
+  if (hist.length >= 2){
+    const n = hist.length;
+    const effToday = hist[n - 1][0];
+    if (simDD(targetDate, effToday) <= 3){
+      /* 1. Estimasi laju bakar empiris 14 hari terakhir (median/P55 hari penurunan murni) */
+      const cut14 = tglPlus(effToday, -14);
+      const recentNeg = [], allNeg = [];
+      for (let i = 1; i < n; i++){
+        const gap = Math.max(1, simDD(hist[i][0], hist[i - 1][0]));
+        if (gap > 3) continue;
+        const dv = (Number(hist[i][1]) - Number(hist[i - 1][1])) / gap;
+        if (isFinite(dv) && dv < -0.06 && dv > -2.5){
+          allNeg.push(-dv);
+          if (hist[i][0] >= cut14) recentNeg.push(-dv);
         }
       }
-    }
-  } else if (hist.length >= 2){
-    /* Fallback mandiri terkalibrasi dari gelombang kenaikan u.hist (tanpa u.apung server) */
-    let idxN = -1;
-    for (let i = hist.length - 1; i >= 1; i--){
-      if (hist[i][0] && hist[i][0] <= targetDate){ idxN = i; break; }
-    }
-    const pbPod = allAtTarget.pbPodMin;
-    if (idxN >= 1 && pbPod && pbPod <= hist[idxN][0] && simDD(targetDate, hist[idxN][0]) <= 1){
-      const twoDrop = idxN >= 2
-        && (Number(hist[idxN][1]) - Number(hist[idxN - 1][1])) < -0.4 * burnNom
-        && (Number(hist[idxN - 1][1]) - Number(hist[idxN - 2][1])) < -0.4 * burnNom;
-      if (!twoDrop){
-        let lastPos = -1;
-        for (let i = idxN; i >= 1; i--){
-          if (hist[i][0] <= pbPod || (idxN - i) > 2) break;
-          if (Number(hist[i][1]) - Number(hist[i - 1][1]) > 0.02){ lastPos = i; break; }
+      const negArr = recentNeg.length >= 2 ? recentNeg : allNeg;
+      if (negArr.length){
+        negArr.sort((a, b) => a - b);
+        cLoc = negArr[Math.min(negArr.length - 1, Math.floor(negArr.length * 0.55))];
+      }
+      const cCons = Math.min(cLoc, cNom);
+      const pbPod = allAtTarget.pbPodMin || effToday;
+
+      /* 2. Estimasi waktu tunggu antrean pelabuhan (port queue lag) dari kapal Tiba/Antri & SB terbaru */
+      const taWait = allAtTarget.taPodMin ? Math.max(0, simDD(effToday, allAtTarget.taPodMin)) : 0;
+      const pbAge = Math.max(0, simDD(effToday, pbPod));
+      const estDischDays = Math.max(1, Math.ceil((allAtTarget.pbHop * bagi) / 4200));
+      const hasCoQueueSb = allAtTarget.sbList.some(s => s.pod >= tglPlus(pbPod, -2));
+      const hasNearSb = allAtTarget.sbList.some(s => s.pod >= tglPlus(pbPod, -4) && simDD(effToday, s.pod) <= 8);
+      const qLag = hasCoQueueSb
+        ? Math.min(8, Math.max(taWait > 0 ? 1 : 0, Math.min(taWait, pbAge - estDischDays)))
+        : (hasNearSb && taWait > 0 ? 1 : 0);
+
+      /* 3. Deteksi gelombang bongkar aktif [idx0+1 .. endIdx] sesudah hari bakar murni terakhir */
+      const gapToday = Math.max(1, simDD(hist[n - 1][0], hist[n - 2][0]));
+      const dvToday = gapToday <= 3 ? (Number(hist[n - 1][1]) - Number(hist[n - 2][1])) : 0;
+      const gainFloor = Math.max(0.20, 0.16 * cNom);
+      let endIdx = -1, isPausedToday = false;
+      if (dvToday > gainFloor && effToday >= pbPod){
+        endIdx = n - 1;
+      } else if (n >= 3 && hist[n - 2][0] > pbPod && gapToday <= 2){
+        const gapYest = Math.max(1, simDD(hist[n - 2][0], hist[n - 3][0]));
+        const dvYest = gapYest <= 3 ? (Number(hist[n - 2][1]) - Number(hist[n - 3][1])) : 0;
+        if (dvYest > gainFloor){
+          endIdx = n - 2;
+          isPausedToday = true;
         }
-        if (lastPos >= 1){
-          let idx0 = lastPos - 1, consecNeg = 0;
-          while (idx0 >= 1 && hist[idx0][0] > pbPod){
-            const dv = Number(hist[idx0][1]) - Number(hist[idx0 - 1][1]);
-            if (dv > 0.02){ consecNeg = 0; idx0--; }
-            else {
-              consecNeg++;
-              if (consecNeg >= 2){ idx0++; break; }
-              if (idx0 >= 2 && hist[idx0 - 1][0] > pbPod && (Number(hist[idx0 - 1][1]) - Number(hist[idx0 - 2][1])) > 0.02) idx0--;
-              else break;
+      }
+
+      if (endIdx >= 1){
+        let idx0 = endIdx;
+        while (idx0 >= 1 && hist[idx0][0] > pbPod){
+          const gap = Math.max(1, simDD(hist[idx0][0], hist[idx0 - 1][0]));
+          const dv = gap <= 3 ? (Number(hist[idx0][1]) - Number(hist[idx0 - 1][1])) : 0;
+          if (dv > 0.05) idx0--;
+          else break;
+        }
+        /* Jika kapal mulai bongkar tepat di hari POD (effToday === pbPod & dvToday > gainFloor) */
+        if (idx0 === endIdx && endIdx === n - 1 && hist[endIdx][0] === pbPod && dvToday > gainFloor){
+          idx0 = endIdx - 1;
+        }
+
+        if (idx0 < endIdx){
+          /* 4. Hitung total batubara masuk ke stockpile selama gelombang aktif */
+          let grossWave = 0;
+          if (!isPausedToday){
+            for (let i = idx0 + 1; i <= endIdx; i++){
+              const gap = Math.max(1, simDD(hist[i][0], hist[i - 1][0]));
+              const dv = Number(hist[i][1]) - Number(hist[i - 1][1]);
+              if (isFinite(dv) && gap <= 3) grossWave += Math.max(0, dv + gap * cLoc);
+            }
+          } else {
+            const span = Math.max(1, simDD(hist[n - 1][0], hist[idx0][0]));
+            grossWave = Math.max(0, (Number(hist[n - 1][1]) - Number(hist[idx0][1])) + span * cCons);
+          }
+
+          /* 5. Kurangi porsi kapal 'Selesai Bongkar' terbaru yang belum terserap sebelum idx0 */
+          let maxUnabsSb = 0;
+          const slacks = isPausedToday ? [0, 4, 7] : (qLag >= 3 ? [0, 4, qLag + 1] : [0, 3]);
+          for (let si = 0; si < slacks.length; si++){
+            const slack = slacks[si];
+            const podCut = tglPlus(pbPod, -slack);
+            let sbSum = 0;
+            for (let j = 0; j < allAtTarget.sbList.length; j++){
+              if (allAtTarget.sbList[j].pod >= podCut) sbSum += allAtTarget.sbList[j].hop;
+            }
+            if (!(sbSum > 0)) continue;
+            const shift = slack > 0 ? qLag : 0;
+            const shiftedCut = tglPlus(podCut, shift);
+            const histCut = shiftedCut < pbPod ? shiftedCut : pbPod;
+            if (!isPausedToday){
+              let absBefore = 0;
+              for (let i = 1; i <= idx0; i++){
+                if (hist[i][0] <= histCut) continue;
+                const gap = Math.max(1, simDD(hist[i][0], hist[i - 1][0]));
+                const dv = Number(hist[i][1]) - Number(hist[i - 1][1]);
+                if (isFinite(dv) && gap <= 3 && dv > -0.25 * cLoc * gap){
+                  absBefore += Math.max(0, dv + gap * cLoc);
+                }
+              }
+              if (sbSum - absBefore > maxUnabsSb) maxUnabsSb = sbSum - absBefore;
+            } else {
+              let kAnchor = -1;
+              for (let i = 0; i <= idx0; i++){
+                if (hist[i][0] >= histCut){ kAnchor = i; break; }
+              }
+              if (kAnchor >= 0 && kAnchor <= idx0){
+                const spanBefore = Math.max(0, simDD(hist[idx0][0], hist[kAnchor][0]));
+                const absBefore = Math.max(0, (Number(hist[idx0][1]) - Number(hist[kAnchor][1])) + spanBefore * cCons);
+                if (sbSum - absBefore > maxUnabsSb) maxUnabsSb = sbSum - absBefore;
+              }
             }
           }
-          const drops = [];
-          for (let i = idx0; i >= 1 && drops.length < 2; i--){
-            const dv = Number(hist[i][1]) - Number(hist[i - 1][1]);
-            const gap = Math.max(1, simDD(hist[i][0], hist[i - 1][0]));
-            if (isFinite(dv) && gap <= 3 && dv < -0.02) drops.push(-dv / gap);
-          }
-          if (drops.length) cLoc = drops.reduce((a, b) => a + b, 0) / drops.length;
-          let grossIn = 0;
-          for (let i = idx0 + 1; i <= lastPos; i++){
-            const dv = Number(hist[i][1]) - Number(hist[i - 1][1]);
-            const gap = Math.max(1, simDD(hist[i][0], hist[i - 1][0]));
-            if (isFinite(dv)) grossIn += dv + gap * cLoc;
-          }
-          grossIn = Math.max(0, grossIn);
-          /* kurangi volume kapal Selesai Bongkar terbaru yang belum terserap sebelum idx0 (proteksi Gorontalo/Punagaya) */
-          const floorSb = tglPlus(pbPod, -6);
-          let recentSb = 0;
-          allAtTarget.sbList.forEach(s => { if (s.pod >= floorSb) recentSb += s.hop; });
-          let absSincePb = 0;
-          for (let i = 1; i <= idx0; i++){
-            if (hist[i][0] <= pbPod) continue;
-            const dv = Number(hist[i][1]) - Number(hist[i - 1][1]);
-            if (isFinite(dv) && dv > 0.02) absSincePb += dv + cLoc;
-          }
-          const unabsorbedSb = Math.max(0, recentSb - absSincePb);
-          unloadedAll = Math.min(allAtTarget.pbHop * 0.85, Math.max(0, grossIn - unabsorbedSb));
+
+          unloadedAll = Math.min(allAtTarget.pbHop * 0.85, Math.max(0, grossWave - maxUnabsSb));
         }
       }
     }
@@ -11658,5 +11691,5 @@ function bindMissionUX(){
   setInterval(() => { if (SYNC.scriptToken) pullFromSheets(false); }, SYNC.refreshMinutes * 60000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4ff09815b17fe23',t:'MTc5MjkwODQwNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50662806d820bfb',t:'MTc5Mjk4NTQ1MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
