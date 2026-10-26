@@ -2232,8 +2232,15 @@ button.gf-inp-prog:hover{filter:brightness(.97);border-color:var(--accent)}
   border:1px solid var(--border);background:var(--surface-2);color:var(--fg-2);white-space:nowrap}
 .bk-sync.ok{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.1);color:#059669}
 .bk-sync.busy{border-color:rgba(217,119,6,.35);background:rgba(217,119,6,.1);color:#D97706}
+.bk-sync.warn{border-color:rgba(220,38,38,.35);background:rgba(220,38,38,.09);color:#DC2626}
 html[data-theme="dark"] .bk-sync.ok{color:#6EE7B7}
 html[data-theme="dark"] .bk-sync.busy{color:#FCD34D}
+html[data-theme="dark"] .bk-sync.warn{color:#FCA5A5}
+.bk-sync-btn{display:inline-flex;align-items:center;gap:4px;padding:2.5px 8px;border-radius:999px;font:700 10.5px/1.2 var(--font);
+  border:1px solid var(--border-2);background:var(--surface);color:var(--fg-2);cursor:pointer;white-space:nowrap;transition:background .12s,color .12s,border-color .12s}
+.bk-sync-btn:hover{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.bk-by{display:inline-block;margin-left:4px;padding:1px 5px;border-radius:4px;font-size:9.5px;font-weight:700;
+  background:var(--accent-soft);color:var(--accent);vertical-align:baseline}
 .bk-body{padding:0;overflow-y:auto;flex:1;background:var(--surface)}
 .bk-tbl{width:100%;border-collapse:collapse;font-size:12px}
 .bk-tbl th{position:sticky;top:0;z-index:2;background:var(--surface-2);border-bottom:1px solid var(--border-2);
@@ -4213,9 +4220,22 @@ function fromGrid(grid){
   return { dates: dClean, rows };
 }
 
+/* Bedakan pratinjau iframe terisolasi tanpa jaringan (sandbox="allow-scripts") vs
+   berkas file:// yang dibuka langsung di peramban laptop (window.parent === window,
+   tetap bisa tersambung ke Google Apps Script lewat JSONP). */
+function isIframeSandbox(){
+  try {
+    if (location.protocol === 'about:' || location.protocol === 'data:') return true;
+    if (window.origin === 'null' && location.protocol !== 'file:') return true;
+    if (location.protocol === 'file:' && window.parent && window.parent !== window) return true;
+    return false;
+  } catch(_){ return true; }
+}
+
 /* Ambil balasan lewat fetch (endpoint Apps Script mengizinkan CORS: allow-origin *) */
 async function fetchPayload(url, timeoutMs){
   if (typeof fetch !== 'function') throw new Error('browser ini tidak mendukung fetch');
+  try { if (location.protocol === 'file:') throw new Error('protokol file lokal memakai JSONP'); } catch(e0){ if (e0 && /JSONP/.test(e0.message)) throw e0; }
   const ctl = (typeof AbortController === 'function') ? new AbortController() : null;
   const t = setTimeout(() => { if (ctl) ctl.abort(); }, timeoutMs || 30000);
   try {
@@ -4462,7 +4482,7 @@ async function pullFromSheets(manual, opts){
     document.getElementById('fPeriode').disabled = false;
     return { ok:false, msg:'Token belum diisi' };
   }
-  const isSandboxed = (() => { try { return window.origin === 'null' || location.protocol === 'about:' || location.protocol === 'data:'; } catch(_){ return true; } })();
+  const isSandboxed = isIframeSandbox();
   if (isSandboxed){
     if (terapkanSnapshot()){
       hideAuthGate();
@@ -4573,6 +4593,11 @@ async function pullFromSheets(manual, opts){
        kalau tidak ada → layar galat + tombol ulangi. Tidak pernah salah bulan. */
     if (cobaCache()){
       toast('Belum bisa terhubung. Menampilkan update terakhir ' + (CACHE_AT || '') + '.');
+    } else if (terapkanSnapshot()){
+      hideAuthGate();
+      const jam = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+      setStatus('busy', 'Snapshot luring · ' + jam, pesanDasar + '\nMenampilkan snapshot bawaan berkas karena jaringan belum tersedia.');
+      toast('Tidak ada sambungan internet — menampilkan snapshot bawaan berkas.');
     } else {
       tampilGagal(lblTarik, pesanDasar + ' Bulan ini belum pernah dibuka saat online, jadi tidak ada update terakhir.');
       toast(pesanDasar);
@@ -5832,11 +5857,21 @@ function simSaveList(){ lsSet(SIM_LS_SAVED, JSON.stringify(SIM.saved)); }
 /* ══ SIMPAN BERSAMA (v59) — kolaboratif untuk seluruh pengguna berwenang yang memiliki akses ══ */
 const SIMB = { st:'', list:[], at:0, busy:false, err:'' };   /* st: '' belum dicek · ok · tidak (Code.gs lama) · gagal */
 function simBBisa(){
-  try { if (window.origin === 'null' || /^(file|about|data):$/.test(location.protocol)) return false; } catch(_){ return false; }
+  if (isIframeSandbox()) return false;
   return !!(SYNC.scriptUrl && SYNC.scriptToken);
 }
 function simBAktif(){ return simBBisa() && SIMB.st === 'ok'; }
 function simBMilik(){ return true; }
+function isBongkarCloudItem(x, dOpt){
+  if (!x) return false;
+  const xid = String(x.id || '');
+  if (/^sbk[a-z0-9]+$/.test(xid) || xid === 'siaga_bongkar_v1') return true;
+  if (/^(__SIAGA_BONGKAR__|SIAGA BONGKAR\b)/i.test(String(x.nama || ''))) return true;
+  let d = dOpt;
+  if (!d && x.data){ try { d = typeof x.data === 'string' ? JSON.parse(x.data) : x.data; } catch(_){} }
+  if (d && (d.siagaBongkar || (Array.isArray(d.a) && d.a[0] && d.a[0].type === 'siaga_bongkar'))) return true;
+  return false;
+}
 async function simBPanggil(par, ms){
   const sep = SYNC.scriptUrl.includes('?') ? '&' : '?';
   /* list=1: Code.gs lama membalas daftar bulan (kecil & cepat) → ketahuan belum mendukung, tanpa menarik data penuh */
@@ -5854,6 +5889,7 @@ async function simBPanggil(par, ms){
 function simBRapikan(x){
   if (!x || !x.id || !x.nama) return null;
   let d = null; try { d = typeof x.data === 'string' ? JSON.parse(x.data) : x.data; } catch(_){}
+  if (isBongkarCloudItem(x, d)) return null;
   if (!d || !Array.isArray(d.a)) return null;
   return { id:String(x.id), name:String(x.nama), oleh:String(x.oleh || ''), at:String(x.at || ''), per:String(x.per || ''),
            a:d.a.filter(q => q && SIM_T[q.type]), e:Number(d.e) || 0, k:Number(d.k) || 0 };
@@ -8463,10 +8499,10 @@ function gfCollectLoadShips(targetDate, realToday){
       atau MT terbongkar (beserta opsional penyesuaian B/L aktual) langsung mengurangi Stock Apung
       dan proyeksi sisa bongkar secara presisi per tongkang di seluruh modul & unduhan PPTX/PNG.
    3. Otomatis kedaluwarsa saat status kapal berubah menjadi 'Selesai Bongkar' atau berganti voyage,
-      serta tersinkron antar-pengguna lewat Web App (simList/simSave id 'siaga_bongkar_v1') tanpa
-      mengubah rumus Google Sheets maupun Code.gs. */
+      serta tersinkron antar-pengguna & antar-laptop lewat Web App (simList/simSave slot per-akun
+      'sbk' + userSlug dengan skema data.a valid SimSkenario.gs + penggabungan Last-Write-Wins
+      lintas-pengguna bebas selisih jam perangkat) tanpa mengubah rumus Google Sheets maupun Code.gs. */
 const LS_BONGKAR = 'siaga_bongkar_v1';
-const BONGKAR_CLOUD_ID = 'siaga_bongkar_v1';
 const BONGKAR = {
   items: {},
   rev: 1,
@@ -8475,10 +8511,44 @@ const BONGKAR = {
   saving: false,
   syncSt: 'local',
   syncAt: '',
+  syncErr: '',
+  dirtyCloud: false,
+  clockSkew: 0,
   cloudLoadedAt: 0,
   open: false,
   focusUnit: ''
 };
+
+function bongkarUserSlug(){
+  const raw = String((typeof SYNC !== 'undefined' && SYNC.authUser) || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+  if (raw) return raw.slice(0, 18);
+  let dev = lsGet('siaga_bk_dev') || '';
+  dev = String(dev).toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 12);
+  if (!dev){
+    dev = Math.random().toString(36).replace(/[^a-z0-9]+/g, '').slice(0, 8) + Date.now().toString(36).slice(-4);
+    lsSet('siaga_bk_dev', dev);
+  }
+  return 'dev' + dev.slice(0, 14);
+}
+function bongkarCloudIdForUser(){
+  return 'sbk' + bongkarUserSlug();
+}
+function bongkarCloudNamaForUser(){
+  const u = String((typeof SYNC !== 'undefined' && SYNC.authUser) || 'TIM').toUpperCase().replace(/[^A-Z0-9 .\-]/g, '').trim().slice(0, 22) || 'TIM';
+  return 'SIAGA BONGKAR ' + u;
+}
+function bongkarSameVal(a, b){
+  if (!a || !b) return false;
+  if (Boolean(a.clr) !== Boolean(b.clr)) return false;
+  if (a.clr && b.clr) return true;
+  const r2 = v => Math.round((Number(v) || 0) * 100);
+  const blA = a.bl == null ? -1 : r2(a.bl);
+  const blB = b.bl == null ? -1 : r2(b.bl);
+  return String(a.mode || 'pct') === String(b.mode || 'pct')
+    && r2(a.pct) === r2(b.pct)
+    && r2(a.mt) === r2(b.mt)
+    && blA === blB;
+}
 
 function gfParseBongkarNum(raw, isPct){
   if (raw == null) return null;
@@ -8541,6 +8611,7 @@ function bongkarLoadLocal(){
     if (parsed && parsed.items && typeof parsed.items === 'object'){
       BONGKAR.items = bongkarPruneMap(parsed.items);
       BONGKAR.syncAt = String(parsed.syncAt || '');
+      BONGKAR.dirtyCloud = Boolean(parsed.dirtyCloud);
       BONGKAR.rev++;
     }
   } catch(_){}
@@ -8549,7 +8620,9 @@ function bongkarLoadLocal(){
 function bongkarSaveLocal(){
   try {
     BONGKAR.items = bongkarPruneMap(BONGKAR.items);
-    lsSet(LS_BONGKAR, JSON.stringify({ v:1, items:BONGKAR.items, syncAt:BONGKAR.syncAt || '' }));
+    lsSet(LS_BONGKAR, JSON.stringify({
+      v:2, items:BONGKAR.items, syncAt:BONGKAR.syncAt || '', dirtyCloud:Boolean(BONGKAR.dirtyCloud)
+    }));
   } catch(_){}
 }
 
@@ -8569,57 +8642,117 @@ function bongkarPropagate(){
   if (typeof INSP_PLTU !== 'undefined' && INSP_PLTU && typeof openPltuInsp === 'function') openPltuInsp(INSP_PLTU, INSP_MODE, INSP_TAB);
 }
 
+function bongkarMergeCloudRecords(list){
+  const merged = {};
+  let latestRecAt = '', latestSrvMs = 0;
+  if (!Array.isArray(list)) return { merged, latestRecAt };
+  const myId = bongkarCloudIdForUser();
+  list.forEach(rec => {
+    if (!rec || !rec.data || !isBongkarCloudItem(rec)) return;
+    let d = null;
+    try { d = typeof rec.data === 'string' ? JSON.parse(rec.data) : rec.data; } catch(_){}
+    if (!d) return;
+    const act = (Array.isArray(d.a) && d.a[0] && d.a[0].type === 'siaga_bongkar') ? d.a[0] : d;
+    const rawItems = act && act.items;
+    if (!rawItems || typeof rawItems !== 'object') return;
+    const srvMs = rec.at ? Date.parse(rec.at) : NaN;
+    const cliMs = Number(act.clientNow) || 0;
+    let skew = 0;
+    if (isFinite(srvMs) && srvMs > 0 && cliMs > 0 && Math.abs(srvMs - cliMs) < 365 * 86400000){
+      skew = srvMs - cliMs;
+      if (String(rec.id || '') === myId) BONGKAR.clockSkew = skew;
+    }
+    if (isFinite(srvMs) && srvMs > latestSrvMs){
+      latestSrvMs = srvMs;
+      latestRecAt = String(rec.at);
+    }
+    const map = bongkarPruneMap(rawItems);
+    Object.keys(map).forEach(k => {
+      const it = map[k];
+      if (!it || typeof it !== 'object') return;
+      const baseAt = Number(it.at) || (isFinite(srvMs) ? srvMs : 0);
+      const normAt = (it.srvAt && isFinite(Number(it.srvAt)) && Number(it.srvAt) > 0)
+        ? Number(it.srvAt)
+        : Math.round(baseAt + skew);
+      const cand = Object.assign({}, it, {
+        srvAt: normAt,
+        by: String(it.by || rec.oleh || '')
+      });
+      if (!merged[k] || normAt > (Number(merged[k].srvAt) || 0)){
+        merged[k] = cand;
+      }
+    });
+  });
+  return { merged, latestRecAt };
+}
+
 function bongkarApplyCloudList(list, silent){
   bongkarLoadLocal();
   if (!Array.isArray(list)) return false;
-  const rec = list.find(x => x && String(x.id) === BONGKAR_CLOUD_ID);
   BONGKAR.syncSt = 'ok';
-  if (!rec || !rec.data) return false;
-  let d = null;
-  try { d = typeof rec.data === 'string' ? JSON.parse(rec.data) : rec.data; } catch(_){}
-  if (!d || !d.items || typeof d.items !== 'object') return false;
-  const incoming = bongkarPruneMap(d.items);
+  BONGKAR.syncErr = '';
+  const { merged, latestRecAt } = bongkarMergeCloudRecords(list);
   let changed = false;
-  Object.keys(incoming).forEach(k => {
-    const inc = incoming[k], cur = BONGKAR.items[k];
-    const incAt = Number(inc && inc.at) || 0, curAt = Number(cur && cur.at) || 0;
+  const authors = [];
+  const me = String((typeof SYNC !== 'undefined' && SYNC.authUser) || '').toLowerCase();
+  Object.keys(merged).forEach(k => {
+    const inc = merged[k], cur = BONGKAR.items[k];
+    const incAt = Number(inc && (inc.srvAt || inc.at)) || 0;
+    const curAt = cur
+      ? (Number(cur.srvAt) || ((Number(cur.at) || 0) + (BONGKAR.clockSkew || 0)))
+      : 0;
+    if (cur && cur.localDirty) return;
     if (!cur || incAt > curAt){
-      if (JSON.stringify(cur || null) !== JSON.stringify(inc)){
-        BONGKAR.items[k] = inc;
+      const valDiff = !cur || !bongkarSameVal(cur, inc);
+      BONGKAR.items[k] = inc;
+      if (valDiff){
         changed = true;
+        const au = String(inc.by || '').trim();
+        if (au && au.toLowerCase() !== me && authors.indexOf(au) < 0) authors.push(au);
       }
     }
   });
-  if (rec.at) BONGKAR.syncAt = typeof simBWaktu === 'function' ? simBWaktu(rec.at) : String(rec.at);
+  if (latestRecAt){
+    BONGKAR.syncAt = typeof simBWaktu === 'function' ? simBWaktu(latestRecAt) : String(latestRecAt);
+  } else if (!BONGKAR.syncAt){
+    BONGKAR.syncAt = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+  }
   if (changed){
     bongkarSaveLocal();
     bongkarPropagate();
     if (BONGKAR.open && typeof renderBongkarModal === 'function') renderBongkarModal();
-    else if (!silent) toast('Realisasi bongkar tongkang disinkronkan dari Cloud');
-  } else if (BONGKAR.open && typeof bongkarUpdateSyncBadge === 'function'){
-    bongkarUpdateSyncBadge();
+    if (!silent){
+      toast('☁ Realisasi bongkar diperbarui dari Cloud' + (authors.length ? ' (oleh ' + authors.join(', ') + ')' : ''));
+    }
+  } else {
+    bongkarSaveLocal();
+    if (BONGKAR.open && typeof bongkarUpdateSyncBadge === 'function') bongkarUpdateSyncBadge();
   }
   return changed;
 }
 
-async function bongkarLoadCloud(force){
+async function bongkarLoadCloud(force, silent){
   bongkarLoadLocal();
-  if (typeof simBBisa !== 'function' || !simBBisa() || BONGKAR.busy) return;
-  if (!force && BONGKAR.cloudLoadedAt && Date.now() - BONGKAR.cloudLoadedAt < 25000) return;
+  if (typeof simBBisa !== 'function' || !simBBisa() || BONGKAR.busy || BONGKAR.saving) return false;
+  if (!force && BONGKAR.cloudLoadedAt && Date.now() - BONGKAR.cloudLoadedAt < 18000) return false;
   BONGKAR.busy = true;
   if (typeof bongkarUpdateSyncBadge === 'function') bongkarUpdateSyncBadge();
   try {
-    const r = await simBPanggil({ action:'simList' }, 20000);
+    const r = await simBPanggil({ action:'simList' }, 18000);
     BONGKAR.cloudLoadedAt = Date.now();
     BONGKAR.syncSt = 'ok';
-    bongkarApplyCloudList(r && r.items, true);
+    BONGKAR.syncErr = '';
+    const chg = bongkarApplyCloudList(r && r.items, silent !== false);
     if (Array.isArray(r && r.items) && typeof simBRapikan === 'function'){
       SIMB.list = r.items.map(simBRapikan).filter(Boolean);
       SIMB.st = 'ok'; SIMB.err = ''; SIMB.at = Date.now();
       if (typeof simBSegarkan === 'function') simBSegarkan();
     }
-  } catch(_){
+    return chg;
+  } catch(err){
+    BONGKAR.syncErr = (err && err.message) ? String(err.message) : 'Koneksi Cloud belum tersedia';
     if (BONGKAR.syncSt !== 'ok') BONGKAR.syncSt = 'local';
+    return false;
   } finally {
     BONGKAR.busy = false;
     if (typeof bongkarUpdateSyncBadge === 'function') bongkarUpdateSyncBadge();
@@ -8627,26 +8760,73 @@ async function bongkarLoadCloud(force){
 }
 
 async function bongkarSaveCloud(){
-  if (typeof simBBisa !== 'function' || !simBBisa()) return false;
+  bongkarLoadLocal();
+  if (typeof simBBisa !== 'function' || !simBBisa()){
+    BONGKAR.syncSt = 'local';
+    return false;
+  }
+  if (BONGKAR.saving) return false;
   BONGKAR.saving = true;
   if (typeof bongkarUpdateSyncBadge === 'function') bongkarUpdateSyncBadge();
   try {
-    const payload = JSON.stringify({ v:1, items:bongkarPruneMap(BONGKAR.items), updatedAt:new Date().toISOString() });
+    /* Tarik & gabungkan dulu pembaruan rekan lain sebelum menulis slot pengguna ini */
+    try {
+      const pre = await simBPanggil({ action:'simList' }, 8000);
+      if (pre && Array.isArray(pre.items)) bongkarApplyCloudList(pre.items, true);
+    } catch(_){}
+    const cliNow = Date.now();
+    const mySlotId = bongkarCloudIdForUser();
+    const myNama = bongkarCloudNamaForUser();
+    const cleanItems = {};
+    const pruned = bongkarPruneMap(BONGKAR.items);
+    Object.keys(pruned).forEach(k => {
+      const copy = Object.assign({}, pruned[k]);
+      if (copy.localDirty){
+        delete copy.srvAt;
+        delete copy.localDirty;
+      }
+      cleanItems[k] = copy;
+    });
+    /* Skema data.a valid penuh sesuai kontrak SimSkenario.gs (Database!U:AA) */
+    const payload = JSON.stringify({
+      v:1,
+      a:[{
+        id:'abk1', type:'siaga_bongkar', on:false, bk:1,
+        clientNow:cliNow, updatedAt:new Date(cliNow).toISOString(),
+        items:cleanItems
+      }],
+      e:0, k:0
+    });
     const parts = simBPotong(payload);
     if (parts.length > 12) throw new Error('Data realisasi bongkar melebihi batas ukuran');
+    let lastSaveRes = null;
     for (let i = 0; i < parts.length; i++){
-      await simBPanggil({
-        action:'simSave', id:BONGKAR_CLOUD_ID, nama:'__SIAGA_BONGKAR__',
+      lastSaveRes = await simBPanggil({
+        action:'simSave', id:mySlotId, nama:myNama,
         per:S.periode || '', part:i + 1, of:parts.length, d:parts[i]
       }, 25000);
     }
+    const srvMs = (lastSaveRes && lastSaveRes.at) ? Date.parse(lastSaveRes.at) : NaN;
+    if (isFinite(srvMs) && srvMs > 0) BONGKAR.clockSkew = srvMs - cliNow;
+    Object.keys(BONGKAR.items).forEach(k => {
+      const it = BONGKAR.items[k];
+      if (it && it.localDirty){
+        delete it.localDirty;
+        it.srvAt = Math.round((Number(it.at) || cliNow) + (BONGKAR.clockSkew || 0));
+      }
+    });
     BONGKAR.syncSt = 'ok';
+    BONGKAR.syncErr = '';
+    BONGKAR.dirtyCloud = false;
     BONGKAR.syncAt = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
     BONGKAR.cloudLoadedAt = Date.now();
     bongkarSaveLocal();
     return true;
-  } catch(_){
-    BONGKAR.syncSt = 'local';
+  } catch(err){
+    BONGKAR.dirtyCloud = true;
+    BONGKAR.syncSt = 'warn';
+    BONGKAR.syncErr = (err && err.message) ? String(err.message) : 'Gagal menyimpan ke Cloud';
+    bongkarSaveLocal();
     return false;
   } finally {
     BONGKAR.saving = false;
@@ -9757,7 +9937,7 @@ function gfSyncMateriPpt(timeoutMs){
     } catch(_){}
   }
   if (GF_MATERI_PROM) return GF_MATERI_PROM;
-  const isSandboxed = (() => { try { return window.origin === 'null' || location.protocol === 'about:' || location.protocol === 'data:'; } catch(_){ return true; } })();
+  const isSandboxed = isIframeSandbox();
   if (isSandboxed || typeof document === 'undefined' || !document.head){
     GF_MATERI_AT = Date.now();
     return Promise.resolve(GF_MATERI_LIVE);
@@ -10898,16 +11078,26 @@ function bongkarSummaryCounts(){
 }
 
 function bongkarSyncBadgeHTML(){
-  if (BONGKAR.saving) return '<span class="bk-sync busy" id="bkSyncBdg">⟳ Menyimpan ke Cloud…</span>';
-  if (BONGKAR.busy) return '<span class="bk-sync busy" id="bkSyncBdg">⟳ Memuat Cloud…</span>';
-  if (typeof simBBisa === 'function' && simBBisa() && BONGKAR.syncSt === 'ok'){
-    return '<span class="bk-sync ok" id="bkSyncBdg">☁ Sinkron Cloud' + (BONGKAR.syncAt ? ' · ' + esc(BONGKAR.syncAt) : '') + '</span>';
+  const canCloud = typeof simBBisa === 'function' && simBBisa();
+  const pullBtn = canCloud
+    ? ' <button type="button" class="bk-sync-btn" id="bkPullCloud" title="Tarik data realisasi bongkar terbaru yang diinput rekan lain di Cloud"' + ((BONGKAR.busy || BONGKAR.saving) ? ' disabled' : '') + '>↻ Tarik Cloud</button>'
+    : '';
+  if (BONGKAR.saving) return '<span id="bkSyncWrap" style="display:inline-flex;align-items:center;gap:6px"><span class="bk-sync busy" id="bkSyncBdg">⟳ Menyimpan ke Cloud…</span></span>';
+  if (BONGKAR.busy) return '<span id="bkSyncWrap" style="display:inline-flex;align-items:center;gap:6px"><span class="bk-sync busy" id="bkSyncBdg">⟳ Memuat Cloud…</span></span>';
+  if (canCloud && (BONGKAR.dirtyCloud || BONGKAR.syncSt === 'warn')){
+    return '<span id="bkSyncWrap" style="display:inline-flex;align-items:center;gap:6px"><span class="bk-sync warn" id="bkSyncBdg" title="' + esc(BONGKAR.syncErr || 'Menunggu koneksi Cloud untuk mengirim perubahan') + '">⚠ Belum Terkirim ke Cloud</span>' + pullBtn + '</span>';
   }
-  return '<span class="bk-sync" id="bkSyncBdg">💾 Tersimpan di Perangkat</span>';
+  if (canCloud && BONGKAR.syncSt === 'ok'){
+    return '<span id="bkSyncWrap" style="display:inline-flex;align-items:center;gap:6px"><span class="bk-sync ok" id="bkSyncBdg" title="Tersinkron otomatis dengan seluruh pengguna SIAGA di Cloud">☁ Sinkron Cloud' + (BONGKAR.syncAt ? ' · ' + esc(BONGKAR.syncAt) : '') + '</span>' + pullBtn + '</span>';
+  }
+  if (canCloud){
+    return '<span id="bkSyncWrap" style="display:inline-flex;align-items:center;gap:6px"><span class="bk-sync" id="bkSyncBdg">☁ Siap Sinkron Cloud</span>' + pullBtn + '</span>';
+  }
+  return '<span id="bkSyncWrap" style="display:inline-flex;align-items:center;gap:6px"><span class="bk-sync" id="bkSyncBdg">💾 Tersimpan di Perangkat</span></span>';
 }
 
 function bongkarUpdateSyncBadge(){
-  const el = $id('bkSyncBdg');
+  const el = $id('bkSyncWrap') || $id('bkSyncBdg');
   if (!el) return;
   const tmp = document.createElement('div');
   tmp.innerHTML = bongkarSyncBadgeHTML();
@@ -11002,13 +11192,14 @@ function renderBongkarModal(){
       const podTxt = item.pod ? ('Tiba ' + fmtShort(item.pod)) : '';
       const taTxt = item.taCnt > 0 ? (' · +' + item.taCnt + ' Tiba/Antri (' + gfN(Math.round(item.taMt)) + ' MT)') : '';
       const srcTxt = item.src === 'next' ? (' · Sheet ' + nxLbl) : (item.src === 'prev' ? ' · Carry-over Bln-1' : '');
+      const byAuthor = (saved && !saved.clr && st.hasInput && saved.by) ? (' <span class="bk-by" title="Diperbarui oleh ' + esc(saved.by) + '">oleh ' + esc(saved.by) + '</span>') : '';
       const isFoc = BONGKAR.focusUnit && BONGKAR.focusUnit.toLowerCase() === item.unit.toLowerCase();
       tblHtml += '<tr class="bk-row' + (isFoc ? ' focus-hi' : '') + '" data-key="' + esc(item.key) + '" data-unit="' + esc(item.unit) + '"'
         + ' data-nom="' + esc(item.nom) + '" data-sup="' + esc(item.sup) + '" data-pod="' + esc(item.pod) + '"'
         + ' data-sheetvol="' + item.sheetVol + '" data-burn="' + item.burn + '" data-tamt="' + item.taMt + '" data-tacnt="' + item.taCnt + '"'
         + ' data-mode="' + rowMode + '">'
         + '<td><span class="bk-pltu">' + esc(item.unit) + '</span><span class="bk-burn">Pembagi ' + gfN(item.burn) + ' MT/hr</span></td>'
-        + '<td><div class="bk-ship">' + esc(item.nom) + '</div>'
+        + '<td><div class="bk-ship">' + esc(item.nom) + byAuthor + '</div>'
           + '<div class="bk-ship-sub">' + esc(item.sup) + (podTxt ? ' · ' + esc(podTxt) : '') + esc(srcTxt) + esc(taTxt) + '</div></td>'
         + '<td class="num"><label class="bk-iw" title="Opsional: isi jika B/L aktual berbeda dari pembulatan sheet (' + gfFmtDecId(item.sheetVol, 2) + ' MT)">'
           + '<input type="text" inputmode="decimal" class="bk-inp w-bl" data-bkf="bl" placeholder="' + esc(gfFmtDecId(item.sheetVol, 2)) + '" value="' + esc(blVal) + '" aria-label="B/L Aktual ' + esc(item.unit) + '">'
@@ -11059,7 +11250,7 @@ function openBongkarModal(optFocusUnit){
   renderBongkarModal();
   scrim.hidden = false;
   modal.hidden = false;
-  bongkarLoadCloud(false);
+  bongkarLoadCloud(true, false);
   setTimeout(() => {
     const focRow = BONGKAR.focusUnit
       ? Array.from(modal.querySelectorAll('tr.bk-row')).find(tr => tr.dataset.unit.toLowerCase() === BONGKAR.focusUnit.toLowerCase())
@@ -11089,11 +11280,13 @@ async function bongkarSaveFromModal(){
   const modal = $id('bongkarModal');
   if (!modal) return;
   const now = Date.now(), realToday = gfRealToday();
+  const normNow = Math.round(now + (BONGKAR.clockSkew || 0));
   const byUser = (typeof SYNC !== 'undefined' && SYNC.authUser) ? String(SYNC.authUser) : '';
-  let filledCnt = 0;
+  let filledCnt = 0, modifiedCnt = 0;
   Array.from(modal.querySelectorAll('tr.bk-row')).forEach(tr => {
     const key = tr.dataset.key;
     if (!key) return;
+    const prev = BONGKAR.items[key] || null;
     const sheetVol = Number(tr.dataset.sheetvol) || 0;
     const blInp = tr.querySelector('[data-bkf="bl"]');
     const pctInp = tr.querySelector('[data-bkf="pct"]');
@@ -11118,23 +11311,34 @@ async function bongkarSaveFromModal(){
     }
     if (pct != null || mt != null || blCustom != null){
       filledCnt++;
-      BONGKAR.items[key] = {
+      const draft = {
         u:tr.dataset.unit || '', nom:tr.dataset.nom || '', sup:tr.dataset.sup || '',
-        pod:tr.dataset.pod || '', mode:mode, pct:pct || 0, mt:mt || 0, bl:blCustom,
-        tgl:realToday, by:byUser, at:now
+        pod:tr.dataset.pod || '', mode:mode, pct:pct || 0, mt:mt || 0, bl:blCustom
       };
-    } else if (BONGKAR.items[key] && !BONGKAR.items[key].clr){
-      BONGKAR.items[key] = { u:tr.dataset.unit || '', pod:tr.dataset.pod || '', clr:1, by:byUser, at:now };
+      /* Hanya beri stempel waktu baru pada baris yang nilainya benar-benar berubah,
+         sehingga input rekan lain pada baris yang tidak disentuh tidak ikut tertimpa */
+      if (!prev || !bongkarSameVal(draft, prev)){
+        BONGKAR.items[key] = Object.assign(draft, { tgl:realToday, by:byUser, at:now, localDirty:1 });
+        modifiedCnt++;
+      }
+    } else if (prev && !prev.clr){
+      BONGKAR.items[key] = { u:tr.dataset.unit || '', pod:tr.dataset.pod || '', clr:1, tgl:realToday, by:byUser, at:now, localDirty:1 };
+      modifiedCnt++;
     }
   });
+  if (modifiedCnt > 0) BONGKAR.dirtyCloud = true;
   bongkarSaveLocal();
   bongkarPropagate();
   closeBongkarModal();
-  const cloudOk = await bongkarSaveCloud();
+  const canCloud = typeof simBBisa === 'function' && simBBisa();
+  const cloudOk = canCloud ? await bongkarSaveCloud() : false;
   if (S.page === 'grafik') gfPaint();
+  const syncSuffix = cloudOk
+    ? ' & tersinkron ke Cloud ✓'
+    : (canCloud && BONGKAR.syncErr ? (' · Gagal kirim ke Cloud (' + BONGKAR.syncErr + '), akan dicoba ulang otomatis') : ' (tersimpan di perangkat)');
   toast(filledCnt > 0
-    ? ('Realisasi bongkar ' + filledCnt + ' tongkang diterapkan' + (cloudOk ? ' & tersinkron ke Cloud ✓' : ' (tersimpan lokal)'))
-    : ('Seluruh kapal Proses Bongkar dikembalikan ke 100% B/L utuh' + (cloudOk ? ' & tersinkron ke Cloud ✓' : '')));
+    ? ('Realisasi bongkar ' + filledCnt + ' tongkang diterapkan' + syncSuffix)
+    : ('Seluruh kapal Proses Bongkar dikembalikan ke 100% B/L utuh' + syncSuffix));
 }
 
 function bindBongkarModalOnce(){
@@ -11142,8 +11346,15 @@ function bindBongkarModalOnce(){
   if (!modal || modal._bkBound) return;
   modal._bkBound = true;
   if (scrim) scrim.addEventListener('click', closeBongkarModal);
-  modal.addEventListener('click', e => {
+  modal.addEventListener('click', async e => {
     if (e.target.closest('#bkClose') || e.target.closest('#bkCancel')){ closeBongkarModal(); return; }
+    if (e.target.closest('#bkPullCloud')){
+      if (BONGKAR.dirtyCloud) await bongkarSaveCloud();
+      const chg = await bongkarLoadCloud(true, true);
+      if (BONGKAR.open) renderBongkarModal();
+      toast(chg ? '☁ Data realisasi bongkar terbaru berhasil ditarik dari Cloud ✓' : '☁ Data realisasi bongkar sudah paling baru dari Cloud ✓');
+      return;
+    }
     if (e.target.closest('#bkSave')){ bongkarSaveFromModal(); return; }
     if (e.target.closest('#bkResetAll')){
       Array.from(modal.querySelectorAll('tr.bk-row')).forEach(tr => {
@@ -11775,7 +11986,7 @@ function deriveLegacyToken(seedHex){
   return mask.map((m, i) => String.fromCharCode(m ^ seedHex.charCodeAt(i))).join('');
 }
 async function callAuthServer(params){
-  const isSandboxed = (() => { try { return window.origin === 'null' || location.protocol === 'about:' || location.protocol === 'data:'; } catch(_){ return true; } })();
+  const isSandboxed = isIframeSandbox();
   if (isSandboxed || !SYNC.scriptUrl) return null;
   try {
     const sep = SYNC.scriptUrl.includes('?') ? '&' : '?';
@@ -11938,8 +12149,12 @@ function smartAutoSync(){
   checkCalendarRollover();
   updateFreshnessUI();
   if (!SYNC.scriptToken || PULL_BUSY) return;
-  const isSandboxed = (() => { try { return window.origin === 'null' || location.protocol === 'about:' || location.protocol === 'data:'; } catch(_){ return true; } })();
+  const isSandboxed = isIframeSandbox();
   if (isSandboxed) return;
+  if (typeof bongkarLoadCloud === 'function'){
+    if (BONGKAR && BONGKAR.dirtyCloud) bongkarSaveCloud();
+    else bongkarLoadCloud(true, false);
+  }
   const age = LAST_SYNC_TS > 0 ? (Date.now() - LAST_SYNC_TS) : Infinity;
   if (age >= 5 * 60 * 1000) pullFromSheets(false);
 }
@@ -12155,8 +12370,24 @@ function bindMissionUX(){
     }
   });
   setInterval(() => { checkCalendarRollover(); updateFreshnessUI(); }, 15000);
+  /* Sinkronisasi latar realisasi bongkar antar-laptop (ringan via list=1&action=simList tiap 20 dtk saat tab aktif) */
+  setInterval(() => {
+    try {
+      if (document.visibilityState === 'hidden') return;
+      if (!SYNC.scriptToken || PULL_BUSY || isIframeSandbox()) return;
+      if (BONGKAR.dirtyCloud && !BONGKAR.saving) bongkarSaveCloud();
+      else if (!BONGKAR.busy && !BONGKAR.saving) bongkarLoadCloud(true, false);
+    } catch(_){}
+  }, 20000);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') smartAutoSync();
+  });
+  window.addEventListener('focus', () => {
+    try {
+      if (!SYNC.scriptToken || PULL_BUSY || isIframeSandbox()) return;
+      if (BONGKAR.dirtyCloud && !BONGKAR.saving) bongkarSaveCloud();
+      else bongkarLoadCloud(false, false);
+    } catch(_){}
   });
   window.addEventListener('online', smartAutoSync);
 }
@@ -12219,5 +12450,5 @@ function bindMissionUX(){
   setInterval(() => { if (SYNC.scriptToken) pullFromSheets(false); }, SYNC.refreshMinutes * 60000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a507ba1a6c82fe09',t:'MTc5Mjk5OTUyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a507eb6acacb88ff',t:'MTc5MzAwMTU0NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
