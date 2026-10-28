@@ -2923,6 +2923,408 @@ html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
   html:not(.vmode-desk) .gf-qbtn{padding:0 7px;font-size:11px}
   .hm-rad .rd-row{grid-template-areas:"n lv" "c2 c2" "c3 c3" "c6 c6" !important}
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   v75 · ANDROID ~6-INCH PRECISION FIT (320px–430px Portrait + Landscape & 100dvh)
+   Menjamin seluruh halaman, tombol, tabel, form, dan fitur klik/ketuk (dropdown,
+   popover, bottom-sheet, modal, tooltip, Mode Desktop) pas 100% di layar Android 6 inci.
+   ══════════════════════════════════════════════════════════════════════════ */
+.sm-exp-hd,.sm-pop-hd{display:none}
+.dq-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:4px}
+.dq-hd h3{margin:0 !important;flex:1;min-width:0}
+.gf-ip-hd .gf-ip-x{display:none}
+.sm-sh-w{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+.pi-proj .pi-box{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#tt,#tt.gf-tt{max-width:min(352px,calc(100vw - 16px));min-width:0;box-sizing:border-box}
+#toast{width:max-content;max-width:min(540px,calc(100vw - 24px));box-sizing:border-box}
+.sm-arrk ol{grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr))}
+
+/* Mid-width & Android Landscape (781px–1040px, mis. HP 6 inci diputar mendatar ~800×360px) */
+@media (min-width:781px) and (max-width:1040px){
+  :root{--navw:184px}
+  .gfw-axis,.gfw-row{grid-template-columns:136px minmax(150px,1fr) 58px 176px;gap:8px;padding-left:12px;padding-right:12px}
+  .gfw-c-near{grid-template-columns:38px 58px minmax(0,1fr);gap:4px}
+  .gfw-nm{font-size:12px}
+  .gfw-c-tot{font-size:11.5px;padding-left:6px}
+}
+@media (max-width:1180px){
+  #smBody[data-pick="1"] .sm-grid{grid-template-columns:minmax(0,1fr) !important}
+}
+
+/* Seluruh layar mobile & tablet potret (<= 780px) */
+@media (max-width:780px){
+  /* 1. Burger Drawer (.nav) aman 100dvh & tidak terpotong bar navigasi Chrome Android */
+  .nav{
+    height:100vh;height:100dvh;max-height:100dvh;
+    width:min(276px,calc(100vw - 44px));
+    padding-bottom:calc(14px + env(safe-area-inset-bottom));
+    overflow-y:auto;overscroll-behavior:contain;
+  }
+  .nv-list{min-height:120px}
+
+  /* 2. Topbar Android 6 Inci: judul halaman lega, indikator status sinkronisasi terpadu di tombol Sync */
+  .topbar{
+    position:sticky !important;top:0;z-index:68;height:50px !important;min-height:50px !important;
+    flex-wrap:nowrap !important;padding:0 8px !important;gap:5px !important;align-items:center;
+    background:linear-gradient(180deg,#0B1F38,#0E2744);
+    box-shadow:0 2px 12px rgba(6,15,28,.22);
+  }
+  .topbar .tb-br,
+  .topbar .tb-today,
+  .topbar #dqChip,
+  .topbar #btnTheme,
+  .topbar #modeBadge,
+  .topbar #usrTxt,
+  .topbar .tb-sp{display:none !important}
+  html:not(.vmode-desk) .topbar #btnView{display:none !important}
+  html.vmode-desk .topbar #btnView{
+    display:inline-flex !important;align-items:center;justify-content:center;gap:3px;
+    height:32px;min-height:32px;padding:0 8px;border-radius:8px;font-size:11px;font-weight:700;flex:none;
+  }
+  html.vmode-desk .topbar #btnView .tbv-t{display:none}
+  html.vmode-desk .topbar #btnView::after{content:"HP";font-size:10.5px;font-weight:800;letter-spacing:.02em}
+  .topbar .tb-burger{width:34px !important;height:34px !important;min-width:34px !important;min-height:34px !important;border-radius:9px;flex:none}
+  .topbar .tb-ttl{flex:1 1 auto;min-width:68px;display:flex;flex-direction:column;justify-content:center;gap:1px;overflow:hidden}
+  .topbar #pgTitle{font-size:14px !important;font-weight:800;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .topbar .tb-sub{font-size:9.5px;line-height:1.1;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .topbar #fPeriode{
+    max-width:92px !important;height:31px !important;min-height:31px !important;
+    padding:0 18px 0 7px !important;font-size:11.5px !important;border-radius:8px;flex:0 1 auto;
+  }
+  .topbar #tbSync:not(.err){display:none !important}
+  .topbar #tbSync.err{height:30px;min-height:30px;padding:0 7px;border-radius:8px;flex:none}
+  .topbar #tbSync.err .syncT{display:none !important}
+  .topbar .tb-cmdk,
+  .topbar #btnSync,
+  .topbar #btnUser{
+    width:34px !important;height:34px !important;min-width:34px !important;min-height:34px !important;
+    padding:0 !important;border-radius:9px !important;justify-content:center;flex:none;position:relative;
+  }
+  .topbar #btnUser .u-av{margin:0;width:23px;height:23px;font-size:10px}
+  .topbar #btnSync[data-syncst]::after{
+    content:"";position:absolute;top:4px;right:4px;width:6.5px;height:6.5px;border-radius:50%;
+    background:#94A3B8;box-shadow:0 0 0 1.5px #0D2440;pointer-events:none;
+  }
+  .topbar #btnSync[data-syncst="live"]::after{background:#22C55E}
+  .topbar #btnSync[data-syncst="stale"]::after{background:#FBBF24}
+  .topbar #btnSync[data-syncst="snap"]::after{background:#38BDF8}
+  .topbar #btnSync[data-syncst="err"]::after{background:#EF4444}
+  .topbar #btnSync[data-syncst="busy"]::after{background:#60A5FA}
+
+  /* Tabbar tetap tampil konsisten baik Mode HP maupun Mode Desktop di layar <=780px */
+  .tabbar{
+    height:auto;padding:5px 8px calc(6px + env(safe-area-inset-bottom));gap:4px;
+    background:color-mix(in srgb,var(--surface) 92%,transparent);
+    backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);
+    border-top:1px solid color-mix(in srgb,var(--border-2) 80%,transparent);
+    box-shadow:0 -8px 24px rgba(15,23,42,.10);
+  }
+  .page{padding-bottom:calc(88px + env(safe-area-inset-bottom)) !important}
+
+  /* 3. Grafik HOP selalu memakai tata letak penuh 1 kolom pada layar <=780px (termasuk bila vmode-desk aktif di Jadwal) */
+  #pg-grafik{padding:10px 10px calc(88px + env(safe-area-inset-bottom)) !important}
+  .gf-shell{max-width:none;width:100%}
+  .gf-topdock{border-radius:13px;margin-bottom:10px}
+  .gf-cmd{padding:9px 10px;gap:7px;flex-direction:column;align-items:stretch}
+  .gf-cmd-l{width:100%;gap:6px;align-items:center}
+  .gf-bound{display:none !important}
+  .gf-scrub{height:35px;border-radius:9px;flex:1 1 154px;min-width:146px;justify-content:space-between}
+  .gf-scrub .gf-dt{height:33px;flex:1;text-align:center;min-width:0;padding:0 4px}
+  .gf-sbtn{width:32px;height:33px;min-width:32px}
+  .gf-qgrp{display:flex;gap:4px;flex:1 0 auto;justify-content:flex-end}
+  .gf-qbtn{height:34px;padding:0 8px;border-radius:8px;font-size:11.5px;flex:1 1 auto;text-align:center}
+  .gf-bk-btn{height:33px;padding:0 9px;border-radius:8px;font-size:11.5px;max-width:100%}
+  button.gf-inp-prog{height:32px;padding:0 9px;border-radius:8px;font-size:11px;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .gf-cmd-r{
+    width:100%;margin-left:0;padding-top:6px;border-top:1px solid var(--border);
+    display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;
+  }
+  .gf-cmd-r .gf-ctrl-l{display:none}
+  .gf-cmd-r .gf-ctrl-g.reg{grid-column:1 / -1;min-width:0;width:100%}
+  .gf-cmd-r .gf-ctrl-g.sort{grid-column:1 / 2;min-width:0;width:100%}
+  .gf-cmd-r .gf-exp{grid-column:2 / 3}
+  .gf-cmd-r .sm-seg{width:100%;display:flex}
+  .gf-cmd-r .sm-seg button{flex:1;padding:5px 4px;font-size:11px;justify-content:center;min-height:32px;min-width:0}
+  .gf-exp summary{height:32px;padding:0 10px;border-radius:8px;display:inline-flex;align-items:center}
+  .gf-ribbon{padding:7px 10px;gap:6px;flex-direction:column;align-items:stretch}
+  .gf-stats{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;margin:0 -10px;padding:1px 10px;gap:6px}
+  .gf-stats::-webkit-scrollbar{display:none}
+  .gf-sp{height:30px;padding:0 9px;flex:none}
+  .gf-leg{margin-left:0;gap:5px 9px;font-size:10px;padding-top:4px;border-top:1px dashed var(--border)}
+  .gfw-board{gap:10px}
+  .gfw-panel{border-radius:13px}
+  .gfw-hd{flex-wrap:wrap;padding:8px 11px;gap:6px 8px}
+  .gfw-hd-r{flex-wrap:wrap;gap:4px}
+  .gfw-axis,.gfw-c-tot,.gfw-c-near{display:none !important}
+  .gfw-row{grid-template-columns:minmax(0,1fr) !important;gap:6px;padding:9px 11px 9px 13px}
+  .gfw-row.has-co{padding-top:9px}
+  .gfw-row.has-co .gfw-trk{margin-top:14px}
+  .gfw-id{gap:5px;min-width:0;overflow:hidden}
+  .gfw-nm-g{flex:none}
+  .gfw-nm{font-size:13.2px}
+  .gfw-dl{flex:none;padding:1.5px 5px;font-size:9.8px}
+  .gfw-mhop{
+    display:inline-flex !important;align-items:center;gap:4px;font-size:11px;font-weight:700;
+    color:var(--fg-2);font-variant-numeric:tabular-nums;margin-left:auto;
+    flex:0 1 auto !important;min-width:0;overflow:hidden;white-space:nowrap;
+  }
+  .gfw-mhop b{color:var(--fg);font-weight:800;font-size:11.8px;flex:none}
+  .gfw-mhop .mh-near{color:var(--muted);font-size:10.2px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .gfw-trk,.gfw-bars{height:22px}
+  .gfw-seg{font-size:9.6px}
+  .gfw-seg.tight{font-size:8.5px;letter-spacing:-.04em}
+
+  /* 4. Semua Menu Klik / Dropdown / Popover jadi Floating Bottom/Top Sheet yang Pas Layar HP */
+  .sm-exp[open] .sm-exp-m,
+  .gf-exp[open] .sm-exp-m{
+    position:fixed !important;left:10px !important;right:10px !important;top:auto !important;
+    bottom:calc(70px + env(safe-area-inset-bottom)) !important;
+    min-width:0 !important;width:auto !important;max-width:none !important;
+    max-height:calc(100dvh - 134px);overflow-y:auto;overscroll-behavior:contain;
+    z-index:146 !important;padding:10px !important;border-radius:16px !important;
+    box-shadow:0 22px 54px rgba(0,0,0,.42),0 0 0 100vmax rgba(8,15,26,.34) !important;
+  }
+  .sm-exp-hd{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:2px 4px 8px;margin-bottom:4px;border-bottom:1px solid var(--border);
+  }
+  .sm-exp-hd b{font-size:13px;font-weight:800;color:var(--fg)}
+  .gf-exp .sm-exp-m button,
+  .sm-exp .sm-exp-m button{
+    width:100%;min-height:42px;padding:9px 10px !important;border-radius:10px;
+    white-space:normal !important;line-height:1.35;gap:10px;
+  }
+  .gf-exp .sm-exp-m button > span{white-space:normal;text-align:left;word-break:break-word}
+
+  /* Popover Kelola Skenario (#smPop) menempel di atas agar aman saat keyboard Android muncul */
+  .sm-pop{
+    position:fixed !important;left:10px !important;right:10px !important;top:56px !important;bottom:auto !important;
+    width:auto !important;max-width:none !important;
+    max-height:calc(100dvh - 130px - env(safe-area-inset-bottom));overflow-y:auto;overscroll-behavior:contain;
+    z-index:146 !important;padding:12px !important;border-radius:16px !important;
+    box-shadow:0 22px 54px rgba(0,0,0,.42),0 0 0 100vmax rgba(8,15,26,.34) !important;
+  }
+  .sm-pop-hd{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:0 2px 8px;margin-bottom:4px;border-bottom:1px solid var(--border);
+  }
+  .sm-pop-hd b{font-size:13.5px;font-weight:800;color:var(--fg)}
+  .sm-pop .sv input{min-height:38px}
+  .sm-pop .sv button{min-height:38px;padding:0 14px}
+  .sm-pop button.mi{min-height:40px}
+
+  /* Popover Kelengkapan Input (#gfInpPop), Kualitas Data (#dqPanel), Filter/Quick/Legenda (.pop), & Pemasok (.suppanel) */
+  .gf-inp-pop{
+    position:fixed !important;left:10px !important;right:10px !important;top:auto !important;
+    bottom:calc(70px + env(safe-area-inset-bottom)) !important;width:auto !important;max-width:none !important;
+    max-height:calc(100dvh - 132px);overflow-y:auto;overscroll-behavior:contain;
+    z-index:145 !important;border-radius:16px !important;padding:13px !important;
+    box-shadow:0 22px 54px rgba(0,0,0,.40),0 0 0 100vmax rgba(8,15,26,.30) !important;
+  }
+  .gf-ip-hd .gf-ip-x{display:inline-flex;width:26px;height:26px;margin-left:6px}
+  .gf-ip-list{max-height:min(200px,36dvh)}
+  .gf-ip-item{min-height:32px;padding:4px 8px}
+
+  #dqPanel{
+    position:fixed !important;left:10px !important;right:10px !important;top:auto !important;
+    bottom:calc(70px + env(safe-area-inset-bottom)) !important;width:auto !important;
+    max-height:calc(100dvh - 132px) !important;border-radius:16px !important;z-index:145 !important;
+    box-shadow:0 22px 54px rgba(0,0,0,.40),0 0 0 100vmax rgba(8,15,26,.30) !important;
+  }
+  .pop,.pop-filter{
+    position:fixed !important;left:10px !important;right:10px !important;top:auto !important;
+    bottom:calc(68px + env(safe-area-inset-bottom)) !important;width:auto !important;min-width:0 !important;
+    max-height:calc(100dvh - 130px) !important;overflow-y:auto;overscroll-behavior:contain;
+    border-radius:16px !important;z-index:144 !important;
+    box-shadow:0 22px 52px rgba(0,0,0,.38),0 0 0 100vmax rgba(8,15,26,.28) !important;
+  }
+  .pq,.pl{min-width:0 !important;width:100%}
+  .pq button{min-height:40px}
+  .suppanel{
+    position:fixed !important;left:10px !important;right:10px !important;top:auto !important;
+    bottom:calc(70px + env(safe-area-inset-bottom)) !important;max-width:none !important;min-width:0 !important;
+    max-height:calc(100dvh - 134px) !important;z-index:144 !important;border-radius:16px !important;
+  }
+
+  /* Popup Grafik Mini (#hopPop), Tooltip Grafik Garis (.hp-tip), & Laci Rincian (#drawer) */
+  #hopPop{
+    left:8px !important;right:8px !important;width:auto !important;max-width:none !important;
+    max-height:calc(100dvh - 126px - env(safe-area-inset-bottom));overflow-y:auto;z-index:960;
+  }
+  .hp-x{width:28px;height:28px;font-size:12px}
+  .hp-tip{
+    max-width:calc(100% - 10px);white-space:normal !important;text-align:center;
+    line-height:1.32;padding:4px 7px;font-size:10px;
+  }
+  #drawer{
+    left:0 !important;right:0 !important;bottom:calc(60px + env(safe-area-inset-bottom)) !important;
+    max-height:min(74dvh,520px) !important;z-index:132 !important;
+    border-radius:16px 16px 0 0 !important;padding:12px 14px calc(14px + env(safe-area-inset-bottom)) !important;
+    box-shadow:0 -14px 36px rgba(0,0,0,.28);
+  }
+  .dr-top{flex-wrap:nowrap;align-items:flex-start}
+  .dr-t{min-width:0}
+
+  /* 5. Panel Inspeksi PLTU (#pltuInsp) Lebih Ringkas & Anti-Potong di Layar 6 Inci */
+  .pi-panel,.pi-panel.wide{max-height:90dvh}
+  .pi-hd{padding:14px 13px 9px}
+  .pi-ttl h3{font-size:15.5px}
+  .pi-nav{padding:6px 12px 7px;gap:5px}
+  .pi-nav-top{flex-wrap:nowrap;gap:6px}
+  .pi-modes{flex:1 1 auto;min-width:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .pi-modes::-webkit-scrollbar{display:none}
+  .pi-step{flex:none;margin-left:0}
+  .pi-sbtn{height:28px;min-height:28px;padding:0 8px}
+  .pi-tabs{padding:5px 12px}
+  .pi-acts{padding:7px 12px;gap:6px}
+  .pi-act{
+    padding:7px 6px;font-size:11px;white-space:normal;text-align:center;
+    line-height:1.2;min-height:36px;
+  }
+  .pi-body{padding:11px 12px 18px;gap:10px}
+  .pi-grid{gap:6px}
+  .pi-m{padding:8px 9px}
+  .pi-m-v{font-size:14.5px}
+  .pi-box-h{flex-wrap:wrap;gap:5px}
+  .pi-proj table.sup th,.pi-proj table.sup td{padding:5px 4px;font-size:10.8px}
+
+  /* 6. Modal Input Bongkar (#bongkarModal) Ergonomis 2 Kolom & Aman Keyboard Android */
+  .bk-modal{max-height:92dvh}
+  .bk-hd{padding:14px 13px 9px;gap:8px}
+  .bk-hd h3{font-size:14px;gap:6px}
+  .bk-sub{font-size:10.8px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .bk-body{padding:8px 10px}
+  .bk-tbl tr.bk-row{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:7px 8px !important;padding:10px 11px !important;
+  }
+  .bk-tbl tr.bk-row td:nth-child(1){grid-column:1 / 2 !important}
+  .bk-tbl tr.bk-row td:nth-child(7){grid-column:2 / 3 !important;justify-self:end;align-self:center}
+  .bk-tbl tr.bk-row td:nth-child(2){grid-column:1 / -1 !important}
+  .bk-tbl tr.bk-row td:nth-child(4){grid-column:1 / 2 !important;order:4}
+  .bk-tbl tr.bk-row td:nth-child(5){grid-column:2 / 3 !important;order:5}
+  .bk-tbl tr.bk-row td:nth-child(3){
+    grid-column:1 / -1 !important;order:6;
+    display:flex !important;align-items:center;justify-content:space-between;gap:8px;
+    padding-top:4px !important;border-top:1px dashed var(--border) !important;
+  }
+  .bk-tbl tr.bk-row td:nth-child(3)::before{content:"B/L Aktual (opsional)";margin-bottom:0 !important;flex:1;font-size:10.5px}
+  .bk-tbl tr.bk-row td:nth-child(3) .bk-iw{width:148px !important;flex:none;height:34px}
+  .bk-tbl tr.bk-row td:nth-child(6){grid-column:1 / -1 !important;order:7}
+  .bk-ft{padding:8px 10px 10px;gap:6px}
+  .bk-ft-note{font-size:10px;line-height:1.3}
+  .bk-ft-btns .bk-btn{padding:0 8px;font-size:11.5px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+
+  /* 7. Halaman Simulasi HOP (#pg-sim) Pas 100% di Layar Android 6 Inci */
+  #pg-sim{padding:10px 10px calc(88px + env(safe-area-inset-bottom)) !important}
+  .sm-tabs{margin-bottom:9px}
+  .sm-tabs .sm-seg button{padding:8px 6px;font-size:12px;min-height:38px}
+  .sm-acts-bar{flex-wrap:wrap;gap:5px}
+  .sm-a{grid-template-columns:28px minmax(0,1fr);gap:6px 9px}
+  .sm-a-b{grid-column:1 / -1;justify-content:flex-end;padding-top:4px;border-top:1px dashed var(--border)}
+  .sm-fb{
+    bottom:calc(62px + env(safe-area-inset-bottom)) !important;z-index:8;
+    padding:9px 2px 4px;flex-wrap:wrap;gap:7px;
+  }
+  .sm-fb button{min-height:40px;font-size:12.5px !important;padding:8px 10px !important}
+  .sm-hero-h{gap:7px;align-items:center}
+  .sm-hero-h > div:first-child{flex:1 1 100%;min-width:0}
+  .sm-hero-h .sm-st{margin-left:0}
+  .sm-hero-h .sm-exp{margin-left:auto}
+  #pg-sim .card-h{flex-wrap:wrap;gap:6px}
+  #pg-sim .card-h h2{flex:1 1 100%;margin-bottom:1px}
+  #pg-sim .card-h .sm-seg{margin-left:0 !important;flex:1 1 auto}
+  #pg-sim .card-h .sm-seg button{flex:1;justify-content:center;padding:5px 6px}
+  table.sm-t.dense th,table.sm-t.dense td{padding:4px 4px;font-size:11px}
+  table.sm-sh{min-width:390px;margin-top:6px}
+  table.sm-sh th,table.sm-sh td{padding:5px 5px;font-size:11px}
+  .sm-arrk .k{white-space:normal;align-items:flex-start;line-height:1.35;padding:2px 0}
+  .sm-arrk .k .nm{white-space:normal}
+  .sm-arrk .k .r{margin-left:0;font-size:10.5px;color:var(--muted)}
+
+  /* 8. Dialog Login (#authGate), Akun (#secDlg), & Sambungan (#dlg) Aman 100dvh */
+  #authGate{min-height:100dvh;padding:12px;align-items:safe center}
+  .ag-shell{margin:auto 0}
+  #secDlg,#dlg{padding:12px;align-items:safe center;overflow-y:auto}
+  .sec-box,.dlg-box{max-height:calc(100dvh - 24px);overflow-y:auto;padding:16px;border-radius:16px;margin:auto 0}
+  .dlg-row{flex-wrap:wrap}
+  .dlg-row .dlg-btn{flex:1 1 auto;min-height:38px;text-align:center;justify-content:center}
+}
+
+/* Mode Desktop Tabel Gantt di Layar Sempit (<= 680px): hanya kolom ke-1 (Pemasok/HOP) yang dibekukan
+   agar kolom tanggal Gantt memiliki ruang geser ~270px+ dan tidak tertutup dinding kolom beku 430px */
+@media (max-width:680px){
+  html.vmode-desk{--w1:68px;--w2:62px;--w3:112px;--w4:52px;--w5:54px;--w6:98px}
+  html.vmode-desk thead tr.hd1 th.fx{left:auto !important;z-index:22 !important}
+  html.vmode-desk tr.grp .gin{max-width:calc(100vw - 24px)}
+  html.vmode-desk th.f2,html.vmode-desk th.f3,html.vmode-desk th.f4,html.vmode-desk th.f5,html.vmode-desk th.f6{
+    left:auto !important;z-index:22 !important;
+  }
+  html.vmode-desk td.f2,html.vmode-desk td.f3,html.vmode-desk td.f4,html.vmode-desk td.f5,html.vmode-desk td.f6,
+  html.vmode-desk td.f456,html.vmode-desk td.hop-m,html.vmode-desk td.hop-sv{
+    position:static !important;left:auto !important;z-index:auto !important;
+  }
+  html.vmode-desk th.f1,html.vmode-desk td.f1{box-shadow:2px 0 6px rgba(15,23,42,.10)}
+  html.vmode-desk #pg-jadwal{height:auto !important;min-height:calc(100dvh - 50px)}
+  html.vmode-desk body .wrap{margin:4px 0 0 !important;max-height:calc(100dvh - 224px) !important;min-height:260px}
+}
+
+/* Penyesuaian Ekstra untuk Layar Potret ~6 Inci (<= 480px, termasuk 320px–412px Android) */
+@media (max-width:480px){
+  .topbar .tb-sub{display:none !important}
+  .topbar #fPeriode{max-width:86px !important;font-size:11px !important;padding:0 16px 0 6px !important}
+  .sm-add{grid-template-columns:1fr !important;gap:7px}
+  .sm-form .r2{grid-template-columns:1fr !important;gap:6px}
+  .sm-pick-f{flex-direction:column;align-items:stretch}
+  .sm-pick-f input[type=search],.sm-pick-f select{width:100%;flex:none}
+  .sec-acts{grid-template-columns:1fr}
+  .sec-acts .dlg-btn{min-height:38px;text-align:center}
+  .ag-hero{padding:16px 16px 14px}
+  .ag-logo{width:44px;height:44px}
+  .ag-bt b{font-size:18.5px}
+  .ag-main{padding:18px 16px}
+  #pg-beranda #kpis .hkpi{gap:8px;flex-wrap:wrap}
+  .hm-fleet-card .card-h{flex-wrap:wrap;gap:4px}
+  .hm-exp-btn{font-size:11px;padding:0 9px;white-space:nowrap;flex:none}
+  .rd-btns button{font-size:11px;padding:6px 7px;white-space:normal;line-height:1.2}
+}
+
+/* Layar Sangat Ramping / Ukuran Tampilan Android "Besar" (<= 359px) */
+@media (max-width:359px){
+  .topbar{padding:0 6px !important;gap:4px !important}
+  .topbar #pgTitle{font-size:13px !important}
+  .topbar #fPeriode{max-width:76px !important;font-size:10.5px !important}
+  .topbar .tb-burger,.topbar .tb-cmdk,.topbar #btnSync,.topbar #btnUser{
+    width:32px !important;height:32px !important;min-width:32px !important;min-height:32px !important;
+  }
+  .gf-qgrp{width:100%;justify-content:stretch}
+  .gfw-nm{font-size:12.4px}
+  .rd-btns{grid-template-columns:1fr}
+}
+
+/* Tinggi Terbatas: Keyboard Android Terbuka atau Mode Landscape HP (max-height: 520px) */
+@media (max-height:520px){
+  .bk-modal,.pi-panel,.pi-panel.wide{max-height:95dvh !important;border-radius:14px 14px 0 0}
+  .bk-hd,.pi-hd{padding:8px 12px 6px !important}
+  .bk-hd::before,.pi-hd::before,.bk-sub,.bk-ft-note{display:none !important}
+  .bk-ft{padding:6px 10px !important}
+  .bk-ft-btns{display:flex !important;flex-wrap:nowrap;gap:6px}
+  .bk-ft-btns #bkSave{order:2;flex:1.4;height:34px !important;font-size:12px !important}
+  .bk-ft-btns .bk-btn{flex:1;height:34px !important;font-size:11.5px !important}
+  .pi-nav{padding:4px 12px !important}
+  .pi-chips{display:none !important}
+  .pi-tabs,.pi-acts{padding:4px 12px !important}
+  .pi-act{min-height:30px;padding:4px 6px}
+  .ck-scrim{padding:6px}
+  .ck-box{max-height:90dvh}
+  #authGate{align-items:flex-start;padding:8px}
+}
+@media (max-width:780px) and (max-height:460px){
+  .tabbar{padding:2px 6px calc(2px + env(safe-area-inset-bottom))}
+  .tb-i{flex-direction:row !important;min-height:36px !important;gap:5px;font-size:11px}
+  .tb-i svg{width:17px !important;height:17px !important}
+  .tb-i b{position:static;margin-left:2px}
+  .page,#pg-grafik,#pg-beranda,#pg-sim{padding-bottom:calc(52px + env(safe-area-inset-bottom)) !important}
+}
 </style>
 </head>
 <body>
@@ -3029,6 +3431,7 @@ html[data-theme="dark"] .pi-alert.ok{color:#6EE7B7}
     <div class="ctl-sp"></div>
     <div class="popwrap"><button class="chip" id="btnLegend" type="button" aria-haspopup="true" aria-expanded="false">Legenda <span class="cv">▾</span></button>
       <div class="pop pop-r" id="popLegend" hidden>
+        <div class="pop-head"><b>Legenda Jadwal &amp; HOP</b><button type="button" class="pop-done">Tutup</button></div>
         <div class="pl">
           <span class="lg"><span class="sw sw-muat"></span> Loading</span>
           <span class="lg"><span class="sw sw-sail"></span> Sailing</span>
@@ -4370,9 +4773,11 @@ function hpNow(unit, anchor){
   + '<span style="margin-left:auto">' + esc(ketArr) + '</span></div>';
   el.classList.add('on');
   const w = el.offsetWidth, hh = el.offsetHeight, r = anchor.getBoundingClientRect();
+  const botClear = window.innerWidth <= 780 ? 74 : 8;
   let x = Math.max(8, Math.min(r.left, window.innerWidth - w - 8));
   let y = r.bottom + 10;
-  if (y + hh > window.innerHeight - 8) y = Math.max(8, r.top - hh - 10);
+  if (y + hh > window.innerHeight - botClear) y = Math.max(8, r.top - hh - 10);
+  if (y + hh > window.innerHeight - botClear) y = Math.max(8, window.innerHeight - hh - botClear);
   el.style.left = x + 'px'; el.style.top = y + 'px';
   hpBindSVG(unit, el);
 }
@@ -4561,6 +4966,7 @@ function setStatus(kind, text, title){
     LAST_SYNC_TS = Date.now();
   }
   const effKind = isSnap ? 'snap' : (kind || '');
+  if (bs) bs.dataset.syncst = effKind || '';
   SYNC_META = { kind:effKind, text:String(text || ''), title:String(title || '') };
   const el = document.getElementById('tbSync');
   if (!el) return;
@@ -5504,10 +5910,12 @@ function hopRowHTML(pltu){
 const tt = document.getElementById('tt');
 function moveTT(e){
   const p = 14, w = tt.offsetWidth, h = tt.offsetHeight;
+  const botPad = innerWidth <= 780 ? 74 : 8;
   let x = e.clientX + p, y = e.clientY - 10;
   if (x + w > innerWidth - 8) x = e.clientX - w - p;
-  if (y + h > innerHeight - 8) y = innerHeight - h - 8;
-  tt.style.left = x + 'px'; tt.style.top = Math.max(8,y) + 'px';
+  x = Math.max(8, Math.min(x, Math.max(8, innerWidth - w - 8)));
+  if (y + h > innerHeight - botPad) y = innerHeight - h - botPad;
+  tt.style.left = x + 'px'; tt.style.top = Math.max(8, y) + 'px';
 }
 function hideTT(){ tt.classList.remove('on', 'gf-tt'); }
 function hasTTTarget(el){
@@ -5586,7 +5994,10 @@ function fillSelects(){ msRefreshAll(); }
 /* lebar & posisi NYATA dari DOM (bukan hitungan nominal) → garis selalu tepat di kolomnya */
 function dateTh(i){ return $id('hd2').children[6 + i] || null; }
 function fixedW(){
-  const wr = $id('wrap'), h = $id('hd2').children[5]; if (!h) return 0;
+  const wr = $id('wrap'), h2 = $id('hd2');
+  if (!wr || !h2) return 0;
+  const h = (window.innerWidth <= 680) ? h2.children[0] : h2.children[5];
+  if (!h) return 0;
   return h.getBoundingClientRect().right - wr.getBoundingClientRect().left - wr.clientLeft;
 }
 function scrollToday(){
@@ -5707,12 +6118,37 @@ function bind(){
   $id('btnReset').addEventListener('click', () => { closePops(); resetFilters(); render(); });
   const ganti = () => { if (typeof toggleAppTheme === 'function') toggleAppTheme(); };
   $id('btnTheme').addEventListener('click', ganti); $id('nvTheme').addEventListener('click', ganti);
+  document.addEventListener('click', e => {
+    const t = e.target;
+    if (t && t.closest && t.closest('[data-expclose]')){
+      const d = t.closest('details.sm-exp');
+      if (d) d.open = false;
+      return;
+    }
+    document.querySelectorAll('details.sm-exp[open]').forEach(d => {
+      if (!t || !d.contains(t)) d.open = false;
+    });
+    if (typeof SIM !== 'undefined' && SIM.menu){
+      const sp = $id('smPop');
+      if (!t || (!t.closest('[data-sa="menu"]') && (!sp || !sp.contains(t)))){
+        SIM.menu = false;
+        if (sp) sp.hidden = true;
+        const mb = document.querySelector('[data-sa="menu"]');
+        if (mb){ mb.classList.remove('on'); mb.setAttribute('aria-expanded', 'false'); }
+      }
+    }
+  });
   document.addEventListener('keydown', e => {
     if (e.key === '/' && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){
       e.preventDefault(); if (S.page !== 'jadwal') go('jadwal'); setTimeout(() => $id('q').focus(), 30); }
     if (e.key === 'Enter' && $id('dlg').classList.contains('on')) $id('dlgSave').click();
     if (e.key === 'Escape'){
       closeDlg(); closeSecDlg(); hpClose(); closePops();
+      document.querySelectorAll('details.sm-exp[open]').forEach(d => { d.open = false; });
+      if (typeof SIM !== 'undefined' && SIM.menu){
+        SIM.menu = false;
+        const sp = $id('smPop'); if (sp) sp.hidden = true;
+      }
       if (typeof gfCloseInpPop === 'function') gfCloseInpPop();
       document.documentElement.classList.remove('nav-open');
       if (expanded != null){ expanded = null; render(); }
@@ -5781,7 +6217,7 @@ function renderQuick(){
   const q = $id('popQuick'); if (!q) return;
   const items = [['late', 'Late loading', ROWS.filter(hasLate).length, S.onlyLate]]
     .concat(Object.keys(PRESET).map(k => [k, PRESET[k].t, ROWS.filter(PRESET[k].f).length, S.preset === k]));
-  q.innerHTML = '<div class="pq">' + items.map(([k, t, n, on]) =>
+  q.innerHTML = '<div class="pop-head"><b>Saring Cepat</b><button type="button" class="pop-done">Tutup</button></div><div class="pq">' + items.map(([k, t, n, on]) =>
       `<button type="button" data-p="${k}" class="${on ? 'on' : ''}"><span>${esc(t)}</span><b>${n}</b></button>`).join('')
     + '<hr><button type="button" data-p="none">Lepas saringan cepat</button></div>';
   const act = S.preset ? PRESET[S.preset].t : (S.onlyLate ? 'Late loading' : '');
@@ -6348,6 +6784,7 @@ function simMuatSkenario(x){
 /* ══ SIMPAN GRAFIK (v54) — JPEG / PDF A4 potret: judul, grafik simulasi, pasokan di grafik ══ */
 function simExpBtn(){
   return '<details class="sm-exp"><summary title="Simpan grafik ini sebagai JPG atau PDF">⤓ Simpan grafik</summary><div class="sm-exp-m">'
+    + '<div class="sm-exp-hd"><b>Simpan Grafik Simulasi</b><button type="button" class="dr-x" data-expclose="1" aria-label="Tutup">✕</button></div>'
     + '<button type="button" data-sa="exp" data-v="jpg">JPG</button><button type="button" data-sa="exp" data-v="pdf">PDF</button></div></details>';
 }
 function simExpSVG(svg, lebar){
@@ -7262,7 +7699,9 @@ function simThumbPos(idOut){
   const min = Number(el.min) || 0, max = Number(el.max) || 100, v = Number(el.value) || 0;
   const w = el.clientWidth || 280, th = 17;
   const p = (v - min) / ((max - min) || 1);
-  o.style.left = Math.round(p * Math.max(0, w - th) + th / 2) + 'px';
+  const raw = Math.round(p * Math.max(0, w - th) + th / 2);
+  const half = Math.min(Math.floor(w / 2), Math.ceil((o.offsetWidth || 68) / 2));
+  o.style.left = Math.max(half, Math.min(Math.max(half, w - half), raw)) + 'px';
 }
 function simThumbs(){ simThumbPos('smEtaTh'); }
 function simLevHTML(){
@@ -7330,6 +7769,7 @@ function simListHTML(){
   const lv = SIM.gKons ? 1 : 0, le = SIM.gEta ? 1 : 0;
   const nAct = on + lv + le;
   const menu = '<div class="sm-pop" id="smPop"' + (SIM.menu ? '' : ' hidden') + '>'
+    + '<div class="sm-pop-hd"><b>Kelola Skenario</b><button type="button" class="dr-x" data-sa="menuclose" aria-label="Tutup">✕</button></div>'
     + '<div class="sv"><input type="text" id="smSvName" maxlength="40" placeholder="' + (simBAktif() ? 'Nama skenario (disimpan bersama)…' : 'Nama skenario…') + '" aria-label="Nama skenario"><button type="button" data-sa="save">Simpan</button></div>'
     + '<div id="smSvList">' + simSvListHTML() + '</div>'
     + '<h5>Lainnya</h5><button type="button" class="mi" data-sa="copy"' + (nAct ? '' : ' disabled') + '>⧉ Salin ringkasan hasil</button>'
@@ -7799,13 +8239,13 @@ function simShipTbl(k, rows){
   if (!rows.length) return '<div class="hp-sub" style="margin-top:10px">Tidak ada pasokan terjadwal untuk unit ini dalam rentang simulasi.</div>';
   /* urutan kolom sesuai permintaan: pemasok · kapal · volume · ketibaan */
   const kapal = r => esc(simKapal(r.nom));
-  return '<table class="sm-sh"><thead><tr><th>Pemasok</th><th>Kapal</th><th class="r">Volume (MT)</th><th>ETA</th><th></th></tr></thead><tbody>'
+  return '<div class="sm-sh-w"><table class="sm-sh"><thead><tr><th>Pemasok</th><th>Kapal</th><th class="r">Volume (MT)</th><th>ETA</th><th></th></tr></thead><tbody>'
     + rows.map(r => '<tr class="' + (r.cancel ? 'x' : '') + '"><td>' + esc(simPemasok(r.sup, r.jenis === 'tambah' ? 'Pasokan tambahan' : '')) + '</td>'
       + '<td>' + kapal(r) + (r.s ? ' <span class="sm-sh-st">' + esc(r.s.status) + '</span>' : '') + '<span class="tg">' + r.tags.join('') + '</span></td>'
       + '<td class="r">' + simN(r.cancel ? (r.s ? r.s.vol : 0) : r.vol) + '</td>'
       + '<td>' + hopDate(r.date) + '</td><td class="r">'
       + (r.s && r.canEdit ? '<button type="button" class="lnk" data-sa="shipedit" data-id="' + esc(r.id) + '">Ubah</button>'
-         : (r.aid ? '<button type="button" class="lnk" data-sa="edit" data-id="' + esc(r.aid) + '">Ubah</button>' : '')) + '</td></tr>').join('') + '</tbody></table>';
+         : (r.aid ? '<button type="button" class="lnk" data-sa="edit" data-id="' + esc(r.aid) + '">Ubah</button>' : '')) + '</td></tr>').join('') + '</tbody></table></div>';
 }
 function simHeroHTML(){
   const k = SIM.sel, ctx = SIMCTX, m = SIMRES.m[k], h = HOPBY && HOPBY[k], u = m.u;
@@ -8140,7 +8580,8 @@ function simInit(){
     else if (a === 'hmrow'){ SIM.hmSatu = b.dataset.v === '1'; simSave(); simOut(); }
     else if (a === 'tbrow'){ SIM.tbSatu = b.dataset.v === '1'; simSave(); simOut(); }
     else if (a === 'sel'){ SIM.sel = b.dataset.k; simOut(); if (SIM.onlySel && !SIM.form && !SIM.pick) simPanel(); }
-    else if (a === 'menu'){ SIM.menu = !SIM.menu; const p = $id('smPop'); if (p) p.hidden = !SIM.menu; b.classList.toggle('on', SIM.menu); b.setAttribute('aria-expanded', String(SIM.menu)); if (SIM.menu){ const i = $id('smSvName'); if (i) i.focus(); simBMuat(false); } }
+    else if (a === 'menu'){ SIM.menu = !SIM.menu; const p = $id('smPop'); if (p) p.hidden = !SIM.menu; b.classList.toggle('on', SIM.menu); b.setAttribute('aria-expanded', String(SIM.menu)); if (SIM.menu){ if (!window.matchMedia('(max-width:780px),(pointer:coarse)').matches){ const i = $id('smSvName'); if (i) i.focus(); } simBMuat(false); } }
+    else if (a === 'menuclose'){ SIM.menu = false; const p = $id('smPop'); if (p) p.hidden = true; const mb = el.querySelector('[data-sa="menu"]'); if (mb){ mb.classList.remove('on'); mb.setAttribute('aria-expanded', 'false'); } }
     else if (a === 'pickopen'){ simFormOpen('rencana'); if (!PERIODS || !PERIODS.length) simPeriodeCadangan(); }
     else if (a === 'pickclose'){ SIM.pick = null; renderSim(true); }
     else if (a === 'picknone'){ if (SIM.pick) SIM.pick.sel = {}; simPanel(); }
@@ -10887,6 +11328,7 @@ async function grafUnduh(fmt){
 function gfUnduhMenu(){
   const dtSpc = gfYmdSpace(gfTgl());
   return '<details class="sm-exp gf-exp"><summary title="Unduh laporan &amp; grafik HOP">⤓ Unduh</summary><div class="sm-exp-m">'
+    + '<div class="sm-exp-hd"><b>Unduh Laporan &amp; Grafik HOP</b><button type="button" class="dr-x" data-expclose="1" aria-label="Tutup">✕</button></div>'
     + '<button type="button" data-gf="mon-pptx" data-r="SULMAPANA">'
       + '<span>' + esc(dtSpc) + ' Monitoring Kondisi Batubara PLTU Regional Sulmapana</span>'
       + '<small>PPTX</small></button>'
@@ -11147,7 +11589,7 @@ function gfInpPopHTML(mAll, tglShort, prog){
   const actList = pltus.filter(r => !r.est);
   const pct = prog.tot > 0 ? Math.round((prog.act / prog.tot) * 100) : 100;
   return '<div class="gf-inp-pop" id="gfInpPop"' + (GF.inpOpen ? '' : ' hidden') + '>'
-    + '<div class="gf-ip-hd"><span>Kelengkapan Input · ' + esc(tglShort) + '</span><span>' + prog.act + '/' + prog.tot + ' PLTU (' + pct + '%)</span></div>'
+    + '<div class="gf-ip-hd"><span>Kelengkapan Input · ' + esc(tglShort) + '</span><span style="display:inline-flex;align-items:center">' + prog.act + '/' + prog.tot + ' PLTU (' + pct + '%)<button type="button" class="dr-x gf-ip-x" data-gfinpclose="1" title="Tutup" aria-label="Tutup">✕</button></span></div>'
     + '<div class="gf-ip-bar"><i style="width:' + pct + '%"></i></div>'
     + (estList.length
       ? ('<div class="gf-ip-sec"><div class="gf-ip-sttl">Belum Input — Estimasi Proyeksi* (' + estList.length + ')</div><div class="gf-ip-list">'
@@ -11705,8 +12147,10 @@ function openBongkarModal(optFocusUnit){
       : modal.querySelector('tr.bk-row');
     if (focRow){
       if (focRow.scrollIntoView) focRow.scrollIntoView({ block:'nearest' });
-      const inp = focRow.querySelector('[data-bkf="pct"]');
-      if (inp && typeof inp.focus === 'function'){ inp.focus(); if (inp.select) inp.select(); }
+      if (!window.matchMedia || !window.matchMedia('(max-width:780px),(pointer:coarse)').matches){
+        const inp = focRow.querySelector('[data-bkf="pct"]');
+        if (inp && typeof inp.focus === 'function'){ inp.focus(); if (inp.select) inp.select(); }
+      }
     }
   }, 20);
 }
@@ -11954,6 +12398,8 @@ function gfInitOnce(){
       if (bkOpen){ e.stopPropagation(); hideTT(); openBongkarModal(''); return; }
       const openBtn = e.target.closest('[data-gfopenpltu]');
       if (openBtn){ e.stopPropagation(); hideTT(); openPltuInsp(openBtn.dataset.gfopenpltu, openBtn.dataset.gfinpmode || 'all'); return; }
+      const inpClose = e.target.closest('[data-gfinpclose]');
+      if (inpClose){ e.stopPropagation(); gfCloseInpPop(); return; }
       const inpBtn = e.target.closest('[data-gfinppop]');
       if (inpBtn){
         e.stopPropagation();
@@ -12031,10 +12477,22 @@ function gfInitOnce(){
   document.addEventListener('click', e => {
     if (GF.inpOpen && (!e.target.closest || !e.target.closest('.gf-inp-wrap'))) gfCloseInpPop();
   });
+  let lastMobTrack = (typeof window !== 'undefined' && window.innerWidth > 0 && window.innerWidth <= 640);
+  window.addEventListener('resize', () => {
+    const nowMobTrack = (typeof window !== 'undefined' && window.innerWidth > 0 && window.innerWidth <= 640);
+    if (nowMobTrack !== lastMobTrack){
+      lastMobTrack = nowMobTrack;
+      if (S.page === 'grafik') gfPaint();
+      else GF.dirty = true;
+    }
+  });
 }
 
 function gfSegLayout(ef, ap, sl, stCls, efCol, wEf, wAp, wSl, relEf, relAp, relSl, totPct){
-  const MIN_IN = 3.8;
+  const isMobTrack = (typeof window !== 'undefined' && window.innerWidth > 0 && window.innerWidth <= 640);
+  const MIN_IN = isMobTrack ? 6.0 : 3.8;
+  const TIGHT_MAX = isMobTrack ? 8.2 : 5.6;
+  const OUT_R_MAX = isMobTrack ? 85.5 : 88.5;
   const specs = [
     { k: 'ef', cls: 'ef ' + stCls, val: ef, w: wEf, rel: relEf, bg: efCol, lnCol: stCls === 'siaga' ? '#D97706' : efCol },
     { k: 'ap', cls: 'ap',          val: ap, w: wAp, rel: relAp, bg: '#9AA0A6', lnCol: '#64748B' },
@@ -12059,13 +12517,13 @@ function gfSegLayout(ef, ap, sl, stCls, efCol, wEf, wAp, wSl, relEf, relAp, relS
     if (a.hasLbl){
       if (a.w >= MIN_IN){
         inTxt = a.txt;
-      } else if (isLast && totPct <= 88.5){
+      } else if (isLast && totPct <= OUT_R_MAX){
         outHtml += '<span class="gfw-out-r ' + a.cls + '" style="left:calc(' + totPct.toFixed(2) + '% + 5px)"><i class="dt"></i>' + a.txt + '</span>';
       } else {
         topCo.push(a);
       }
     }
-    const tightCls = (inTxt && a.w < 5.6) ? ' tight' : '';
+    const tightCls = (inTxt && a.w < TIGHT_MAX) ? ' tight' : '';
     segsHtml += '<span class="gfw-seg ' + a.cls + tightCls + '" style="width:' + a.rel.toFixed(2) + '%;background:' + a.bg + '">' + inTxt + '</span>';
   }
   if (topCo.length === 1){
@@ -12474,10 +12932,17 @@ function fillDQ(){
         `<button type="button" class="dq-jump" data-ri="${x.ri}" title="Buka dan sorot Baris ${x.row} pada halaman Jadwal">Lihat di Jadwal: ${esc(x.pltu)} · ${esc(x.sup || x.nom || 'Baris ' + x.row)} (Baris ${x.row}) ›</button>`
       ).join('') + '</div>'
     : '';
-  p.innerHTML = `<h3>Kualitas data: ${DQ.level === 'ok' ? 'Baik' : DQ.level === 'warn' ? 'Perlu dicek' : 'Bermasalah'}</h3>
+  p.innerHTML = `<div class="dq-hd"><h3>Kualitas data: ${DQ.level === 'ok' ? 'Baik' : DQ.level === 'warn' ? 'Perlu dicek' : 'Bermasalah'}</h3><button type="button" class="dr-x" id="dqClose" title="Tutup" aria-label="Tutup panel kualitas data">✕</button></div>
     <div class="dq-meta">Sumber: ${DATA_MODE === 'live' ? 'tarikan langsung dari Google Sheets' : HOP_SRC === 'snapshot' ? 'cadangan bawaan offline (' + esc(CACHE_AT || '—') + ')' : 'data terakhir tersimpan di peramban (' + esc(CACHE_AT || '—') + ')'}${LAST_PULL ? ' · ditarik ' + esc(LAST_PULL) : ''}<br>
       Stok dasar per ${upd} · jadwal ${esc((PERIODE && PERIODE.label) || '')}<br>Dashboard memperbarui data otomatis tiap ${Number(SYNC.refreshMinutes) || 10} menit.</div>
     ${DQ.issues.length ? '<ul>' + DQ.issues.map(i => `<li class="dq-${i.sev}">${esc(i.t)}${i.fix ? '<small>' + esc(i.fix) + '</small>' : ''}${jumpBtns(i.items)}</li>`).join('') + '</ul>' : '<div class="dq-meta">Tidak ada masalah yang terdeteksi oleh pemeriksaan otomatis.</div>'}`;
+  const dqX = p.querySelector('#dqClose');
+  if (dqX) dqX.addEventListener('click', e => {
+    e.stopPropagation();
+    p.hidden = true;
+    const chip = document.getElementById('dqChip');
+    if (chip) chip.setAttribute('aria-expanded', 'false');
+  });
   p.querySelectorAll('.dq-jump').forEach(btn => btn.addEventListener('click', e => {
     e.stopPropagation();
     jumpToRow(Number(btn.getAttribute('data-ri')));
@@ -12726,6 +13191,8 @@ function updateFreshnessUI(){
     const age = Date.now() - LAST_SYNC_TS;
     const stale = age >= 15 * 60 * 1000;
     el.className = 'tb-sync ' + (stale ? 'stale' : 'live');
+    const bs = document.getElementById('btnSync');
+    if (bs) bs.dataset.syncst = stale ? 'stale' : 'live';
     tx.textContent = 'Live · ' + fmtAgeShort(age);
     el.title = (SYNC_META.title ? SYNC_META.title + '\n' : '')
       + 'Umur data: ' + fmtAgeShort(age) + (stale ? ' — klik ⟳ untuk memuat ulang sekarang.' : ' (auto-sync aktif).');
@@ -13056,5 +13523,5 @@ function bindMissionUX(){
   setInterval(() => { if (SYNC.scriptToken) pullFromSheets(false); }, SYNC.refreshMinutes * 60000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50a8226295aff78',t:'MTc5MzAyODY5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
