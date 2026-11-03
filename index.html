@@ -3267,7 +3267,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
      server sesi khusus, gerbang di klien bersifat pengaman antarmuka; otorisasi
      data sesungguhnya wajib ditegakkan pada Web App Apps Script & IAM Google.
    ───────────────────────────────────────────────────────────────────────── */
-const DASH_V = 'v60';
+const DASH_V = 'v61';
 const SYNC = {
   scriptUrl: 'https://script.google.com/macros/s/AKfycbzsvSRfGAkRP2SuSMaTPgjUWZyx_2rTZshQm97o5FPiSKO4obL9JfSjhhDCr6T9EIPd/exec',
   scriptToken: '',        // diisi setelah verifikasi sesi
@@ -5326,7 +5326,16 @@ function buildHop(){
   });
   const accSup = r => !(S.sup && !S.sup.has(normSup(r.sup)));
   const hasNext = !!(typeof SIM !== 'undefined' && SIM.next && SIM.nextFor === S.periode && SIM.next.rows && SIM.next.dates && SIM.next.dates.length);
+  const hasPrev = !!(typeof GF !== 'undefined' && GF.prev && GF.prev.rows && GF.prev.rows.length
+                     && GF.prev.dates && GF.prev.dates.length);
   const projDates = (DATES || []).filter(Boolean);
+  /* v61 · sertakan rentang tanggal sheet N-1 supaya ketibaan / sisa bongkar
+     bulan lalu punya tempat pada deret HOP, bukan hilang di luar DATES. */
+  if (hasPrev && projDates.length){
+    const firstCur = projDates[0];
+    const pre = GF.prev.dates.filter(d => d && d < firstCur);
+    if (pre.length) projDates.unshift.apply(projDates, pre);
+  }
   if (hasNext && projDates.length){
     const nextEnd = SIM.next.dates.filter(Boolean).slice(-1)[0] || '';
     const minEnd = S.today ? tglPlus(S.today, 30) : '';
@@ -5390,9 +5399,39 @@ function buildHop(){
       (mergedByUnit[unit] = mergedByUnit[unit] || []).push(Object.assign({}, s, { days:daysInProj, src:'next' }));
     }));
   }
+  /* v61 · Bulan N-1 (mis. Oktober saat sheet November aktif) tetap disertakan
+     selama statusnya belum 'Selesai Bongkar' / Cancel / Carry Over / Pengalihan.
+     Sengaja diproses TERAKHIR: sheet berjalan (cur) & N+1 lebih baru, sehingga
+     reg.seenOrAdd(...,'prev') membuang carry-over kembar tanpa hitung ganda.
+     preDone() sengaja TIDAK mendaftarkan baris 'selesai' dari N-1 agar baris
+     aktif di sheet yang lebih baru tetap menang (sumber terbaru = acuan). */
+  if (hasPrev && projDates.length){
+    const prevAktif = GF.prev.rows.filter(r => {
+      if (!r || (typeof gfIsCancel === 'function' && gfIsCancel(r))) return false;
+      const st = String(r.status || '').trim();
+      if (st === 'Selesai Bongkar' || /^carry\s*over$/i.test(st) || /^pengalihan$/i.test(st)) return false;
+      return st === 'Tiba/Antri' || st === 'Proses Bongkar' || st === 'Bongkar'
+             || /^sailing$/i.test(st) || /^sailing\s+to\s+pol$/i.test(st);
+    });
+    const spPrev = EW.shipments(prevAktif, { dates:GF.prev.dates, today:S.today, realToday:realToday,
+      bongkarDays:BONGKAR_HARI, unitMeta:unitMeta,
+      unitOf:r => map[r.pltu] || r.pltu, accept:accSup });
+    Object.keys(spPrev.byUnit).forEach(unit => spPrev.byUnit[unit].forEach(s => {
+      const rv = s.rawVol != null ? s.rawVol : s.vol;
+      if (reg && reg.seenOrAdd(unit, s, s.etaPod || s.awal, rv, 'prev')) return;
+      const n0 = Math.max(1, Math.round(s.vol / s.per));
+      const daysInProj = [];
+      for (let h = 0; h < n0; h++){
+        const d = tglPlus(s.awal, h);
+        if (inProjDates.has(d)) daysInProj.push(d);
+      }
+      if (!daysInProj.length) return;
+      (mergedByUnit[unit] = mergedByUnit[unit] || []).push(Object.assign({}, s, { days:daysInProj, src:'prev' }));
+    }));
+  }
   SHIPBY = mergedByUnit; SHIPSTATS = sp.stats;
   const by = {};
-  const runDates = hasNext ? projDates : DATES;
+  const runDates = (hasNext || hasPrev) ? projDates : DATES;
   HOPDATA.units.forEach(u => {
     const arr = EW.arrivalMap(SHIPBY[u.pltu]);
     const est = typeof simPakaiEst === 'function' ? simPakaiEst(u) : { ok:false, mt:0 };
@@ -5414,7 +5453,7 @@ function buildHop(){
   const mSync = typeof gfModel === 'function' ? gfModel('SULMAPANA', S.today) : null;
   const gfEfByU = {};
   if (mSync && mSync.rows) mSync.rows.forEach(r => { if (!r.isGroup) gfEfByU[r.nm] = r.ef; });
-  const assessDates = (hasNext && S.today) ? projDates.filter(d => d <= tglPlus(S.today, 30)) : DATES;
+  const assessDates = ((hasNext || hasPrev) && S.today) ? projDates.filter(d => d <= tglPlus(S.today, 30)) : DATES;
   Object.keys(by).forEach(k => {
     const a = EW.assess(by[k], SHIPBY[k] || [], { today:S.today, dates:assessDates.length ? assessDates : DATES, fmt:hopDate, hopNow:gfEfByU[k] });
     ASSESS[k] = a;
@@ -8401,7 +8440,12 @@ function gfProjBounds(){
   const now = new Date();
   const maxCal = iso(new Date(now.getFullYear(), now.getMonth() + 2, 0));
   const curMonthStart = iso(new Date(now.getFullYear(), now.getMonth(), 1));
-  const minD = (DATES && DATES.length) ? DATES[0] : curMonthStart;
+  /* v61 · riwayat bulan N-1 ikut bisa dipilih: stock apung / bongkar / ketibaan
+     bulan lalu tidak boleh hilang hanya karena tanggalnya di luar sheet aktif. */
+  const prevStart = (typeof GF !== 'undefined' && GF.prev && GF.prev.dates && GF.prev.dates.length)
+    ? (GF.prev.dates.find(Boolean) || '') : '';
+  const minOwn = (DATES && DATES.length) ? DATES[0] : curMonthStart;
+  const minD = (prevStart && prevStart < minOwn) ? prevStart : minOwn;
   const maxD = (DATES && DATES.length && DATES[DATES.length - 1] < curMonthStart) ? DATES[DATES.length - 1] : maxCal;
   return { min:minD, max:maxD < minD ? minD : maxD, maxCal:maxCal };
 }
@@ -8801,10 +8845,13 @@ function gfCollectActualShips(targetDate, realToday){
         }
         /* pada targetDate >= realToday: baris yang di sheet N+1 sudah berstatus 'Sailing' / 'Tiba/Antri' / 'Proses Bongkar'
            memang aktif saat ini (mis. 2 tongkang Sailing Timor di sheet November) → langsung masuk */
-      } else if (src === 'prev'){
-        const touch = dt.lastTouch || estPod;
-        if (touch && simDD(targetDate, touch) > 14) return;
       }
+      /* v61 · LINTAS BULAN N-1: TIDAK ada lagi kadaluarsa 14 hari.
+         Selama statusnya belum terminal (Cancel / Selesai Bongkar / Carry Over /
+         Pengalihan — sudah disaring di atas), kapal bulan lalu tetap dihitung
+         sebagai Stock Apung / Sailing persis seperti baris di sheet berjalan.
+         Yang mengeluarkannya adalah perubahan STATUS, bukan umur ETA POD.
+         Anti-duplikat carry-over ditangani reg.seenOrAdd() di bawah. */
       if (reg.seenOrAdd(unit, r, estPod, vol, src)) return;
       (byUnit[unit] = byUnit[unit] || []).push({
         row:r.row, pltu:r.pltu, unit:unit, sup:r.sup || '—', nom:r.nom || '',
@@ -8860,10 +8907,9 @@ function gfCollectProjShips(realToday){
       const ls = dt.ls, ss = dt.ss;
       const rawPod = gfEstProjPod(r, dt, realToday);
       if (!rawPod) return;
-      if (src === 'prev'){
-        const touch = dt.lastTouch || rawPod;
-        if (touch && simDD(realToday, touch) > 14) return;
-      }
+      /* v61 · N-1 tidak dibuang karena ETA POD/lastTouch lewat > 14 hari.
+         Status terminal sudah disaring di atas; sisa bongkar & ketibaan yang
+         masih aktif tetap masuk proyeksi sampai status jadi 'Selesai Bongkar'. */
       if (reg.seenOrAdd(unit, r, rawPod, vol, src)) return;
       let pod = rawPod;
       if (!diPelabuhan && praTiba && rawPod <= realToday){
@@ -8938,8 +8984,10 @@ function gfCollectLoadShips(targetDate, realToday){
       const rawPod = validPlanDate(gfEstProjPod(r, dt, realToday) || dt.rawPod || r.etaPod || r.etaRakor || null);
       const vol = Number(r.vol) || 0;
       if (src === 'prev'){
+        /* v61 · tanpa kadaluarsa 14 hari; hanya rencana yang benar-benar tidak
+           punya penanda tanggal yang dibuang agar tidak menggantung di tooltip. */
         const touch = dt.lastTouch || rawPod || pol;
-        if (!touch || simDD(realToday, touch) > 14) return;
+        if (!touch) return;
       }
       if (reg.seenOrAdd(unit, r, rawPod || pol, vol > 0 ? vol : 1, src)) return;
       let sailFrom = null;
@@ -13124,5 +13172,5 @@ function bindMissionUX(){
   if(mq){ fit(); (mq.addEventListener?mq.addEventListener('change',fit):mq.addListener(fit)); }
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50a8226295aff78',t:'MTc5MzAyODY5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50a8226295aff78',t:'MTc5MzAyODY5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5498aa06eb2e428',t:'MTc5MzY4OTY0MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5498aa06eb2e428',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
