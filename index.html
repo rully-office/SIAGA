@@ -2978,6 +2978,48 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   .topbar #tbSync .syncT{display:none}
   .topbar .tb-cmdk .ck-lbl,.topbar .tb-cmdk kbd{display:none}
 }
+
+/* ══════════════ v64 · grafik simulasi & kartu pasokan otomatis ══════════════ */
+.hp-grid{opacity:.5}
+.hp-vgrid{stroke:var(--border);stroke-width:1;opacity:.5}
+.hp-vdot{opacity:.95}
+.hp-arrh{fill:#0E7490;opacity:.92}
+.hp-leg .hp-sht{display:inline-flex;align-items:center;gap:5px;color:#0E7490;font-weight:700}
+.hp-leg .hp-sht i{width:7px;height:7px;border:0;border-radius:50%;background:#0E7490;margin:0}
+.sm-arrk .k.sheet i{background:#0E7490;color:#fff}
+.sm-dc .hp-leg i.sm-l1{border-top:2.5px solid #475569}
+.sm-dc .hp-leg i.sm-l2{border-top:2px dashed #94A3B8}
+.sm-dc .hp-leg i.sm-l3{border-top:3px solid #0EA5E9}
+.sm-seg.hz{margin-left:8px}
+.sm-hero-h .sm-seg.hz button{font-size:10.5px;padding:3px 8px}
+.sm-sync-wrap{display:inline-flex;align-items:center;margin-right:2px}
+.sm-sync{font-size:10px;font-weight:800;color:var(--muted);white-space:nowrap}
+.sm-sync.ok{color:#0E8A6E}
+.sm-sync.warn{color:#C2410C}
+.sm-a-bl{display:inline-block;margin:0 6px;padding:0 5px;border-radius:5px;
+  background:var(--accent-soft);color:var(--accent);font-size:9.5px;font-weight:800}
+.sm-a-why{display:inline-block;margin:2px 0 0 6px;padding:1px 6px;border-radius:999px;
+  background:rgba(194,65,12,.10);color:#C2410C;font-size:9.5px;font-weight:800;white-space:nowrap}
+.sm-a.nc{opacity:.82}
+.sm-a.nc .sm-a-why{background:rgba(127,150,180,.14);color:var(--muted)}
+.sm-a-grp{margin-top:5px}
+.sm-a-grp-h{display:flex;align-items:center;gap:7px;padding:4px 3px 5px;border-top:1px dashed var(--border)}
+.sm-a-grp-h b{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--fg-2)}
+.sm-a-grp-h span{margin-left:auto;font-size:9.5px;color:var(--muted);font-weight:700}
+.sm-a-grp.co .sm-a-grp-h{background:rgba(180,83,9,.06);border-top:1px solid rgba(180,83,9,.30);border-radius:6px}
+.sm-a-grp.co .sm-a-grp-h b{color:#B45309}
+.sm-a-vol{display:flex;align-items:center;gap:6px;margin:4px 0 1px;font-size:10px;color:var(--muted)}
+.sm-a-vol span{font-weight:700}
+.sm-a-vol input{width:104px;padding:2px 6px;border:1px solid var(--border-2);border-radius:6px;
+  background:var(--surface);color:var(--fg);font:inherit;font-size:10.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.sm-a-vol input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.sm-a-in{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 1px}
+.sm-a-in .sm-a-vol{margin:0}
+.sm-a-vol input[type=date]{width:126px;font-weight:700}
+.sm-hz-note{display:inline-flex;align-items:center;gap:4px;margin-left:8px;padding:2px 7px;
+  border-radius:999px;background:rgba(194,65,12,.09);color:#C2410C;font-size:9.5px;font-weight:800;white-space:nowrap}
+@media (max-width:780px){ .sm-hero-h .sm-seg.hz{margin-left:0;margin-top:6px} }
+
 </style>
 </head>
 <body>
@@ -3267,7 +3309,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
      server sesi khusus, gerbang di klien bersifat pengaman antarmuka; otorisasi
      data sesungguhnya wajib ditegakkan pada Web App Apps Script & IAM Google.
    ───────────────────────────────────────────────────────────────────────── */
-const DASH_V = 'v61';
+const DASH_V = 'v66';
 const SYNC = {
   scriptUrl: 'https://script.google.com/macros/s/AKfycbzsvSRfGAkRP2SuSMaTPgjUWZyx_2rTZshQm97o5FPiSKO4obL9JfSjhhDCr6T9EIPd/exec',
   scriptToken: '',        // diisi setelah verifikasi sesi
@@ -4595,12 +4637,15 @@ function simHapusAksi(id){
   } });
 }
 function simResetSemua(){
-  const simpan = { a:JSON.parse(JSON.stringify(SIM.actions)), e:SIM.gEta };
-  SIM.actions = []; SIM.gKons = 0; SIM.gEta = 0; SIM.form = null; SIM.menu = false; SIM.pick = null;
+  const simpan = { a:JSON.parse(JSON.stringify(SIM.actions)), e:SIM.gEta, k:SIM.gKons };
+  const ada = SIM.actions.some(a => !a.hide && a.on !== false)
+  SIM.actions.forEach(a => { if (!a.hide) a.on = false; });
+  SIM.gKons = 0; SIM.gEta = 0; SIM.form = null; SIM.menu = false; SIM.pick = null;
   simSave(); renderSim(true);
-  if (!simpan.a.length && !simpan.e){ toast('Belum ada perubahan untuk dikembalikan'); return; }
-  toast('Dikembalikan ke jadwal yang berjalan', { label:'Urungkan', fn(){
-    SIM.actions = simpan.a; SIM.gEta = simpan.e; simSave(); renderSim(true); toast('Skenario dikembalikan');
+  if (!ada){ toast('Belum ada perubahan untuk dikembalikan'); return; }
+  toast('Semua pasokan dimatikan — kembali ke jadwal yang berjalan', { label:'Urungkan', fn(){
+    SIM.actions = simpan.a; SIM.gEta = simpan.e; SIM.gKons = simpan.k;
+    simSave(); renderSim(true); toast('Skenario dikembalikan');
   } });
 }
 
@@ -6275,7 +6320,7 @@ Object.assign(ICO, {
   truck: '<path d="M2.5 17V7h11v10"/><path d="M13.5 10h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>'
 });
 const SIM_T = {
-  rencana:{ t:'Ambil dari rencana',   d:'Pasokan dari rencana kapal yang sudah punya ETA tapi belum terkirim', ic:'list' },
+  rencana:{ t:'Pasokan rencana',      d:'Baris rencana dari sheet, otomatis masuk daftar perubahan', ic:'list' },
   tambah: { t:'Pasokan tambahan',     d:'Isi sendiri volume, tanggal tiba, dan estimasi bongkarnya',            ic:'plus' },
   alih:   { t:'Alihkan kapal',        d:'Pindahkan muatan kapal terjadwal ke PLTU lain',                        ic:'swap' },
   ubah:   { t:'Ubah kapal terjadwal', d:'Pasang tanggal tiba, geser, ubah volume, atau batalkan',              ic:'clock' },
@@ -6284,7 +6329,7 @@ const SIM_T = {
 const SIM_LS = 'sulm_sim_v1', SIM_LS_SAVED = 'sulm_sim_saved_v1';
 const SIM = { actions:[], gKons:0, gEta:0, pakaiMode:'riwayat', ref:'bln1', sort:'risiko', hm:'skenario', sel:null, form:null, tab:'atur', perLalu:0,
               next:null, nextState:'idle', nextLabel:'', nextErr:'', nextPaksa:'', menu:false, dirty:true, saved:[], seq:1,
-              pick:null, grp:{}, onlySel:true, hmSatu:true, tbSatu:true };   /* v73: pemisahan TBN + anti-duplikat + mode History 10 hr / Pemakaian Max */
+              pick:null, grp:{}, onlySel:true, hmSatu:true, tbSatu:true, hz:'bln2' };   /* v73: pemisahan TBN + anti-duplikat + mode History 10 hr / Pemakaian Max */
 let SIMCTX = null, SIMBASE = null, SIMRES = null, simRaf = 0;
 
 /* ── format kecil ── */
@@ -6296,15 +6341,45 @@ const simD1 = x => {
 const simN = n => (n == null || !isFinite(n)) ? '—' : Math.round(n).toLocaleString('id-ID');
 const simSt = v => v == null ? 'nodata' : v <= 0 ? 'so' : v < 10 ? 'krit' : v < 15 ? 'siaga' : 'norm';
 const SIM_STT = { so:'Stock out', krit:'Kritis', siaga:'Siaga', norm:'Normal', nodata:'Data kurang' };
-const simEnd1 = () => { const t = toDate(S.today); return iso(new Date(t.getFullYear(), t.getMonth() + 1, 0)); };
-const simEnd2 = () => { const t = toDate(S.today); return iso(new Date(t.getFullYear(), t.getMonth() + 2, 0)); };
+/* v65: "bulan ini" mengikuti KALENDER sungguhan, bukan S.today yang tertahan
+   di tanggal snapshot. S.today sengaja TIDAK diubah: stok dasar HOPDATA
+   tercatat per 12 Okt 2026, jadi memundurkan/memblokirnya akan menggeser
+   hitungan v61 yang sudah disetujui. simCalToday() dipakai HANYA untuk
+   label & rentang tampilan grafik. */
+const simCalToday = () => (typeof gfRealToday === 'function' ? gfRealToday() : iso(new Date()));
+const simDataEnd = () => {
+  let d = (DATES && DATES.length) ? DATES[DATES.length - 1] : (S.today || '');
+  if (SIM.next && SIM.next.dates && SIM.next.dates.length){
+    const e = SIM.next.dates[SIM.next.dates.length - 1];
+    if (e > d) d = e;
+  }
+  return d;
+};
+const simEnd1 = () => { const t = toDate(simCalToday()); return iso(new Date(t.getFullYear(), t.getMonth() + 1, 0)); };
+const simEnd2 = () => { const t = toDate(simCalToday()); return iso(new Date(t.getFullYear(), t.getMonth() + 2, 0)); };
+
 function simRange(a, b){ const o = []; for (let d = a, n = 0; d <= b && n < 400; d = tglPlus(d, 1), n++) o.push(d); return o; }
 const simMon = d => BLN[toDate(d).getMonth()];
+/* v62: rentang grafik simulasi. bln1 = sampai akhir bulan ini saja,
+   bln2 = bulan ini + bulan depan (perilaku lama). Tidak mengubah simRun(). */
+const simHzEnd = () => (SIM.hz === 'bln1'
+  ? (SIMCTX ? SIMCTX.end1 : simEnd1())
+  : (SIMCTX ? SIMCTX.end2 : simEnd2()));
+const simMonP = d => BLN_PANJANG[toDate(d).getMonth()];   /* nama bulan utuh untuk toggle */
+/* v63: mode "<bulan> saja" tidak boleh cuma menyisakan 10 hari terakhir.
+   Mulai dari tanggal 1 bulan berjalan bila itu LEBIH AWAL dari history 10 hari;
+   mode dua bulan tetap memakai perilaku v61 (hari ini −10). */
+const simHzStart = () => {
+  const ctx = SIMCTX, base = tglPlus(simCalToday(), -10);
+  if (SIM.hz !== 'bln1' || !ctx) return base;
+  const t = toDate(ctx.end1), first = iso(new Date(t.getFullYear(), t.getMonth(), 1));
+  return first < base ? first : base;
+};
 
 /* ── simpan / muat (hanya browser ini) ── */
 function simSave(){
   lsSet(SIM_LS, JSON.stringify({ a:SIM.actions, k:SIM.gKons, e:SIM.gEta, pm:SIM.pakaiMode, r:SIM.ref, s:SIM.seq, g:SIM.grp, o:SIM.onlySel,
-    hs:SIM.hmSatu ? 1 : 0, ts:SIM.tbSatu ? 1 : 0 }));
+    hs:SIM.hmSatu ? 1 : 0, ts:SIM.tbSatu ? 1 : 0, hz:SIM.hz }));
 }
 function simLoad(){
   try {
@@ -6318,6 +6393,7 @@ function simLoad(){
       if (typeof o.o === 'boolean') SIM.onlySel = o.o;
       if (o.hs != null) SIM.hmSatu = !!o.hs;
       if (o.ts != null) SIM.tbSatu = !!o.ts;
+      SIM.hz = o.hz === 'bln1' ? 'bln1' : 'bln2';
       SIM.seq = Math.max(Number(o.s) || 1, SIM.actions.length + 1);
     }
   } catch(_){}
@@ -6784,7 +6860,7 @@ function simBuildCtx(){
 function simDD(a, b){ return Math.round((toDate(a) - toDate(b)) / 86400000); }
 /* jalankan skenario → deret HOP harian per unit. only = daftar unit (opsional, untuk pratinjau cepat) */
 function simRun(ctx, scen, only){
-  const A = (scen.actions || []).filter(a => a.on !== false);
+  const A = (scen.actions || []).filter(a => a.on !== false && !a.noCount);
   const kons = 1 + (Number(scen.gKons) || 0) / 100, eta = Number(scen.gEta) || 0, today = ctx.today;
   const arr = {}, ov = {}, valid = {}, st = {}, dedupRencana = {}, usedPlanKeys = new Set(), matchedBaseIds = new Set();
   const normVsl = nm => String(nm || '').toLowerCase().replace(/\s+/g, ' ').trim();
@@ -7221,7 +7297,9 @@ function simDesc(a){
   const ctx = SIMCTX, s = a.ship ? ctx.byId[a.ship] : null;
   const nama = s ? esc(simKirimNm(s.sup, s.nom)) : '<span class="wr">kapal tidak ada di jadwal terbaru</span>';
   const nb = (Number(a.n) > 1) ? ' · bongkar ' + a.n + ' hr' : '';
-  if (a.type === 'rencana') return '<b>' + esc(simKirimNm(a.pemasok, a.kapal)) + '</b> · <b>' + simN(a.mt) + ' MT</b> · ETA ' + hopDate(a.tgl) + nb;
+  if (a.type === 'rencana') return '<b>' + esc(simKirimNm(a.pemasok, a.kapal)) + '</b> · '
+    + (a.co ? '' : '<b>' + simN(a.mt) + ' MT</b> · ')
+    + (a.tgl ? 'ETA ' + hopDate(a.tgl) : 'ETA belum diisi') + nb;
   if (a.type === 'tambah') return '<b>' + esc(simKirimNm(a.pemasok, a.kapal, 'Pasokan tambahan')) + '</b> · <b>' + simN(a.mt) + ' MT</b> · ETA ' + hopDate(a.tgl) + nb;
   if (a.type === 'alih')   return '<b>' + (s ? esc(simKirimNm(s.sup, s.nom)) : '?') + '</b> · dari ' + (s ? esc(s.unit) : '?') + ' · <b>' + simN(a.mt) + ' MT</b> · ETA ' + hopDate(a.tgl) + nb;
   if (a.type === 'ubah'){
@@ -7264,6 +7342,7 @@ function renderSim(force){
   }
   if (SIM.nextState === 'idle' || SIM.nextState === 'none' || SIM.nextFor !== S.periode) simEnsureNext();
   if (!simCompute()){ el.innerHTML = '<div class="pg-busy">Belum ada PLTU yang dapat disimulasikan.</div>'; return; }
+  if (simAutoRencana()) simCompute();   /* v63: kartu pasokan otomatis → hitung ulang sekali */
   if (!el.querySelector('#smHead')){
     el.innerHTML = '<div id="smHead"></div><div class="sm-tabs" id="smTabs"></div>'
       + '<div class="sm-grid">'
@@ -7379,16 +7458,172 @@ function simPltuOfAct(a){
   return a.unit;
 }
 function simActionCard(a, v){
-  const t = SIM_T[a.type] || SIM_T.tambah, bad = a.on !== false && v[a.id] === false;
-  return '<div class="sm-a' + (a.on === false ? ' off' : '') + (bad ? ' bad' : '') + '" data-id="' + esc(a.id) + '">'
+  const t = SIM_T[a.type] || SIM_T.tambah, bad = a.on !== false && !a.noCount && v[a.id] === false;
+  return '<div class="sm-a' + (a.on === false ? ' off' : '') + (bad ? ' bad' : '') + (a.noCount ? ' nc' : '') + (a.co ? ' co' : '') + '" data-id="' + esc(a.id) + '">'
     + '<span class="sm-a-ic" aria-hidden="true">' + svgI(t.ic) + '</span>'
-    + '<div class="sm-a-t"><b class="tt">' + esc(t.t) + '</b>' + simDesc(a) + (bad ? '<span class="wr">Tidak bisa dipakai: kapal atau PLTU-nya tidak ada lagi di data terbaru.</span>' : '') + '</div>'
-    + '<div class="sm-a-b"><label class="sm-sw" title="' + (a.on === false ? 'Pakai perubahan ini' : 'Lewati dulu perubahan ini') + '"><input type="checkbox" data-sa="tog" data-id="' + esc(a.id) + '"' + (a.on === false ? '' : ' checked') + ' aria-label="Perubahan aktif"><i></i></label>'
+    + '<div class="sm-a-t"><b class="tt">' + esc(t.t) + '</b>'
+    + (a.bln ? '<span class="sm-a-bl">' + esc(a.bln) + '</span>' : '') + simDesc(a)
+    + (a.autoOff ? '<span class="sm-a-why">' + esc(a.autoOff) + '</span>' : '')
+    + (a.co ? '<div class="sm-a-in"><label class="sm-a-vol"><span>Volume (MT)</span><input type="number" min="0" step="1" inputmode="numeric" data-sa="vol" data-id="' + esc(a.id) + '" value="' + (Number(a.mt) || 0) + '" aria-label="Volume pasokan carry over"></label>'
+        + '<label class="sm-a-vol"><span>ETA</span><input type="date" data-sa="eta" data-id="' + esc(a.id) + '" value="' + esc(a.tgl || '') + '" aria-label="ETA pasokan carry over"></label></div>' : '')
+    + (bad ? '<span class="wr">Tidak bisa dipakai: kapal atau PLTU-nya tidak ada lagi di data terbaru.</span>' : '') + '</div>'
+    + '<div class="sm-a-b"><label class="sm-sw" title="' + (a.on === false ? 'Nyalakan pasokan ini' : 'Matikan pasokan ini') + '"><input type="checkbox" data-sa="tog" data-id="' + esc(a.id) + '"' + (a.on === false ? '' : ' checked') + ' aria-label="Perubahan aktif"><i></i></label>'
     + '<button type="button" class="sm-ib" data-sa="edit" data-id="' + esc(a.id) + '" title="Ubah" aria-label="Ubah perubahan">✎</button>'
-    + '<button type="button" class="sm-ib dl" data-sa="del" data-id="' + esc(a.id) + '" title="Hapus" aria-label="Hapus perubahan">✕</button></div></div>';
+    + (a.autoKey ? '' : '<button type="button" class="sm-ib dl" data-sa="del" data-id="' + esc(a.id) + '" title="Hapus" aria-label="Hapus perubahan">✕</button>')
+    + '</div></div>';
 }
+/* ═══════════════════ v65 · BARIS SHEET → KARTU AKSI ═══════════════════
+   v65: pasokan "Jadwal dasar" tidak dibuat kartu (membingungkan di panel
+   kiri); yang terealisasi / dibatalkan juga tidak. Keduanya tetap tampil
+   otomatis di grafik lewat kapal dasar & penanda sheet.
+   co = kategori persis "Carry Over" — bukan status, bukan Carry Forward. */
+function simRencanaRows(){
+  const ctx = SIMCTX; if (!ctx) return [];
+  const map = (HOPDATA && HOPDATA.map) || {}, pick = {};
+  try { simPickRows(true).forEach(c => { pick[c.src + '|' + c.row + '|' + c.unit] = c; }); } catch(_){}
+  /* v64: alasan dipangkas jadi chip pendek supaya kartu tidak berderet panjang */
+  const pendek = s => {
+    const x = String(s || '').trim();
+    if (/^ETA-nya sudah lewat/i.test(x)) return 'ETA lewat';
+    if (/^ETA-nya di luar rentang/i.test(x)) return 'ETA di luar rentang';
+    if (/^Belum ada ETA/i.test(x)) return 'Belum ada ETA';
+    if (/^Sudah ditambahkan/i.test(x)) return 'Sudah di skenario';
+    if (/^Sudah masuk jadwal dasar/i.test(x)) return 'Jadwal dasar';
+    return x.length > 26 ? x.slice(0, 24) + '…' : x;
+  };
+  /* hanya kolom STATUS yang menentukan terminal; KATEGORI "Carry Over" bukan status */
+  const terminal = s => {
+    const x = String(s || '').trim();
+    return ['Tiba/Antri','Proses Bongkar','Bongkar','Selesai Bongkar'].indexOf(x) >= 0
+      || /^carry\s*over$/i.test(x) || /^pengalihan$/i.test(x);
+  };
+  const out = [];
+  /* v66: CO yang Nominasi + Volume + ETA POD sudah terisi di sheet tidak
+     perlu kartu di panel kiri. Kriteria MURNI dari sheet (bukan hasil edit
+     inline). Aksinya TETAP dibuat dengan hide:true supaya simRun() dan angka
+     HOP tidak berubah — hanya tidak dirender. */
+  const coLengkap = (r, kat, vol) => {
+    if (!/^carry\s*over$/i.test(String(kat || '').trim())) return false;
+    const nom = String(r.nom || '').trim();
+    return !!nom && !/^tbn$/i.test(nom) && Number(vol) > 0
+      && !!String(r.etaPod || '').trim();
+  };
+  /* v65: label bulan kartu mengikuti SHEET asal, bukan rentang kalender */
+  const blnNow = (DATES && DATES.length) ? DATES[DATES.length - 1] : ctx.today;
+  const blnNext = (SIM.next && SIM.next.dates && SIM.next.dates.length)
+    ? SIM.next.dates[SIM.next.dates.length - 1] : ctx.end2;
+  const ambil = (rows, dates, src) => (rows || []).forEach(r => {
+    if (!r || !String(r.pltu || '').trim()) return;
+    const unit = map[r.pltu] || r.pltu;
+    const c = pick[src + '|' + r.row + '|' + unit];
+    let eta = (c && c.eta) || r.etaPod || r.etaRakor || null;
+    if (!eta && r.bars){
+      const ks = Object.keys(r.bars).sort((a,b) => Number(a) - Number(b));
+      for (let i = 0; i < ks.length; i++){
+        if (String(r.bars[ks[i]] || '').toUpperCase() === 'X' && (dates || [])[Number(ks[i])]){
+          eta = dates[Number(ks[i])]; break;
+        }
+      }
+    }
+    const vol = Number(r.vol) || 0, status = String(r.status || '—').trim(), kat = String(r.kat || '').trim();
+    /* v64 koreksi 2: terealisasi & batal keluar total dari panel kiri */
+    if (/^\s*cancel/i.test(status) || /^\s*cancel/i.test(kat) || terminal(status)) return;
+    const o = { src:src, row:r.row, autoKey:src + '|' + r.row, unit:unit,
+      sup:r.sup || '—', nom:r.nom || 'TBN', vol:vol, status:status, kat:kat,
+      eta:eta, etaRakor:r.etaRakor || (c && c.etaRakor) || null,
+      bln: simMonP(src === 'next' ? blnNext : blnNow),
+      co: /^carry\s*over$/i.test(kat), hide:coLengkap(r, kat, vol),
+      on:false, noCount:false, autoNoVol:false, why:'' };
+    if (!(vol > 0)){ o.noCount = true; o.autoNoVol = true; o.why = 'Volume belum diisi'; out.push(o); return; }
+    if (!eta){ o.noCount = true; o.why = 'Belum ada ETA'; out.push(o); return; }
+    if (c && c.grp === 2){ if (o.hide) out.push(o); return; }   /* v65/v66 */
+    if (c && c.off){
+      if (/^Sudah masuk jadwal dasar/i.test(String(c.off))){ if (o.hide) out.push(o); return; }   /* v65/v66 */
+      o.noCount = true; o.why = pendek(c.off); out.push(o); return;
+    }
+    if (c && !c.off && c.grp === 1){ o.on = true; out.push(o); return; }
+    if (ctx.shipByRow && r.row != null && ctx.shipByRow[src + '|' + r.row]){
+      if (o.hide) out.push(o); return;   /* v65/v66: hidden CO tetap dihitung */
+    }
+    o.noCount = true; o.why = 'ETA tak valid'; out.push(o);
+  });
+  ambil(ROWS, DATES, 'now');
+  if (SIM.next && SIM.next.rows) ambil(SIM.next.rows, SIM.next.dates, 'next');
+  return out;
+}
+
+/* v63: sinkron OTOMATIS. Semua baris sheet menjadi kartu aksi 'rencana'
+   dengan toggle. Idempoten: status ON/OFF dan hasil edit pengguna tidak pernah
+   ditimpa; kartu yang sudah tidak ada di sheet (ganti periode) dibuang. */
+function simAutoRencana(){
+  if (!SIMCTX) return false;
+  const rows = simRencanaRows(), wanted = {}, have = {};
+  rows.forEach(x => { wanted[x.autoKey] = 1; });
+  const keep = SIM.actions.filter(a => !a.autoKey || wanted[a.autoKey]);
+  let changed = keep.length !== SIM.actions.length;
+  SIM.actions = keep;
+  keep.forEach(a => { if (a.autoKey) have[a.autoKey] = 1; });
+  rows.forEach(x => {
+    if (have[x.autoKey]) return;
+    SIM.actions.push({ id:simNewId(), type:'rencana', on:x.on, unit:x.unit, tgl:x.eta,
+      mt:Math.round(x.vol) || 0, n:BONGKAR_HARI, kapal:x.nom, pemasok:x.sup,
+      status:x.status, kat:x.kat, etaRakor:x.etaRakor, srcRow:x.row, src:x.src,
+      autoKey:x.autoKey, autoOff:x.why, noCount:x.noCount, bln:x.bln,
+      co:x.co, autoNoVol:x.autoNoVol, autoVolEdit:false, hide:x.hide });
+    have[x.autoKey] = 1; changed = true;
+  });
+  /* v66: kartu yang tersimpan dari v65 belum punya hide → selaraskan
+     tanpa menimpa status ON/OFF maupun hasil edit pengguna. */
+  const wantHide = {};
+  rows.forEach(x => { wantHide[x.autoKey] = !!x.hide; });
+  SIM.actions.forEach(a => {
+    if (!a.autoKey || !(a.autoKey in wantHide)) return;
+    if (!!a.hide !== wantHide[a.autoKey]){ a.hide = wantHide[a.autoKey]; changed = true; }
+  });
+  if (changed) simSave();
+  return changed;
+}
+/* v64: kartu CO yang diedit inline divalidasi ulang — butuh volume DAN ETA
+   sebelum boleh ikut hitungan. Alasan lain (Jadwal dasar / ETA lewat) sengaja
+   tidak diubah supaya pengaman anti-double v61 tetap utuh. */
+function simAutoValidate(x){
+  if (!x || !x.autoKey || !x.autoVolEdit) return;
+  if (!(Number(x.mt) > 0)){ x.noCount = true; x.autoOff = 'Volume belum diisi'; return; }
+  if (!x.tgl){ x.noCount = true; x.autoOff = 'Belum ada ETA'; return; }
+  x.noCount = false; x.autoOff = ''; x.autoNoVol = false;
+}
+function simSyncHTML(){
+  const s = SIM.nextState === 'ok'
+    ? '<span class="sm-sync ok">● Tersinkron otomatis</span>'
+    : (SIM.nextState === 'loading'
+        ? '<span class="sm-sync">⏳ Menarik bulan depan…</span>'
+        : '<span class="sm-sync warn">! Bulan depan belum termuat</span>');
+  return '<span class="sm-sync-wrap">' + s + '</span>';
+}
+
+/* v62: pemilih rentang grafik */
+function simHzSegHTML(){
+  const ctx = SIMCTX, b1 = ctx ? simMonP(ctx.end1) : 'bulan ini',
+        b2 = ctx ? simMonP(ctx.end2) : 'bulan depan';
+  const b = (v, t, ttl) => '<button type="button" class="' + (SIM.hz === v ? 'on' : '')
+    + '" data-sa="hz" data-v="' + v + '" title="' + esc(ttl) + '" aria-pressed="'
+    + (SIM.hz === v) + '">' + esc(t) + '</button>';
+  /* v65: kalau rentang melebihi sheet terakhir, beri tahu bahwa ujungnya
+     baru proyeksi pemakaian (belum ada kiriman Desember). */
+  const de = simDataEnd();
+  const note = (ctx && simHzEnd() > de)
+    ? '<span class="sm-hz-note" title="Sheet belum sampai akhir rentang ini. Lewat tanggal tersebut grafik hanya memproyeksikan pemakaian, tanpa kiriman baru.">⚠ Data sheet s.d. ' + esc(hopDate(de)) + '</span>'
+    : '';
+  return '<div class="sm-seg sm hz" role="group" aria-label="Rentang grafik simulasi">'
+    + b('bln1', b1 + ' saja', 'Grafik sampai akhir ' + b1 + ' saja')
+    + b('bln2', b1 + '–' + b2, 'Grafik ' + b1 + ' sampai akhir ' + b2)
+    + note + '</div>';
+}
+
 function simListHTML(){
-  const A = SIM.actions, on = A.filter(a => a.on !== false).length;
+  /* v66: CO lengkap dari sheet tetap di SIM.actions (ikut simRun),
+     tapi tidak dirender & tidak dihitung pada badge panel. */
+  const A = SIM.actions.filter(a => !a.hide), on = A.filter(a => a.on !== false).length;
   const v = SIMRES.run.valid;
   /* dikelompokkan per PLTU supaya enak diuraikan; alih kapal masuk ke kelompok PLTU tujuannya */
   const grp = {};
@@ -7404,17 +7639,30 @@ function simListHTML(){
     let chip = '';
     if (m && !m.nodata) chip = '<span class="sm-st ' + simSt(simVal2(m, SIM.ref)) + '">' + SIM_STT[simSt(simVal2(m, SIM.ref))] + '</span>';
     const nOn = list.filter(x => x.on !== false).length;
+    /* v64 koreksi 3: Rencana vs Carry over dipisah di dalam tiap PLTU, urut ETA */
+    const urut = arr => arr.slice().sort((a, b) => {
+      const da = a.tgl || '9999-12-31', db = b.tgl || '9999-12-31';
+      return da < db ? -1 : da > db ? 1
+        : (String(a.autoKey || a.id) < String(b.autoKey || b.id) ? -1 : 1);
+    });
+    const co = urut(list.filter(x => x.co)), ren = urut(list.filter(x => !x.co));
+    const blok = (judul, arr, cls) => arr.length
+      ? '<div class="sm-a-grp ' + cls + '"><div class="sm-a-grp-h"><b>' + judul + '</b><span>'
+        + arr.length + ' pasokan · ' + arr.filter(x => x.on !== false).length + ' aktif</span></div>'
+        + '<div class="sm-acts">' + arr.map(a => simActionCard(a, v)).join('') + '</div></div>'
+      : '';
     return '<details class="sm-grp" data-g="' + esc(k) + '"' + (SIM.grp[k] === false ? '' : ' open') + '><summary><b>' + esc(k) + '</b>'
       + '<span class="sm-grp-n">' + list.length + ' perubahan</span>' + chip + '</summary>'
       + '<div class="sm-acts-bar"><span>' + nOn + ' dari ' + list.length + ' dipakai</span>'
       + '<button type="button" data-sa="gtog" data-g="' + esc(k) + '" data-v="1"' + (nOn === list.length ? ' disabled' : '') + '>Pakai semua</button>'
       + '<button type="button" data-sa="gtog" data-g="' + esc(k) + '" data-v="0"' + (nOn === 0 ? ' disabled' : '') + '>Lewati semua</button></div>'
-      + '<div class="sm-acts">' + list.map(a => simActionCard(a, v)).join('') + '</div></details>';
+      + blok('Pasokan rencana', ren, 'ren') + blok('Carry over', co, 'co')
+      + '</details>';
   };
   /* mode fokus: hanya PLTU yang sedang tampil di grafik */
   const lain = nama.filter(k => k !== SIM.sel);
   let isi;
-  if (!nama.length) isi = '<div class="sm-empty-guide"><div class="sm-eg-ic" aria-hidden="true">' + svgI('plus') + '</div><b>Belum ada perubahan skenario</b><p>Jadwal dasar menghitung kapal yang sudah bernominasi/aktif. Ambil rencana kapal/TBN lalu aktifkan atau lewati per PLTU lewat tombol <b>Pakai semua</b> / <b>Lewati semua</b>.</p><ul><li>Gunakan <b>Ambil dari rencana</b> untuk memilih kapal rencana/TBN tanpa risiko hitung ganda</li><li>Atau klik tombol di bawah untuk menambah pasokan, menggeser jadwal, atau mengalihkan kapal</li></ul></div>';
+  if (!nama.length) isi = '<div class="sm-empty-guide"><div class="sm-eg-ic" aria-hidden="true">' + svgI('plus') + '</div><b>Belum ada perubahan skenario</b><p>Semua pasokan dari sheet sudah masuk otomatis sebagai kartu di sini. Nyalakan atau matikan satu per satu; yang sudah ikut jadwal dasar tidak dihitung ulang.</p></div>';
   else if (!SIM.onlySel) isi = nama.map(kartu).join('');
   else if (grp[SIM.sel]) isi = kartu(SIM.sel) + (lain.length ? '<div class="sm-oth">PLTU lain yang punya perubahan: '
       + lain.map(k => '<button type="button" data-sa="sel" data-k="' + esc(k) + '">' + esc(k) + ' <b>' + grp[k].length + '</b></button>').join('') + '</div>' : '');
@@ -7428,26 +7676,18 @@ function simListHTML(){
     + '<div id="smSvList">' + simSvListHTML() + '</div>'
     + '<h5>Lainnya</h5><button type="button" class="mi" data-sa="copy"' + (nAct ? '' : ' disabled') + '>⧉ Salin ringkasan hasil</button>'
     + '<button type="button" class="mi" data-sa="reset"' + (nAct || A.length ? '' : ' disabled') + '>↺ Kembalikan ke jadwal yang berjalan</button></div>';
-  /* pintasan utama: ambil pasokan dari rencana kapal yang belum terkirim */
-  let cad = [];
-  try { cad = simPickRows().filter(c => c.grp === 1 && !c.off); } catch(_){}
-  const cadNext = cad.filter(c => c.src === 'next').length;
-  const cta = '<button type="button" class="sm-add-ren" data-sa="pickopen">'
-    + '<span class="ic" aria-hidden="true">' + svgI('list') + '</span><span><b>Ambil dari rencana</b><small>'
-    + (cad.length ? cad.length + ' kapal siap diambil' + (cadNext ? ' · ' + cadNext + ' dari jadwal bulan depan' : '')
-                  : (SIM.nextState === 'ok' ? 'Belum ada rencana kapal yang bisa diambil'
-                                            : 'Jadwal bulan depan belum termuat'))
-    + '</small></span><span class="go" aria-hidden="true">›</span></button>';
+
   /* badge + tombol Kelola pindah ke baris atas panel — judul "Perubahan skenario" tidak lagi dobel */
   const hdR = $id('smPanelHdR');
-  if (hdR) hdR.innerHTML = '<span class="sm-cnt">' + (nAct ? nAct + ' aktif' : 'belum ada') + '</span>'
+  if (hdR) hdR.innerHTML = simSyncHTML() + '<span class="sm-cnt">' + (nAct ? nAct + ' aktif' : 'belum ada') + '</span>'
     + '<button type="button" class="sm-menu-b' + (SIM.menu ? ' on' : '') + '" data-sa="menu" aria-haspopup="true" aria-expanded="' + !!SIM.menu + '">Kelola ▾</button>' + menu;
   return simLevHTML()
     + '<div class="sm-sec"><h3>Perubahan per PLTU</h3>'
     + '<button type="button" class="sm-sec-lnk" data-sa="onlysel">' + (SIM.onlySel ? 'Tampilkan semua PLTU' : 'Hanya PLTU di grafik') + '</button></div>'
     + isi
+
     + '<div class="sm-sec"><h3>Tambah perubahan</h3></div>'
-    + cta
+
     + '<div class="sm-add">' + Object.keys(SIM_T).filter(k => k !== 'rencana').map(k => '<button type="button" data-sa="add" data-t="' + k + '"><span aria-hidden="true">' + svgI(SIM_T[k].ic) + '</span><span>' + esc(SIM_T[k].t) + '<small>' + esc(SIM_T[k].d) + '</small></span></button>').join('') + '</div>'
     ;
 }
@@ -7654,7 +7894,7 @@ function simExplain(k){
    Menyaring jadwal (periode ini + bulan depan) untuk kapal yang belum tiba:
    grp 1 = belum ikut dihitung di jadwal dasar → ditambahkan sebagai pasokan baru
    grp 2 = sudah ikut dihitung → tanggal tibanya diganti dengan ETA rakornya      */
-function simPickRows(){
+function simPickRows(ignoreActions){
   const ctx = SIMCTX; if (!ctx) return [];
   const map = (HOPDATA && HOPDATA.map) || {}, today = ctx.today, end2 = ctx.end2;
   const realToday = typeof gfRealToday === 'function' ? gfRealToday() : today;
@@ -7699,7 +7939,7 @@ function simPickRows(){
       if (!c.etaRakor) c.off = 'Sudah masuk jadwal dasar pada ' + hopDate(baseShip.awal) + ' (tidak perlu ditambah ulang).';
       else if (c.etaRakor === baseShip.awal) c.off = 'Sudah masuk jadwal dasar pada tanggal yang sama (' + hopDate(baseShip.awal) + ').';
     } else {
-      const sudahAksi = SIM.actions.some(x => x.on !== false && x.type === 'rencana' && (x.src || 'now') === src && x.srcRow === r.row);
+      const sudahAksi = !ignoreActions && SIM.actions.some(x => x.on !== false && x.type === 'rencana' && (x.src || 'now') === src && x.srcRow === r.row);
       if (sudahAksi) c.off = 'Sudah ditambahkan pada daftar perubahan skenario ini.';
       else if (!c.eta) c.off = 'Belum ada ETA, jadi tanggal tibanya belum bisa ditempatkan di grafik.';
     }
@@ -7857,6 +8097,39 @@ function simShipRows(k){
 function simShipName(s){ return simKirimNm(s.sup, s.nom); }
 /* daftar pasokan yang masuk ke satu PLTU — dipakai untuk penomoran di grafik + daftar kunci */
 let SIMARR = [];
+/* v63 · mode "<bulan> saja": penanda SELURUH kiriman bulan itu dari sheet,
+   termasuk yang sudah terealisasi sebelum ctx.today (simArrList hanya menyisakan
+   kiriman MENDATANG, sehingga bulan yang sudah lewat tampak kosong).
+   Murni tampilan: tidak menyentuh simRun(), jadi angka HOP v61 tetap sama. */
+function simMonthArrList(k, d0, d1){
+  const map = (HOPDATA && HOPDATA.map) || {};
+  const out = simArrList(k).filter(a => a.date >= d0 && a.date <= d1).slice();
+  const seen = {}, kk = (d, p) => d + '|' + p;
+  out.forEach(a => { seen[kk(a.date, a.pendek || a.nama)] = 1; });
+  const sheet = (rows, dates) => (rows || []).forEach(r => {
+    if (!r || !String(r.pltu || '').trim()) return;
+    if ((map[r.pltu] || r.pltu) !== k) return;
+    const vol = Number(r.vol) || 0; if (!(vol > 0)) return;
+    const st = String(r.status || '').trim();
+    if (/^\s*cancel/i.test(st) || /^\s*cancel/i.test(String(r.kat || ''))) return;
+    let d = r.etaPod || r.etaRakor || null;
+    if (!d && r.bars){
+      const ks = Object.keys(r.bars).sort((a,b) => Number(a) - Number(b));
+      for (let i = 0; i < ks.length; i++){
+        if (String(r.bars[ks[i]] || '').toUpperCase() === 'X' && (dates || [])[Number(ks[i])]){
+          d = dates[Number(ks[i])]; break;
+        }
+      }
+    }
+    if (!d || d < d0 || d > d1) return;
+    const p = simKirimPendek(r.sup || '—', r.nom || 'TBN'), key = kk(d, p);
+    if (seen[key]) return; seen[key] = 1;
+    out.push({ date:d, vol:vol, kind:'sheet', nama:simKirimNm(r.sup || '—', r.nom || 'TBN'), pendek:p, dari:'' });
+  });
+  sheet(ROWS, DATES);
+  if (SIM.next && SIM.next.rows) sheet(SIM.next.rows, SIM.next.dates);
+  return out.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+}
 function simArrList(k){
   if (!SIMCTX || !SIMRES || !SIMBASE) return [];
   const ctx = SIMCTX, out = [];
@@ -7939,11 +8212,13 @@ function simHeroHTML(){
           + '<button type="button" data-sa="pakai45" data-k="' + esc(k) + '" title="Pakai pola ' + pk.polaN + ' hari sampai akhir simulasi">Pakai pola ' + pk.polaN + ' hari · ' + simN(Math.round(pk.polaMT)) + '</button></div>'
         : '') + '</div>' : '';
   const rows = m.nodata ? [] : simShipRows(k);
-  const ARR = m.nodata ? [] : simArrList(k).filter(a => a.date >= tglPlus(ctx.today, -10) && a.date <= ctx.end2);
+  const d0 = simHzStart(), d1 = simHzEnd();
+  const ARR = m.nodata ? [] : (SIM.hz === 'bln1' ? simMonthArrList(k, d0, d1) : simArrList(k))
+                        .filter(a => a.date >= d0 && a.date <= d1);
   SIMARR = ARR;
   return '<div class="card sm-hero sm-dc" id="smDetail">'
     + '<div class="sm-hero-h"><div><h2 class="sm-hero-k">' + esc(k) + '</h2><div class="sm-hero-s">' + sub + '</div></div>'
-    + '<span class="sm-st ' + stS + '">' + hopDate(SIM.ref === 'bln2' ? ctx.end2 : ctx.end1) + ': ' + (SIM_STT[stS] || '—') + '</span>' + (m.nodata ? '' : simExpBtn()) + '</div>'
+    + '<span class="sm-st ' + stS + '">' + hopDate(SIM.ref === 'bln2' ? ctx.end2 : ctx.end1) + ': ' + (SIM_STT[stS] || '—') + '</span>' + (m.nodata ? '' : simHzSegHTML()) + (m.nodata ? '' : simExpBtn()) + '</div>'
     + catatan
     + (m.nodata
         ? '<div class="hp-kosong">Stok dasar atau angka pemakaian ' + esc(k) + ' belum lengkap, jadi belum bisa digambarkan.</div>'
@@ -7951,7 +8226,9 @@ function simHeroHTML(){
           + '<div class="hp-wrap">' + simChartSVG(k, ARR) + '<div class="hp-tip"></div></div>'
           + '<div class="hp-leg"><span><i class="sm-l1"></i>riwayat</span><span><i class="sm-l2"></i>jadwal yang berjalan</span><span><i class="sm-l3"></i>hasil skenario</span>'
           + '<span><i class="hp-l3"></i>batas 15 &amp; 10 hari</span>'
-          + '<span class="hp-sok" style="white-space:nowrap"><i></i>stock out</span></div>'
+          + '<span class="hp-sok" style="white-space:nowrap"><i></i>stock out</span>'
+          + (SIM.hz === 'bln1' ? '<span class="hp-sht"><i></i>kiriman sheet ' + esc(simMonP(ctx.end1)) + ' (realisasi + rencana)</span>' : '')
+          + '</div>'
           + simArrKeyHTML(ARR)
           + simFilmHTML())
     + (m.nodata ? '' : '<details class="sm-sub"><summary>Rincian pasokan ke ' + esc(k) + ' · ' + rows.length + ' kiriman</summary>' + simShipTbl(k, rows) + '</details>')
@@ -7962,7 +8239,7 @@ function simChartSVG(k, arrList){
   const ctx = SIMCTX, m = SIMRES.m[k];
   if (m.nodata) return '<div class="hp-kosong">Data belum lengkap.</div>';
   const u = m.u, rS = SIMRES.run.res[k], rB = SIMBASE.run.res[k];
-  const days = simRange(tglPlus(ctx.today, -10), ctx.end2), n = days.length;
+  const days = simRange(simHzStart(), simHzEnd()), n = days.length;
   const val = (r, d) => simVal(ctx, r, d);
   const vs = days.map(d => val(rS, d)), vb = days.map(d => val(rB, d));
   const all = vs.concat(vb).filter(v => v != null);
@@ -7989,6 +8266,11 @@ function simChartSVG(k, arrList){
   for (let v = Math.ceil(zmin / step) * step; v <= top; v += step){
     s += '<line class="hp-grid" x1="' + L + '" y1="' + f1(Y(v)) + '" x2="' + (W - R) + '" y2="' + f1(Y(v)) + '"/><text class="hp-ytick" x="' + (L - 6) + '" y="' + f1(Y(v) + 3) + '">' + v + '</text>';
   }
+  /* v62: grid vertikal tipis — memberi ritme tanpa menutup kurva */
+  const vgStep = Math.max(1, Math.round(n / 12));
+  for (let i = 0; i < n; i += vgStep)
+    s += '<line class="hp-vgrid" x1="' + f1(X(i)) + '" y1="' + T
+       + '" x2="' + f1(X(i)) + '" y2="' + (H - B) + '"/>';
   [[15, 'var(--h-norm-fg)'], [10, 'var(--h-emerg-fg)']].forEach(q => {
     if (q[0] > top || q[0] < zmin) return;
     s += '<line x1="' + L + '" y1="' + f1(Y(q[0])) + '" x2="' + (W - R) + '" y2="' + f1(Y(q[0])) + '" stroke="' + q[1] + '" stroke-width="1" stroke-dasharray="4 4" opacity=".75"/>'
@@ -7996,7 +8278,8 @@ function simChartSVG(k, arrList){
   });
   /* penanda akhir bulan */
   const lblDipakai = [];
-  [[ctx.end1, 'akhir ' + simMon(ctx.end1)], [ctx.end2, 'akhir ' + simMon(ctx.end2)]].forEach((q, qi) => {
+  (SIM.hz === 'bln1' ? [[ctx.end1, 'akhir ' + simMonP(ctx.end1)]]
+                     : [[ctx.end1, 'akhir ' + simMonP(ctx.end1)], [ctx.end2, 'akhir ' + simMonP(ctx.end2)]]).forEach((q, qi) => {
     const j = days.indexOf(q[0]); if (j < 0) return;
     let lb = q[1];
     if (lblDipakai.indexOf(lb) >= 0) lb = 'akhir bulan';
@@ -8005,20 +8288,54 @@ function simChartSVG(k, arrList){
       + '<text class="sm-cpt" x="' + f1(X(j) - 3) + '" y="23" text-anchor="end">' + lb + '</text>';
   });
   if (iT >= 0) s += '<line class="hp-today" x1="' + f1(X(iT)) + '" y1="' + T + '" x2="' + f1(X(iT)) + '" y2="' + (H - B) + '"/><text class="hp-todayt" x="' + f1(X(iT) + 3) + '" y="' + (H - B - 4) + '">hari ini</text>';
-  const path = (vals, from, to, cls, extra) => {
+  /* v62: kurva halus (Catmull-Rom → kubik) dengan kontrol-Y diklem agar tidak
+     overshoot melewati nilai data; marker titik kecil mengikuti gambar referensi. */
+  const curve = q => {
+    if (q.length < 2) return '';
+    let d = 'M' + f1(q[0][0]) + ' ' + f1(q[0][1]);
+    const t = 0.18;
+    for (let i = 0; i < q.length - 1; i++){
+      const p0 = q[Math.max(0, i - 1)], p1 = q[i], p2 = q[i + 1], p3 = q[Math.min(q.length - 1, i + 2)];
+      const lo = Math.min(p1[1], p2[1]), hi = Math.max(p1[1], p2[1]);
+      const c1x = p1[0] + (p2[0] - p0[0]) * t, c1y = Math.min(hi, Math.max(lo, p1[1] + (p2[1] - p0[1]) * t));
+      const c2x = p2[0] - (p3[0] - p1[0]) * t, c2y = Math.min(hi, Math.max(lo, p2[1] - (p3[1] - p1[1]) * t));
+      d += ' C' + f1(c1x) + ' ' + f1(c1y) + ' ' + f1(c2x) + ' ' + f1(c2y) + ' ' + f1(p2[0]) + ' ' + f1(p2[1]);
+    }
+    return d;
+  };
+  const dots = (q, col) => {
+    if (q.length < 2) return '';
+    const step = Math.max(1, Math.round(q.length / 16));
+    let z = '';
+    for (let i = 0; i < q.length; i++){
+      if (i % step && i !== q.length - 1) continue;
+      z += '<circle class="hp-vdot" cx="' + f1(q[i][0]) + '" cy="' + f1(q[i][1])
+         + '" r="2.9" fill="#fff" stroke="' + col + '" stroke-width="1.9"/>';
+    }
+    return z;
+  };
+  const path = (vals, from, to, col, extra, withDots) => {
     const q = []; vals.forEach((v, i) => { if (v != null && i >= from && i <= to) q.push([X(i), Yr(v)]); });
     if (q.length < 2) return '';
-    return '<path d="' + q.map((p, j) => (j ? 'L' : 'M') + f1(p[0]) + ' ' + f1(p[1])).join(' ') + '" fill="none" ' + extra + '/>';
+    return '<path d="' + curve(q) + '" fill="none" ' + extra + '/>' + (withDots ? dots(q, col) : '');
   };
   const proj0 = iB >= 0 ? iB : Math.max(0, iT);
   const same = all.length && vs.every((v, i) => v == null || vb[i] == null || Math.abs(v - vb[i]) < 0.05);
   const cid = 'hpclip' + String(k).replace(/[^A-Za-z0-9]/g, '');
+  const CH = '#475569', CB = '#94A3B8', CS = '#0EA5E9';   /* abu tua · abu muda · cyan */
   s += '<defs><clipPath id="' + cid + '"><rect x="' + L + '" y="' + T + '" width="' + (W - L - R) + '" height="' + (H - T - B) + '"/></clipPath></defs>'
     + '<g clip-path="url(#' + cid + ')">'
-    + path(vs, 0, proj0, '', 'stroke="var(--fg-2)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"');
-  if (!same) s += path(vb, proj0, n - 1, '', 'stroke="var(--muted)" stroke-width="1.8" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round" opacity=".9"');
+    + path(vs, 0, proj0, CH,
+        'stroke="' + CH + '" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"', true);
+  if (!same) s += path(vb, proj0, n - 1, CB,
+        'stroke="' + CB + '" stroke-width="1.7" stroke-dasharray="5 5" stroke-linejoin="round" stroke-linecap="round" opacity=".85"', false);
   const sst = simSt(simVal2(m, SIM.ref)), ccol = 'var(--' + (sst === 'norm' ? 'h-norm' : sst === 'siaga' ? 'h-siaga' : 'h-emerg') + '-fg)';
-  s += path(vs, proj0, n - 1, '', 'stroke="' + ccol + '" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"' + (same ? ' stroke-dasharray="7 5"' : '')) + '</g>';
+  s += path(vs, proj0, n - 1, CS,
+        'stroke="' + CS + '" stroke-width="2.9" stroke-linejoin="round" stroke-linecap="round"' + (same ? ' stroke-dasharray="7 5"' : ''), true);
+  /* cincin ujung tetap memakai warna status → makna operasional tidak hilang */
+  let iE = -1; vs.forEach((v, i) => { if (v != null && i >= proj0 && i <= n - 1) iE = i; });
+  if (iE >= 0) s += '<circle cx="' + f1(X(iE)) + '" cy="' + f1(Yr(vs[iE])) + '" r="4.6" fill="#fff" stroke="' + ccol + '" stroke-width="2.4"/>';
+  s += '</g>';
   /* pasokan yang masuk: satu penanda per kiriman, bernomor sama seperti daftar di bawah grafik */
   const vArr = (arrList || []).filter(a => days.indexOf(a.date) >= 0);
   const aMax = Math.max(1, Math.max.apply(null, vArr.map(a => Number(a.vol) || 0).concat([1])));
@@ -8031,7 +8348,7 @@ function simChartSVG(k, arrList){
     const gone = a.kind === 'gone';
     const d0 = 'M' + f1(cx - r) + ' ' + f1(cy - r) + ' L' + f1(cx + r) + ' ' + f1(cy - r) + ' L' + f1(cx) + ' ' + f1(cy + r) + ' Z';
     const ket = a.nama + ' · ' + simN(a.vol) + ' MT · ETA ' + hopDate(a.date) + (gone ? ' (dibatalkan)' : a.kind === 'base' ? '' : ' (dari skenario)');
-    s += '<path class="' + (gone ? 'sm-arr0' : a.kind === 'base' ? 'hp-arr' : 'sm-arr2') + '" d="' + d0 + '"><title>' + esc(ket) + '</title></path>';
+    s += '<path class="' + (gone ? 'sm-arr0' : a.kind === 'sheet' ? 'hp-arrh' : a.kind === 'base' ? 'hp-arr' : 'sm-arr2') + '" d="' + d0 + '"><title>' + esc(ket) + '</title></path>';
     if (!gone) s += '<line class="hp-arrl" x1="' + f1(cx) + '" y1="' + f1(cy + r) + '" x2="' + f1(cx) + '" y2="' + (H - B) + '"/>';
     const by = cy - r - 9, rad = (idx + 1 >= 10 ? 7.6 : 6.6);
     s += '<circle class="sm-arrn ' + a.kind + '" cx="' + f1(cx) + '" cy="' + f1(by) + '" r="' + rad + '"><title>' + esc(ket) + '</title></circle>'
@@ -8073,7 +8390,7 @@ function simBindChart(k, root){
   const ctx = SIMCTX, m = SIMRES.m[k]; if (!m || m.nodata) return;
   const tip = root.querySelector('.hp-tip'), guide = svg.querySelector('.hp-guide');
   const vb = svg.viewBox.baseVal, W = vb.width;
-  const days = simRange(tglPlus(ctx.today, -10), ctx.end2), n = days.length, L = W < 500 ? 30 : 40, R = W < 500 ? 10 : 18;
+  const days = simRange(simHzStart(), simHzEnd()), n = days.length, L = W < 500 ? 30 : 40, R = W < 500 ? 10 : 18;
   const X = i => L + (W - L - R) * (n > 1 ? i / (n - 1) : .5);
   const rS = SIMRES.run.res[k], rB = SIMBASE.run.res[k];
   const go = e => {
@@ -8096,7 +8413,7 @@ function simBindChart(k, root){
   svg.addEventListener('pointerleave', () => { tip.classList.remove('on'); if (guide) guide.style.display = 'none'; });
 }
 function simHeatHTML(){
-  const ctx = SIMCTX, days = ctx.hz, M = SIM.hm;
+  const ctx = SIMCTX, days = ctx.hz.filter(d => d <= simHzEnd()), M = SIM.hm;
   const semua = simOrder();
   const order = SIM.hmSatu ? semua.filter(k => k === SIM.sel) : semua;   /* ikut PLTU yang sedang dibuka di grafik */
   const mo = []; days.forEach(d => { const k = toDate(d).getMonth() + '-' + toDate(d).getFullYear(); if (!mo.length || mo[mo.length - 1].k !== k) mo.push({ k:k, n:0, l:BLN[toDate(d).getMonth()] + ' ' + toDate(d).getFullYear() }); mo[mo.length - 1].n++; });
@@ -8231,6 +8548,8 @@ function simInit(){
     else if (a === 'film'){ const q = $id('smOut') && $id('smOut').querySelector('.sm-film'); const d = (Number(b.dataset.v) || 1) * 280;
       if (q){ try { q.scrollBy({ left:d, behavior:'smooth' }); } catch(_){ q.scrollLeft += d; } } }
     else if (a === 'hm'){ SIM.hm = b.dataset.v; simOut(); }
+    else if (a === 'hz'){ SIM.hz = b.dataset.v === 'bln1' ? 'bln1' : 'bln2'; simSave(); simOut(); }
+
     else if (a === 'hmrow'){ SIM.hmSatu = b.dataset.v === '1'; simSave(); simOut(); }
     else if (a === 'tbrow'){ SIM.tbSatu = b.dataset.v === '1'; simSave(); simOut(); }
     else if (a === 'sel'){ SIM.sel = b.dataset.k; simOut(); if (SIM.onlySel && !SIM.form && !SIM.pick) simPanel(); }
@@ -8254,7 +8573,7 @@ function simInit(){
     else if (a === 'edit'){ const x = SIM.actions.filter(q => q.id === id)[0]; if (x) simFormOpen(null, x); }
     else if (a === 'gtog'){
       const g = b.dataset.g, on = b.dataset.v === '1';
-      SIM.actions.forEach(x => { if (simPltuOfAct(x) === g) x.on = on; });
+      SIM.actions.forEach(x => { if (!x.hide && simPltuOfAct(x) === g) x.on = on; });
       simSave(); renderSim(true);
       toast(on ? 'Semua perubahan ' + g + ' dipakai' : 'Semua perubahan ' + g + ' dilewati');
     }
@@ -8264,7 +8583,9 @@ function simInit(){
     else if (a === 'fok'){
       const d = simDraft(); if (d.errs.length) return;
       const x = d.a; const i = SIM.actions.findIndex(q => q.id === x.id);
-      if (i >= 0){ x.on = SIM.actions[i].on; SIM.actions[i] = x; } else { x.id = simNewId(); x.on = true; SIM.actions.push(x); }
+      if (i >= 0){ const old = SIM.actions[i]; x.on = old.on;
+        ['autoKey','autoOff','noCount','bln','src','srcRow','co','autoNoVol','autoVolEdit','kat','hide'].forEach(q => { if (old[q] !== undefined) x[q] = old[q]; });
+        SIM.actions[i] = x; } else { x.id = simNewId(); x.on = true; SIM.actions.push(x); }
       SIM.form = null; simSave(); renderSim(true);
       if (window.matchMedia('(max-width:1180px)').matches) SIM.tab = 'hasil', $id('smBody').dataset.tab = 'hasil', simTabs();
       toast(i >= 0 ? 'Perubahan disimpan' : 'Ditambahkan ke skenario');
@@ -8315,6 +8636,21 @@ function simInit(){
     const t = e.target;
     if (t.dataset && t.dataset.sa === 'tog'){
       const x = SIM.actions.filter(q => q.id === t.dataset.id)[0]; if (x){ x.on = t.checked; simSave(); renderSim(true); }
+    } else if (t.dataset && (t.dataset.sa === 'vol' || t.dataset.sa === 'eta')){
+      /* v64 koreksi 4: volume & ETA CO langsung dari kartu */
+      const x = SIM.actions.filter(q => q.id === t.dataset.id)[0];
+      if (x){
+        if (t.dataset.sa === 'vol'){
+          const raw = String(t.value).trim().replace(/\s/g, '');
+          let vv = /^\d{1,3}(\.\d{3})+$/.test(raw) ? Number(raw.replace(/\./g, ''))
+                 : Number(raw.replace(',', '.'));
+          if (!isFinite(vv) || vv < 0) vv = 0;
+          x.mt = Math.round(vv);
+        } else x.tgl = t.value || null;
+        x.autoVolEdit = true;
+        if (SIMCTX) simAutoValidate(x);
+        simSave(); renderSim(true);
+      }
     } else if (t.dataset && t.dataset.sa === 'pickf'){
       if (SIM.pick) SIM.pick.f = t.value; simPanel();
     } else if (t.dataset && t.dataset.sa === 'picktog'){
@@ -13172,5 +13508,5 @@ function bindMissionUX(){
   if(mq){ fit(); (mq.addEventListener?mq.addEventListener('change',fit):mq.addListener(fit)); }
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50a8226295aff78',t:'MTc5MzAyODY5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5498aa06eb2e428',t:'MTc5MzY4OTY0MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5498aa06eb2e428',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50a8226295aff78',t:'MTc5MzAyODY5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a550b3cf09eefe01',t:'MTc5Mzc2NDcyOA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a550b3cf09eefe01',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
