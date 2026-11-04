@@ -3309,7 +3309,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
      server sesi khusus, gerbang di klien bersifat pengaman antarmuka; otorisasi
      data sesungguhnya wajib ditegakkan pada Web App Apps Script & IAM Google.
    ───────────────────────────────────────────────────────────────────────── */
-const DASH_V = 'v66';
+const DASH_V = 'v67';
 const SYNC = {
   scriptUrl: 'https://script.google.com/macros/s/AKfycbzsvSRfGAkRP2SuSMaTPgjUWZyx_2rTZshQm97o5FPiSKO4obL9JfSjhhDCr6T9EIPd/exec',
   scriptToken: '',        // diisi setelah verifikasi sesi
@@ -4638,8 +4638,8 @@ function simHapusAksi(id){
 }
 function simResetSemua(){
   const simpan = { a:JSON.parse(JSON.stringify(SIM.actions)), e:SIM.gEta, k:SIM.gKons };
-  const ada = SIM.actions.some(a => !a.hide && a.on !== false)
-  SIM.actions.forEach(a => { if (!a.hide) a.on = false; });
+  const ada = SIM.actions.some(a => !a.hide && !simAksiMati(a) && a.on !== false)
+  SIM.actions.forEach(a => { if (!a.hide && !simAksiMati(a)) a.on = false; });
   SIM.gKons = 0; SIM.gEta = 0; SIM.form = null; SIM.menu = false; SIM.pick = null;
   simSave(); renderSim(true);
   if (!ada){ toast('Belum ada perubahan untuk dikembalikan'); return; }
@@ -7457,16 +7457,30 @@ function simPltuOfAct(a){
   if (a.type === 'ubah'){ const s = SIMCTX && SIMCTX.byId ? SIMCTX.byId[a.ship] : null; return s ? s.unit : '(kapal tidak dikenali)'; }
   return a.unit;
 }
-function simActionCard(a, v){
-  const t = SIM_T[a.type] || SIM_T.tambah, bad = a.on !== false && !a.noCount && v[a.id] === false;
-  return '<div class="sm-a' + (a.on === false ? ' off' : '') + (bad ? ' bad' : '') + (a.noCount ? ' nc' : '') + (a.co ? ' co' : '') + '" data-id="' + esc(a.id) + '">'
+/* v67: aksi yang kapal/PLTU-nya sudah tidak ada lagi di data terbaru
+   ditolak simRun() sehingga TIDAK menyumbang HOP. Jangan dirender, tapi
+   jangan dibuang dari SIM.actions — kalau data kembali lengkap kartunya
+   bisa muncul lagi. Cek struktural dipakai pula agar status OFF (yang tidak
+   dievaluasi simRun) tidak menghidupkan kembali kartu mati. */
+function simAksiMati(a){
+  const ctx = SIMCTX; if (!ctx) return false;
+  const v = (SIMRES && SIMRES.run) ? SIMRES.run.valid : null;
+  if (v && v[a.id] === false) return true;
+  const unit = simPltuOfAct(a);
+  if (!ctx.eng || !ctx.eng[unit]) return true;
+  if ((a.type === 'ubah' || a.type === 'alih') && !ctx.byId[a.ship]) return true;
+  return false;
+}
+function simActionCard(a){
+  const t = SIM_T[a.type] || SIM_T.tambah;
+  return '<div class="sm-a' + (a.on === false ? ' off' : '') + (a.noCount ? ' nc' : '') + (a.co ? ' co' : '') + '" data-id="' + esc(a.id) + '">'
     + '<span class="sm-a-ic" aria-hidden="true">' + svgI(t.ic) + '</span>'
     + '<div class="sm-a-t"><b class="tt">' + esc(t.t) + '</b>'
     + (a.bln ? '<span class="sm-a-bl">' + esc(a.bln) + '</span>' : '') + simDesc(a)
     + (a.autoOff ? '<span class="sm-a-why">' + esc(a.autoOff) + '</span>' : '')
     + (a.co ? '<div class="sm-a-in"><label class="sm-a-vol"><span>Volume (MT)</span><input type="number" min="0" step="1" inputmode="numeric" data-sa="vol" data-id="' + esc(a.id) + '" value="' + (Number(a.mt) || 0) + '" aria-label="Volume pasokan carry over"></label>'
         + '<label class="sm-a-vol"><span>ETA</span><input type="date" data-sa="eta" data-id="' + esc(a.id) + '" value="' + esc(a.tgl || '') + '" aria-label="ETA pasokan carry over"></label></div>' : '')
-    + (bad ? '<span class="wr">Tidak bisa dipakai: kapal atau PLTU-nya tidak ada lagi di data terbaru.</span>' : '') + '</div>'
+    + '</div>'
     + '<div class="sm-a-b"><label class="sm-sw" title="' + (a.on === false ? 'Nyalakan pasokan ini' : 'Matikan pasokan ini') + '"><input type="checkbox" data-sa="tog" data-id="' + esc(a.id) + '"' + (a.on === false ? '' : ' checked') + ' aria-label="Perubahan aktif"><i></i></label>'
     + '<button type="button" class="sm-ib" data-sa="edit" data-id="' + esc(a.id) + '" title="Ubah" aria-label="Ubah perubahan">✎</button>'
     + (a.autoKey ? '' : '<button type="button" class="sm-ib dl" data-sa="del" data-id="' + esc(a.id) + '" title="Hapus" aria-label="Hapus perubahan">✕</button>')
@@ -7623,7 +7637,9 @@ function simHzSegHTML(){
 function simListHTML(){
   /* v66: CO lengkap dari sheet tetap di SIM.actions (ikut simRun),
      tapi tidak dirender & tidak dihitung pada badge panel. */
-  const A = SIM.actions.filter(a => !a.hide), on = A.filter(a => a.on !== false).length;
+  /* v67: aksi yang tidak menyumbang HOP tidak ditampilkan sama sekali */
+  const A = SIM.actions.filter(a => !a.hide && !simAksiMati(a));
+  const on = A.filter(a => a.on !== false).length;
   const v = SIMRES.run.valid;
   /* dikelompokkan per PLTU supaya enak diuraikan; alih kapal masuk ke kelompok PLTU tujuannya */
   const grp = {};
@@ -7649,7 +7665,7 @@ function simListHTML(){
     const blok = (judul, arr, cls) => arr.length
       ? '<div class="sm-a-grp ' + cls + '"><div class="sm-a-grp-h"><b>' + judul + '</b><span>'
         + arr.length + ' pasokan · ' + arr.filter(x => x.on !== false).length + ' aktif</span></div>'
-        + '<div class="sm-acts">' + arr.map(a => simActionCard(a, v)).join('') + '</div></div>'
+        + '<div class="sm-acts">' + arr.map(a => simActionCard(a)).join('') + '</div></div>'
       : '';
     return '<details class="sm-grp" data-g="' + esc(k) + '"' + (SIM.grp[k] === false ? '' : ' open') + '><summary><b>' + esc(k) + '</b>'
       + '<span class="sm-grp-n">' + list.length + ' perubahan</span>' + chip + '</summary>'
@@ -8573,7 +8589,7 @@ function simInit(){
     else if (a === 'edit'){ const x = SIM.actions.filter(q => q.id === id)[0]; if (x) simFormOpen(null, x); }
     else if (a === 'gtog'){
       const g = b.dataset.g, on = b.dataset.v === '1';
-      SIM.actions.forEach(x => { if (!x.hide && simPltuOfAct(x) === g) x.on = on; });
+      SIM.actions.forEach(x => { if (!x.hide && !simAksiMati(x) && simPltuOfAct(x) === g) x.on = on; });
       simSave(); renderSim(true);
       toast(on ? 'Semua perubahan ' + g + ' dipakai' : 'Semua perubahan ' + g + ' dilewati');
     }
@@ -13508,5 +13524,5 @@ function bindMissionUX(){
   if(mq){ fit(); (mq.addEventListener?mq.addEventListener('change',fit):mq.addListener(fit)); }
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50a8226295aff78',t:'MTc5MzAyODY5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a550b3cf09eefe01',t:'MTc5Mzc2NDcyOA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a550b3cf09eefe01',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50a8226295aff78',t:'MTc5MzAyODY5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a550c64eab63fd0b',t:'MTc5Mzc2NTQ4NQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a550c64eab63fd0b',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
