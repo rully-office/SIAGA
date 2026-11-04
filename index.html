@@ -3309,7 +3309,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
      server sesi khusus, gerbang di klien bersifat pengaman antarmuka; otorisasi
      data sesungguhnya wajib ditegakkan pada Web App Apps Script & IAM Google.
    ───────────────────────────────────────────────────────────────────────── */
-const DASH_V = 'v67';
+const DASH_V = 'v69';
 const SYNC = {
   scriptUrl: 'https://script.google.com/macros/s/AKfycbzsvSRfGAkRP2SuSMaTPgjUWZyx_2rTZshQm97o5FPiSKO4obL9JfSjhhDCr6T9EIPd/exec',
   scriptToken: '',        // diisi setelah verifikasi sesi
@@ -3443,6 +3443,21 @@ function setDlgSpin(t){ document.getElementById('dlgSpin').textContent = t || ''
    Neraca harian: stok akhir = stok awal + pasokan masuk − konsumsi.
    Dihitung dalam "hari konsumsi maks" (HOP) — setara MT ÷ konsumsi maks PLTU (Pembagi Stock).
    Ambang di CFG bersifat INTERIM (belum ditetapkan resmi) — ubah di satu tempat ini. */
+/* ═══════════ v69 · ATURAN STATUS PROYEKSI HOP (GANTT) ═══════════
+   Sesuai arahan user: proyeksi HOP hanya naik bila kapal "Sailing" DAN
+   kolom ETA POD benar-benar terisi, atau kapal sudah Tiba/Antri /
+   Proses Bongkar / Bongkar (sisa bongkar). Status perencanaan — Menunggu,
+   Menunggu Loading, Proses Loading, Sailing to POL — serta Selesai Bongkar,
+   Cancel, Carry Over, Pengalihan TIDAK menaikkan HOP. Untuk baris Sailing,
+   ETA POD tidak lagi diestimasi dari TD POL / ETA POL / ETA Rakor. */
+function gfHopGanttOk(r, st){
+  const s = String(st || '').trim();
+  if (/^selesai\s*bongkar$/i.test(s) || /^cancel/i.test(s)
+      || /^carry\s*over$/i.test(s) || /^pengalihan$/i.test(s)) return false;
+  if (s === 'Tiba/Antri' || s === 'Proses Bongkar' || s === 'Bongkar') return true;
+  if (/^sailing$/i.test(s)) return !!(r && r.etaPod && String(r.etaPod).trim());
+  return false;
+}
 function gfIsTbnRow(r){
   if (!r) return false;
   const st = String(r.status || '').trim();
@@ -3499,6 +3514,9 @@ const EW = (function(){
       if ((st === 'Sailing' || st === 'Sailing to POL') && !r.etaPod){
         stats.noEta++; stats.noEtaList.push(info);
       }
+      /* v69: diagnostik di atas tetap dihitung, tetapi baris ini tidak
+         boleh menyebar volume ke proyeksi HOP gantt. */
+      if (o.hopGantt && !gfHopGanttOk(r, st)) return;
       const unit = o.unitOf ? o.unitOf(r) : r.pltu;
       const um = o.unitMeta && o.unitMeta[unit] ? o.unitMeta[unit] : null;
       const tBase = (um && um.tBase) || o.today || null;
@@ -5392,7 +5410,7 @@ function buildHop(){
     }
   }
   const inProjDates = new Set(projDates);
-  const sp = EW.shipments(ROWS, { dates:DATES, today:S.today, realToday:realToday, bongkarDays:BONGKAR_HARI,
+  const sp = EW.shipments(ROWS, { hopGantt:true, dates:DATES, today:S.today, realToday:realToday, bongkarDays:BONGKAR_HARI,
     unitMeta:unitMeta,
     unitOf:r => map[r.pltu] || r.pltu,
     accept:accSup });                                                // filter pemasok ikut memotong kedatangan
@@ -5427,7 +5445,7 @@ function buildHop(){
     });
   });
   if (hasNext && projDates.length){
-    const spNext = EW.shipments(SIM.next.rows, { dates:SIM.next.dates, today:S.today, realToday:realToday, bongkarDays:BONGKAR_HARI,
+    const spNext = EW.shipments(SIM.next.rows, { hopGantt:true, dates:SIM.next.dates, today:S.today, realToday:realToday, bongkarDays:BONGKAR_HARI,
       unitMeta:unitMeta,
       unitOf:r => map[r.pltu] || r.pltu,
       accept:accSup });
@@ -5458,7 +5476,7 @@ function buildHop(){
       return st === 'Tiba/Antri' || st === 'Proses Bongkar' || st === 'Bongkar'
              || /^sailing$/i.test(st) || /^sailing\s+to\s+pol$/i.test(st);
     });
-    const spPrev = EW.shipments(prevAktif, { dates:GF.prev.dates, today:S.today, realToday:realToday,
+    const spPrev = EW.shipments(prevAktif, { hopGantt:true, dates:GF.prev.dates, today:S.today, realToday:realToday,
       bongkarDays:BONGKAR_HARI, unitMeta:unitMeta,
       unitOf:r => map[r.pltu] || r.pltu, accept:accSup });
     Object.keys(spPrev.byUnit).forEach(unit => spPrev.byUnit[unit].forEach(s => {
@@ -5670,9 +5688,15 @@ document.getElementById('tb').addEventListener('mouseover', e => {
       const o = h.seri[d];
       if (o){
         const a = o.arr ? ('+' + o.arr.toLocaleString('id-ID') + ' MT → +' + (o.arr / h.u.bagi).toFixed(1) + ' hr') : '—';
+        /* v69: transparansi sumber kenaikan (nama kapal + status) */
+        const src = (SHIPBY[hc.dataset.unit] || [])
+          .filter(s => (s.days || []).indexOf(d) >= 0)
+          .map(s => esc((s.nom || 'TBN') + ' · ' + (s.status || '—')))
+          .slice(0, 3).join('<br>');
         tt.innerHTML = '<div class="tt-t">HOP ' + esc(hc.dataset.unit) + ' — ' + fmt(d) + '</div>'
           + '<div class="tt-r"><span>Sisa stok</span><span>' + nf(Math.round(o.v * 10) / 10) + ' hr · ' + ketSingkat(o.v) + '</span></div>'
           + '<div class="tt-r"><span>Kapal masuk</span><span>' + a + '</span></div>'
+          + (src ? '<div class="tt-r"><span>Sumber</span><span>' + src + '</span></div>' : '')
           + '<div class="tt-r"><span>Pemakaian maks</span><span>' + (h.u.bagi ? h.u.bagi.toLocaleString('id-ID') + ' MT/hari' : '—') + '</span></div>'
           + '<div class="tt-r"><span>Susut</span><span>'
           + (h.burn === 0 ? 'tidak menyusut (belum operasi)' : nf(h.burn) + ' hr/hari' + (h.u.fallback ? ' (bawaan)' : ''))
@@ -6859,16 +6883,44 @@ function simBuildCtx(){
 /* selisih hari antara dua tanggal ISO (a − b) */
 function simDD(a, b){ return Math.round((toDate(a) - toDate(b)) / 86400000); }
 /* jalankan skenario → deret HOP harian per unit. only = daftar unit (opsional, untuk pratinjau cepat) */
+/* ══════════════ v68 · ANTI-DOUBLE-INPUT ══════════════
+   Identitas kuat sebuah pasokan. Baris placeholder CO (belum ada ETA /
+   volume) sengaja TIDAK diberi kunci: beberapa slot TBN yang belum terisi
+   memang pasokan berbeda dan tidak boleh disatukan. */
+function simSupKey(a){
+  if (!a) return '';
+  const t = a.type || 'rencana';
+  if (t !== 'rencana' && t !== 'tambah') return '';
+  const unit = String(a.unit || '').trim();
+  const nom  = String(a.kapal || a.nom || '').trim().toLowerCase().replace(/\s+/g,' ');
+  const sup  = String(a.pemasok || a.sup || '').trim().toLowerCase().replace(/\s+/g,' ');
+  const tgl  = String(a.tgl || '').slice(0,10);
+  const mt   = Math.round(Number(a.mt != null ? a.mt : a.vol) || 0);
+  if (!unit || !tgl || !(mt > 0)) return '';
+  return [unit, nom, sup, tgl, mt,
+          String(a.status || '').trim().toLowerCase(),
+          String(a.kat || '').trim().toLowerCase()].join('|');
+}
+/* ID kapal dasar tanpa akhiran tabrakan '#2', '#3', … dari registry v61 */
+function simShipBaseId(s){ return String((s && s.id) || '').replace(/#\d+$/, ''); }
 function simRun(ctx, scen, only){
   const A = (scen.actions || []).filter(a => a.on !== false && !a.noCount);
   const kons = 1 + (Number(scen.gKons) || 0) / 100, eta = Number(scen.gEta) || 0, today = ctx.today;
   const arr = {}, ov = {}, valid = {}, st = {}, dedupRencana = {}, usedPlanKeys = new Set(), matchedBaseIds = new Set();
+  const usedSupKeys = new Set(), usedShipIds = new Set();   /* v68 */
   const normVsl = nm => String(nm || '').toLowerCase().replace(/\s+/g, ' ').trim();
   ctx.units.forEach(u => { arr[u.pltu] = {}; ov[u.pltu] = []; });
   const add = (unit, d, mt) => { if (arr[unit]) arr[unit][d] = (arr[unit][d] || 0) + mt; };
   const spread = (unit, d0, mt, n) => { n = Math.max(1, Math.round(n) || 1); for (let h = 0; h < n; h++) add(unit, tglPlus(d0, h), mt / n); };
   ctx.ships.forEach(s => { st[s.id] = { vol:s.vol, shift:0, cancel:false, sh:0, alih:0 }; });
   A.forEach(a => {
+    /* v68: satu identitas pasokan hanya boleh masuk SATU kali, baik lewat
+       penyelarasan kapal dasar maupun penyebaran volume baru. */
+    const sk = simSupKey(a);
+    if (sk){
+      if (usedSupKeys.has(sk)){ valid[a.id] = false; return; }
+      usedSupKeys.add(sk);
+    }
     let ok = true;
     if (a.type === 'tambah'){
       if (arr[a.unit] && a.tgl && Number(a.mt) > 0) spread(a.unit, a.tgl, Number(a.mt), a.n || BONGKAR_HARI); else ok = false;
@@ -6915,6 +6967,13 @@ function simRun(ctx, scen, only){
     valid[a.id] = ok;
   });
   ctx.ships.forEach(s => {
+    /* v68: registry v61 bisa meloloskan kapal kembar lintas bulan (id '#2').
+       Jangan menyebar volumenya dua kali. */
+    const bId = simShipBaseId(s);
+    if (bId){
+      if (usedShipIds.has(bId)) return;
+      usedShipIds.add(bId);
+    }
     const x = st[s.id];
     let sh = x.shift;
     if (eta && s.cert !== 'di_pelabuhan' && s.awal >= today) sh += eta;
@@ -7573,10 +7632,25 @@ function simAutoRencana(){
   if (!SIMCTX) return false;
   const rows = simRencanaRows(), wanted = {}, have = {};
   rows.forEach(x => { wanted[x.autoKey] = 1; });
-  const keep = SIM.actions.filter(a => !a.autoKey || wanted[a.autoKey]);
-  let changed = keep.length !== SIM.actions.length;
-  SIM.actions = keep;
-  keep.forEach(a => { if (a.autoKey) have[a.autoKey] = 1; });
+  /* v68 (1): aksi 'rencana' warisan v62 tanpa autoKey adalah sisa picker
+     lama — tidak punya pasangan di sheet, dan selalu menyebar volume lagi.
+     (2) duplikat autoKey & (3) duplikat identitas dibuang pula. */
+  const seenAuto = {}, seenSup = {};
+  const keep = SIM.actions.filter(a => {
+    if (a.type === 'rencana' && !a.autoKey) return false;
+    if (!a.autoKey) return true;
+    if (!wanted[a.autoKey] || seenAuto[a.autoKey]) return false;
+    seenAuto[a.autoKey] = 1; return true;
+  });
+  const bersih = keep.filter(a => {
+    const k = simSupKey(a);
+    if (!k) return true;
+    if (seenSup[k]) return false;
+    seenSup[k] = 1; return true;
+  });
+  let changed = bersih.length !== SIM.actions.length;
+  SIM.actions = bersih;
+  bersih.forEach(a => { if (a.autoKey) have[a.autoKey] = 1; });
   rows.forEach(x => {
     if (have[x.autoKey]) return;
     SIM.actions.push({ id:simNewId(), type:'rencana', on:x.on, unit:x.unit, tgl:x.eta,
@@ -8144,12 +8218,19 @@ function simMonthArrList(k, d0, d1){
   });
   sheet(ROWS, DATES);
   if (SIM.next && SIM.next.rows) sheet(SIM.next.rows, SIM.next.dates);
-  return out.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  /* v68: satukan penanda kembar (tanggal + nama + volume + jenis) */
+  const seen2 = {};
+  return out.filter(x => {
+    const q = [x.date, x.pendek || x.nama, Math.round(Number(x.vol) || 0), x.kind].join('|');
+    if (seen2[q]) return false; seen2[q] = 1; return true;
+  }).sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
 }
 function simArrList(k){
   if (!SIMCTX || !SIMRES || !SIMBASE) return [];
   const ctx = SIMCTX, out = [];
+  const seenShip = {};   /* v68 */
   simShipRows(k).forEach(r => {
+    if (r.s){ const b = simShipBaseId(r.s); if (b && seenShip[b]) return; if (b) seenShip[b] = 1; }
     if (r.cancel){
       if (r.s && r.s.awal >= ctx.today) out.push({ date:r.s.awal, vol:r.s.vol, kind:'gone', nama:simShipName(r.s), pendek:simKirimPendek(r.s.sup, r.s.nom), dari:'' });
       return;
@@ -13524,5 +13605,5 @@ function bindMissionUX(){
   if(mq){ fit(); (mq.addEventListener?mq.addEventListener('change',fit):mq.addListener(fit)); }
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50a8226295aff78',t:'MTc5MzAyODY5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a550c64eab63fd0b',t:'MTc5Mzc2NTQ4NQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a550c64eab63fd0b',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a50a8226295aff78',t:'MTc5MzAyODY5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a551b122fb9faeb9',t:'MTc5Mzc3NTEwNA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a551b122fb9faeb9',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
